@@ -2,13 +2,13 @@
 #include "Sender.h"
 namespace CliboardQQSender
 {
-	void pushStringToClipboard(string source)
+	void pushStringToClipboard(HWND hwnd,string source)
 	{
-		if (g_QQHwnd == 0x0)
+		if (hwnd == 0x0)
 		{
 			return;
 		}
-		if (OpenClipboard(g_QQHwnd))
+		if (OpenClipboard(hwnd))
 		{
 			HGLOBAL clipbuffer;
 			char * buffer;
@@ -22,19 +22,19 @@ namespace CliboardQQSender
 		}
 	}
 
-	void sendClipboardMessage()
+	void sendClipboardMessage(HWND hwnd)
 	{
-		if (g_QQHwnd == 0x0)
+		if (hwnd == 0x0)
 		{
 			return;
 		}
 		keybd_event(VK_CONTROL, 0x1D, 0, 0);
-		PostMessage(g_QQHwnd, WM_KEYDOWN, 0x00000056, 0x002F0001);
+		PostMessage(hwnd, WM_KEYDOWN, 0x00000056, 0x002F0001);
 		Sleep(500);
-		PostMessage(g_QQHwnd, WM_KEYUP, 0x00000056, 0xC02F0001);
-		PostMessage(g_QQHwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
+		PostMessage(hwnd, WM_KEYUP, 0x00000056, 0xC02F0001);
+		PostMessage(hwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
 		Sleep(500);
-		PostMessage(g_QQHwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
+		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
 	}
 }

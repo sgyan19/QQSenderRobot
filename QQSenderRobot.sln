@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testSendQQ", "testSendQQ\testSendQQ.vcxproj", "{297378E5-A201-4688-95C0-9DA7FF2E0660}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testQQRobot", "testQQRobot\testQQRobot.vcxproj", "{BFD02CC3-7C8A-4324-A247-BDFE833689FC}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SendClipboard2QQ", "SendClipboard2QQ\SendClipboard2QQ.vcxproj", "{C68AE701-8886-4D8E-9699-BA37B07A5AF5}"
@@ -12,6 +10,11 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CliboardQQSender", "CliboardQQSender\CliboardQQSender.vcxproj", "{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQRobot", "QQRobot\QQRobot.csproj", "{8585F112-CCFB-4150-8996-9343C540F6A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119} = {45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testQQRobot2", "testQQRobot2\testQQRobot2.vcxproj", "{49A405C7-F5F1-4336-9782-998958662DBA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,16 +26,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Debug|x64.ActiveCfg = Debug|x64
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Debug|x64.Build.0 = Debug|x64
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Debug|x86.ActiveCfg = Debug|Win32
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Debug|x86.Build.0 = Debug|Win32
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Release|Any CPU.ActiveCfg = Release|Win32
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Release|x64.ActiveCfg = Release|x64
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Release|x64.Build.0 = Release|x64
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Release|x86.ActiveCfg = Release|Win32
-		{297378E5-A201-4688-95C0-9DA7FF2E0660}.Release|x86.Build.0 = Release|Win32
 		{BFD02CC3-7C8A-4324-A247-BDFE833689FC}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{BFD02CC3-7C8A-4324-A247-BDFE833689FC}.Debug|x64.ActiveCfg = Debug|x64
 		{BFD02CC3-7C8A-4324-A247-BDFE833689FC}.Debug|x64.Build.0 = Debug|x64
@@ -75,6 +68,16 @@ Global
 		{8585F112-CCFB-4150-8996-9343C540F6A4}.Release|x64.Build.0 = Release|Any CPU
 		{8585F112-CCFB-4150-8996-9343C540F6A4}.Release|x86.ActiveCfg = Release|Any CPU
 		{8585F112-CCFB-4150-8996-9343C540F6A4}.Release|x86.Build.0 = Release|Any CPU
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Debug|x64.ActiveCfg = Debug|x64
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Debug|x64.Build.0 = Debug|x64
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Debug|x86.ActiveCfg = Debug|Win32
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Debug|x86.Build.0 = Debug|Win32
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Release|Any CPU.ActiveCfg = Release|Win32
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Release|x64.ActiveCfg = Release|x64
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Release|x64.Build.0 = Release|x64
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Release|x86.ActiveCfg = Release|Win32
+		{49A405C7-F5F1-4336-9782-998958662DBA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

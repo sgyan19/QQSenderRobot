@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
- "CliboardQQSender.dll";
+     
 
 namespace QQRobot
 {
@@ -16,6 +16,7 @@ namespace QQRobot
         public Form1()
         {
             InitializeComponent();
+            SenderApi.sendQQ();
         }
     }
 }

@@ -10,6 +10,4 @@
 #define CLIBOARDQQSENDER_API __declspec(dllimport)
 #endif
 
-CLIBOARDQQSENDER_API void setHwnd(UINT32 value);
-
-CLIBOARDQQSENDER_API void send(void);
+CLIBOARDQQSENDER_API void Send(HWND value);

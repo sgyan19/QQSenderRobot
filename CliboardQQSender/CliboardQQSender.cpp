@@ -6,21 +6,14 @@
 
 namespace CliboardQQSender 
 {
-	extern HWND g_QQHwnd;
-	extern void pushStringToClipboard(string source);
-	extern void sendClipboardMessage();
+	extern void pushStringToClipboard(HWND hwnd,string source);
+	extern void sendClipboardMessage(HWND hwnd);
 }
 
 
 
 // 这是导出函数的一个示例。
-CLIBOARDQQSENDER_API void send(void)
+CLIBOARDQQSENDER_API void Send(HWND value)
 {
-	CliboardQQSender::sendClipboardMessage();
-}
-
-// 这是导出函数的一个示例。
-CLIBOARDQQSENDER_API void setHwnd(UINT32 value)
-{
-	CliboardQQSender::g_QQHwnd = (HWND)value;
+	CliboardQQSender::sendClipboardMessage(value);
 }

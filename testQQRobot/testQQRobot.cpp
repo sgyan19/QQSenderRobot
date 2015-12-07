@@ -29,6 +29,7 @@ void sendStringToClipboard(HWND hwnd, CString source)
 		GlobalUnlock(clipbuffer);
 		SetClipboardData(CF_TEXT, clipbuffer);
 		CloseClipboard();
+		source.ReleaseBuffer(-1);
 	}
 }
 
@@ -43,29 +44,7 @@ void sendClipboardMessage(CWnd *pwnd)
 	pwnd->PostMessage(WM_KEYUP, 0x0000000D, 0xC01C0001);
 	keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
 }
-void sendStringToClipboard(HWND hwnd,CWnd * pWnd, CString source) 
-{
 
-	if (OpenClipboard(hwnd))
-	{
-		EmptyClipboard();
-		CBitmap * junk = new CBitmap();
-		CClientDC cdc(pWnd);
-		CDC dc;
-		dc.CreateCompatibleDC(&cdc);
-		CRect client(0, 0, 200, 200);
-		junk->CreateCompatibleBitmap(&cdc, client.Width(), client.Height());
-		dc.SelectObject(junk);
-
-		DrawImage(&dc, CString("Bitmap"));
-
-		//复制数据到剪贴板
-		SetClipboardData(CF_BITMAP, junk->m_hObject);
-		CloseClipboard();
-
-		delete junk;
-	}
-}
 
 int main()
 {
@@ -85,7 +64,7 @@ int main()
         else
         {
             // TODO: 在此处为应用程序的行为编写代码。
-			HWND hw = (HWND)0x0011035A;
+			HWND hw = (HWND)0x00150060;
 			CWnd* pQQWnd;
 			pQQWnd = CDialog::FromHandle(hw);
 			sendStringToClipboard(hw, CString("本消息由robot 发送"));
