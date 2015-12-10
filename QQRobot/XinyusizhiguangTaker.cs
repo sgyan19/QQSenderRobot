@@ -146,18 +146,18 @@ namespace QQRobot
             int i = 0;
             foreach (Match imgMatch in imgMathes)
             {
-                imgUrls[i++] = imgMatch.Groups[mWeiboImgGoups].Value.Replace("\\", "").Replace("thumbnail", "bmiddle");
+                imgUrls[i++] = imgMatch.Groups[mWeiboImgGoups].Value.Replace("\\", "").Replace("thumbnail", "bmiddle").Replace("square", "bmiddle");
             }
             return weibo;
         }
 
         private Weibo[] deleteTop(int topCount,Weibo[] data)
         {
-            if(data.Length < topCount)
+            if(data.Length < topCount || topCount == 0)
             {
                 return data;
             }
-            Weibo[] newWeibos = new Weibo[data.Length - 1];
+            Weibo[] newWeibos = new Weibo[data.Length - topCount];
             for (int i = topCount; i < data.Length; i++)
             {
                 newWeibos[i - topCount] = data[i];
