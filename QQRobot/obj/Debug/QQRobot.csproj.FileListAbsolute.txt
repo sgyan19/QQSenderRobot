@@ -1,3 +1,0 @@
-E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.exe.config
-E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.exe
-E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.pdb

@@ -132,7 +132,7 @@ namespace QQRobot
                     if(name.IndexOf('@') != 0)
                     {
                         string url = linkMatch.Groups["url"].Value.Replace("\\", "");
-                        content = content.Replace(linkMatch.Value, name + ":" + url);
+                        content = content.Replace(linkMatch.Value, name + ":[" + url + "]");
                     }
                 }
 
