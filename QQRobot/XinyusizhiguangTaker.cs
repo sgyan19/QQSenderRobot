@@ -74,7 +74,7 @@ namespace QQRobot
                 int matchIndex = 0;
                 foreach (Match m in mathes)
                 {
-                    weiboHtmls[matchIndex] = m.Groups[mWeiboItemGoups].Value;
+                    weiboHtmls[matchIndex] = m.Groups[mWeiboItemGoups].Value.Replace("&amp;","&");
                     matchIndex++;
                 }
             }
