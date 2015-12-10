@@ -1,11 +1,3 @@
 E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.exe.config
 E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.exe
 E:\VSProjects\Projects\QQSenderRobot\QQRobot\$(SolutionDir)$(Configuration)\QQRobot.pdb
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\QQRobot.exe.config
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\QQRobot.exe
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\QQRobot.pdb
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\QQRobot\obj\Debug\QQRobot.Properties.Resources.resources
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\QQRobot\obj\Debug\QQRobot.csproj.GenerateResource.Cache
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\QQRobot\obj\Debug\QQRobot.exe
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\QQRobot\obj\Debug\QQRobot.pdb
-D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\QQRobot\obj\Debug\QQRobot.Form1.resources

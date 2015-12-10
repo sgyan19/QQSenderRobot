@@ -16,8 +16,9 @@ namespace QQRobot
         public const string WeiboItemTemplet = "<div class=\\\\\\\"WB_detail\\\\\\\">(?<item>[\\s\\S]*?)<a class=\\\\\\\"S_txt2\\\\\\\"";
         public const string WeiboTextTemplet = "<div class=\\\\\\\"WB_text W_f14\\\\\\\"[\\s\\S]*?>\\\\n[\\s]*?(?<content>[\\s\\S]*?)<\\\\/div>";
         public const string WeiboLabelTemplet = "<[\\s\\S]*?>";
-        public const string WeiboFilterTemplet = "[ \\\\/]";
+        public const string WeiboFilterTemplet = "[ \\\\]";
         public const string WeiboImgTemplet = "<img[\\s\\S]*?src=\\\\\\\"(?<url>[\\s\\S]*?)\\\\\\\"[\\s\\S]*?>";
+        public const string WeiboLinkTemplet = "<a[\\s\\S]*?href=\\\\\\\"(?<url>[\\S]*?)\\\\\\\"[\\s\\S]*?>(?<name>[\\s\\S]*?)<\\\\/a>";
         
         private Regex mWeiboItemReg = new Regex(WeiboItemTemplet);
         private string mWeiboItemGoups = "item";
@@ -27,8 +28,15 @@ namespace QQRobot
         private string mWeiboImgGoups = "url";
         private Regex mWeiboLabelReg = new Regex(WeiboLabelTemplet);
         private Regex mWeiboFilterReg = new Regex(WeiboFilterTemplet);
+        private Regex mWeiboLinkReg = new Regex(WeiboLinkTemplet);
         private string cookie;
         private string uid;
+        private int topCount;
+
+        public void setTopCount(string topCount)
+        {
+            this.topCount = int.Parse(topCount);
+        }
         public void setCookie(string cookie)
         {
             this.cookie = cookie;
@@ -75,7 +83,7 @@ namespace QQRobot
             {
                 weibos[i] = paserItem(weiboHtmls[i]);
             }
-            weibos = deleteTop(weibos);
+            weibos = deleteTop(topCount,weibos);
             return weibos;
         }
 
@@ -116,7 +124,19 @@ namespace QQRobot
             Match textMatch = mWeiboTextReg.Match(weiboHtml);
             if (textMatch.Success)
             {
-                weibo.Text = mWeiboFilterReg.Replace(mWeiboLabelReg.Replace(textMatch.Groups[mWeiboTextGoups].Value, ""), "") ;
+                MatchCollection linkMatches = mWeiboLinkReg.Matches(textMatch.Groups[mWeiboTextGoups].Value);
+                string content = textMatch.Groups[mWeiboTextGoups].Value;
+                foreach (Match linkMatch in linkMatches)
+                {
+                    string name = mWeiboLabelReg.Replace(linkMatch.Groups["name"].Value, "");
+                    if(name.IndexOf('@') != 0)
+                    {
+                        string url = linkMatch.Groups["url"].Value.Replace("\\", "");
+                        content = content.Replace(linkMatch.Value, name + ":" + url);
+                    }
+                }
+
+                weibo.Text = mWeiboFilterReg.Replace(mWeiboLabelReg.Replace(content, ""), "") ;
             }
 
             MatchCollection imgMathes = mWeiboImgReg.Matches(weiboHtml);
@@ -131,16 +151,16 @@ namespace QQRobot
             return weibo;
         }
 
-        private Weibo[] deleteTop(Weibo[] data)
+        private Weibo[] deleteTop(int topCount,Weibo[] data)
         {
-            if(data.Length < 1)
+            if(data.Length < topCount)
             {
                 return data;
             }
             Weibo[] newWeibos = new Weibo[data.Length - 1];
-            for (int i = 1; i < data.Length; i++)
+            for (int i = topCount; i < data.Length; i++)
             {
-                newWeibos[i - 1] = data[i];
+                newWeibos[i - topCount] = data[i];
             }
             return newWeibos;
         }

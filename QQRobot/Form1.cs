@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using System.Collections;
 using System.Net;
 using System.IO;
+using System.Threading;
 
 namespace QQRobot
 {
@@ -47,7 +48,17 @@ namespace QQRobot
             handle.shower.startBtn = button2;
             handle.shower.stopBtn = button3;
             handle.shower.doBtn = button4;
+            FormClosed += Form1_FormClosed;
+        }
 
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if(server!= null)
+            {
+                server.Stop();
+                Thread.Sleep(2000);
+                server.AbortStop();
+            }
         }
 
         public void start()
@@ -56,6 +67,7 @@ namespace QQRobot
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);
+            taker.setTopCount(topCount);
             server.Start(taker);
         }
 
@@ -63,6 +75,7 @@ namespace QQRobot
         private string uid;
         private string interval;
         private string[] windows;
+        private string topCount;
         private Handle handle;
         private Server server;
         private ArrayList contols = new ArrayList();
@@ -73,12 +86,14 @@ namespace QQRobot
             string windowText = ini.ReadValue("robot", "windows");
             interval = ini.ReadValue("robot", "interval");
             uid = ini.ReadValue("robot", "uid");
+            topCount = ini.ReadValue("robot","top");
             windows = windowText.Split(',');
             cookie = File.ReadAllText(cookiePath);
             textBox1.Text = cookie;
             listBox1.Items.Clear();
             textBox3.Text = uid;
             textBox4.Text = interval;
+            textBox5.Text = topCount;
             for (int i = 0; i< windows.Length; i++)
             {
                 listBox1.Items.Add(windows[i]);
@@ -119,6 +134,7 @@ namespace QQRobot
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);
+            taker.setTopCount(topCount);
             server.StartOnce(taker);
         }
     }

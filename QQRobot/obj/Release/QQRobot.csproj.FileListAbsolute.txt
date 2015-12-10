@@ -1,3 +1,11 @@
 d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.exe.config
 d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.exe
 d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.pdb
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Release\QQRobot.exe.config
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Release\QQRobot.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Release\QQRobot.pdb
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\obj\Release\QQRobot.Form1.resources
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\obj\Release\QQRobot.Properties.Resources.resources
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\obj\Release\QQRobot.csproj.GenerateResource.Cache
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\obj\Release\QQRobot.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\obj\Release\QQRobot.pdb

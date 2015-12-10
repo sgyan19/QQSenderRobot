@@ -43,6 +43,8 @@
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
+            this.textBox5 = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // button1
@@ -171,7 +173,7 @@
             // 
             this.textBox4.Location = new System.Drawing.Point(136, 31);
             this.textBox4.Name = "textBox4";
-            this.textBox4.Size = new System.Drawing.Size(118, 21);
+            this.textBox4.Size = new System.Drawing.Size(56, 21);
             this.textBox4.TabIndex = 12;
             // 
             // label5
@@ -192,11 +194,29 @@
             this.label6.TabIndex = 14;
             this.label6.Text = "间隔：";
             // 
+            // textBox5
+            // 
+            this.textBox5.Location = new System.Drawing.Point(198, 30);
+            this.textBox5.Name = "textBox5";
+            this.textBox5.Size = new System.Drawing.Size(56, 21);
+            this.textBox5.TabIndex = 15;
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(196, 9);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(53, 12);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "置顶数：";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(407, 395);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.textBox5);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.textBox4);
@@ -214,7 +234,7 @@
             this.Controls.Add(this.button1);
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "QQ自动转发";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -237,6 +257,8 @@
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.Label label7;
     }
 }
 

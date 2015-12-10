@@ -48,6 +48,7 @@ namespace QQRobot
             foreach(Image img in imgs)
             {
                 Clipboard.SetImage(img);
+                Thread.Sleep(1000);
                 SenderApi.QQPaste(mHwnd);
             }
             SenderApi.QQSumbit(mHwnd);

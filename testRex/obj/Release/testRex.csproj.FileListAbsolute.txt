@@ -1,0 +1,7 @@
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\bin\Release\testRex.exe.config
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\bin\Release\testRex.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\bin\Release\testRex.pdb
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Release\testRex.Properties.Resources.resources
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Release\testRex.csproj.GenerateResource.Cache
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Release\testRex.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Release\testRex.pdb

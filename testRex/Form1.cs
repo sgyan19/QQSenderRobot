@@ -24,23 +24,27 @@ namespace testRex
             Regex gex = new Regex("<div class=\\\\\\\"WB_text W_f14\\\\\\\"[\\s\\S]*?>\\\\n[\\s]*?(?<content>[\\s\\S]*?)<\\\\/div>");
             Regex biaoqian = new Regex("<[\\s\\S]*?>");
             Regex kongbai = new Regex("[ \\\\/]");
-            Regex linkRex = new Regex("<a[\\s\\S]*?herf=\\\\\\\"(?<url>[\\S]*?)\\\\\\\"[\\s\\S]*?>(?<name>[\\s\\S]*?)<\\\\/a>");
+            Regex linkRex = new Regex("<a[\\s\\S]*?href=\\\\\\\"(?<url>[\\S]*?)\\\\\\\"[\\s\\S]*?>(?<name>[\\s\\S]*?)<\\\\/a>");
             MatchCollection matches = gex.Matches(html);
             if(matches.Count > 0)
             {
                 foreach(Match match in matches)
                 {
-                    string content = match.Groups["content"].Value;
-                    string result = biaoqian.Replace(content, "");
-                    string r = kongbai.Replace(result, "");
+                    string old = match.Groups["content"].Value;
 
-                    MatchCollection mcs = linkRex.Matches(content);
-                    foreach(Match m in mcs)
+                    MatchCollection mcs = linkRex.Matches(old);
+                    string content = old;
+                    foreach (Match m in mcs)
                     {
-                        string url = m.Groups["url"].Value;
-                        string name = m.Groups["name"].Value;
+                        string url = m.Groups["url"].Value.Replace("\\", "");
+                        string name = biaoqian.Replace(m.Groups["name"].Value,"");
+                        content = linkRex.Replace(old, name + ":" + url);
                         int y = 1212 + 2323;
                     }
+
+                    string result = biaoqian.Replace(content, "");
+                    string r = kongbai.Replace(result, "");
+                    
                     int x = 1212 + 2323;
                 }
             }
