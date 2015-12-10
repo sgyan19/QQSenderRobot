@@ -1,5 +1,20 @@
-﻿生成启动时间为 2015/12/7 23:36:42。
+﻿生成启动时间为 2015/12/8 15:24:10。
+     1>项目“D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\SendClipboard2QQ\SendClipboard2QQ.vcxproj”在节点 2 上(Rebuild 个目标)。
+     1>ClCompile:
+         C:\Program Files\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D SENDCLIPBOARD2QQ_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Yc"stdafx.h" /Fp"Debug\SendClipboard2QQ.pch" /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt stdafx.cpp
+         stdafx.cpp
+         C:\Program Files\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D SENDCLIPBOARD2QQ_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /D _AFXDLL /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Yu"stdafx.h" /Fp"Debug\SendClipboard2QQ.pch" /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt SendClipboard2QQ.cpp
+         SendClipboard2QQ.cpp
+       ResourceCompile:
+         C:\Program Files\Windows Kits\8.1\bin\x86\rc.exe /D _UNICODE /D UNICODE /D _AFXDLL /l"0x0409" /nologo /fo"Debug\SendClipboard2QQ.res" SendClipboard2QQ.rc 
+       Link:
+         C:\Program Files\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.dll" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"C:\Program Files\Microsoft Visual Studio 14.0\VC\Include\Manifest\dpiaware.manifest" /Debug /PDB:"D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.lib" /MACHINE:X86 /DLL Debug\SendClipboard2QQ.res
+         Debug\SendClipboard2QQ.obj
+         Debug\stdafx.obj
+           正在创建库 D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.lib 和对象 D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.exp
+         SendClipboard2QQ.vcxproj -> D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\Debug\SendClipboard2QQ.dll
+     1>已完成生成项目“D:\workdata\mydocument\Visual Studio 2015\Projects\QQSenderRobot\SendClipboard2QQ\SendClipboard2QQ.vcxproj”(Rebuild 个目标)的操作。
 
 已成功生成。
 
-已用时间 00:00:00.06
+已用时间 00:00:06.16

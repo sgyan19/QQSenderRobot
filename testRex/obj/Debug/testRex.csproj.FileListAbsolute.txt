@@ -1,0 +1,8 @@
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\testRex.exe.config
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\testRex.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\testRex.pdb
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Debug\testRex.csprojResolveAssemblyReference.cache
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Debug\testRex.Properties.Resources.resources
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Debug\testRex.csproj.GenerateResource.Cache
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Debug\testRex.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\testRex\obj\Debug\testRex.pdb

@@ -1,5 +1,17 @@
-﻿生成启动时间为 2015/12/7 23:36:42。
+﻿生成启动时间为 2015/12/10 12:26:20。
+     1>项目“d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\CliboardQQSender\CliboardQQSender.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         C:\Program Files\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USRDLL /D CLIBOARDQQSENDER_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Yu"stdafx.h" /Fp"Debug\CliboardQQSender.pch" /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt Sender.cpp
+         Sender.cpp
+       Link:
+         C:\Program Files\Microsoft Visual Studio 14.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.dll" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.lib" /MACHINE:X86 /DLL Debug\CliboardQQSender.obj
+         Debug\dllmain.obj
+         Debug\Sender.obj
+         Debug\stdafx.obj
+           正在创建库 d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.lib 和对象 d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.exp
+         CliboardQQSender.vcxproj -> d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\Debug\CliboardQQSender.dll
+     1>已完成生成项目“d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\CliboardQQSender\CliboardQQSender.vcxproj”(Build 个目标)的操作。
 
 已成功生成。
 
-已用时间 00:00:00.03
+已用时间 00:00:03.44

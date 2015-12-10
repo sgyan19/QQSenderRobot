@@ -10,4 +10,10 @@
 #define CLIBOARDQQSENDER_API __declspec(dllimport)
 #endif
 
-CLIBOARDQQSENDER_API void Send(HWND value);
+CLIBOARDQQSENDER_API void Paste(HWND value);
+
+CLIBOARDQQSENDER_API void Pasteln(HWND value);
+
+CLIBOARDQQSENDER_API void PasteAndSumbit(HWND value);
+
+CLIBOARDQQSENDER_API void Sumbit(HWND value);
