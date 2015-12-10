@@ -10,16 +10,16 @@ namespace QQRobot
 {
     class SenderApi
     {
-        [DllImport(@"CliboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void PasteAndSumbit(IntPtr hwnd);
 
-        [DllImport(@"CliboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Paste(IntPtr hwnd);
 
-        [DllImport(@"CliboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Pasteln(IntPtr hwnd);
 
-        [DllImport(@"CliboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Sumbit(IntPtr hwnd);
 
         [DllImport("user32.dll")]

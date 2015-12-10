@@ -1,0 +1,3 @@
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.exe.config
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.exe
+d:\workdata\mydocument\visual studio 2015\Projects\QQSenderRobot\QQRobot\bin\Release\QQRobot.pdb

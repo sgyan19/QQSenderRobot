@@ -24,6 +24,7 @@ namespace testRex
             Regex gex = new Regex("<div class=\\\\\\\"WB_text W_f14\\\\\\\"[\\s\\S]*?>\\\\n[\\s]*?(?<content>[\\s\\S]*?)<\\\\/div>");
             Regex biaoqian = new Regex("<[\\s\\S]*?>");
             Regex kongbai = new Regex("[ \\\\/]");
+            Regex linkRex = new Regex("<a[\\s\\S]*?herf=\\\\\\\"(?<url>[\\S]*?)\\\\\\\"[\\s\\S]*?>(?<name>[\\s\\S]*?)<\\\\/a>");
             MatchCollection matches = gex.Matches(html);
             if(matches.Count > 0)
             {
@@ -32,6 +33,14 @@ namespace testRex
                     string content = match.Groups["content"].Value;
                     string result = biaoqian.Replace(content, "");
                     string r = kongbai.Replace(result, "");
+
+                    MatchCollection mcs = linkRex.Matches(content);
+                    foreach(Match m in mcs)
+                    {
+                        string url = m.Groups["url"].Value;
+                        string name = m.Groups["name"].Value;
+                        int y = 1212 + 2323;
+                    }
                     int x = 1212 + 2323;
                 }
             }
