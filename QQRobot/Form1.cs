@@ -30,8 +30,6 @@ namespace QQRobot
         private string topCount;
         private Handle handle;
         private Server server;
-        private Sender heartbeatSender;
-        private System.Windows.Forms.Timer heartbeatTimer;
 
         public Form1()
         {
@@ -60,9 +58,6 @@ namespace QQRobot
             handle.shower.doBtn = button4;
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
-            heartbeatTimer = new System.Windows.Forms.Timer();
-            heartbeatTimer.Interval = 60 * 10 * 1000;
-            heartbeatTimer.Tick += HeartbeatTimer_Tick;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -112,10 +107,6 @@ namespace QQRobot
                 Sender sender = Sender.CreateSender(win,this);
                 if (sender != null)
                 {
-                    if(heartbeatSender == null)
-                    {
-                        heartbeatSender = sender;
-                    }
                     handle.senders.AddLast(sender);
                     listBox2.Items.Add(sender.getWndName());
                 }
@@ -149,14 +140,6 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             server.StartOnce(taker);
-        }
-
-        private void HeartbeatTimer_Tick(object sender, EventArgs e)
-        {
-            if(heartbeatSender != null)
-            {
-                heartbeatSender.heartbeat();
-            }
         }
     }
 }

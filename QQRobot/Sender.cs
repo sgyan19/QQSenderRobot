@@ -16,6 +16,8 @@ namespace QQRobot
         private IntPtr mHwnd;
         private string mWndName;
         private Form form;
+        private static System.Timers.Timer heartbeatTimer;
+        private static IntPtr HeartbeatHwnd;
 
         public static Sender CreateSender(string wndNameRegex, Form form)
         {
@@ -30,16 +32,26 @@ namespace QQRobot
                 instance.form = form;
                 instance.mWndNameRegex = wndNameRegex;
                 instance.mWndName = wndName;
+                if(heartbeatTimer == null)
+                {
+                    heartbeatTimer = new System.Timers.Timer(5 * 60 * 1000);
+                    heartbeatTimer.Elapsed += HeartbeatTimer_Elapsed;
+                    HeartbeatHwnd = hwnd;
+                    heartbeatTimer.Start();
+                }
             }
             return instance;
+        }
+
+        private static void HeartbeatTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            SenderApi.QQHeartbeat(HeartbeatHwnd);
         }
 
         public string getWndName()
         {
             return mWndName;
         }
-
-        private Sender() {  }
 
         public void threadHeartbeat()
         {
@@ -70,6 +82,11 @@ namespace QQRobot
         public void heartbeat()
         {
             SenderApi.QQHeartbeat(mHwnd);
+        }
+
+        ~Sender()
+        {
+            heartbeatTimer.Stop();
         }
     }
 }

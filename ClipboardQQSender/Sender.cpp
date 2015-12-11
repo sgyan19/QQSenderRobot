@@ -85,9 +85,9 @@ namespace ClipboardQQSender
 			return;
 		}
 		Sleep(500);
-		PostMessage(hwnd, WM_SYSKEYDOWN, 0x00000012, 0x20380001);
+		PostMessage(hwnd, WM_SYSKEYDOWN, 0x00000011, 0x20380001);
 		Sleep(100);
-		PostMessage(hwnd, WM_SYSKEYUP, 0x00000012, 0xC0380001);
+		PostMessage(hwnd, WM_SYSKEYUP, 0x00000011, 0xC0380001);
 	}
 
 	void sendSumbit(HWND hwnd)
