@@ -16,4 +16,6 @@ CLIPBOARDQQSENDER_API void Pasteln(HWND value);
 
 CLIPBOARDQQSENDER_API void PasteAndSumbit(HWND value);
 
+CLIPBOARDQQSENDER_API void Heartbeat(HWND value);
+
 CLIPBOARDQQSENDER_API void Sumbit(HWND value);

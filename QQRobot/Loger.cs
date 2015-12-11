@@ -119,12 +119,13 @@ namespace QQRobot
                 }
                 if (sw != null)
                 {
-                    sw.WriteLine("{0} {1}", DateTime.Now.ToString(), weibo.Text);
+                    sw.WriteLine(DateTime.Now.ToString());
+                    sw.WriteLine("       {0} {1}", "[Text]", weibo.Text);
                     if(weibo.ImgUrls != null && weibo.ImgUrls.Length > 0)
                     {
                         for (int i = 0; i < weibo.ImgUrls.Length; i ++ )
                         {
-                            sw.WriteLine("       {0} {1}", "图片", weibo.ImgUrls[i]);
+                            sw.WriteLine("       {0} {1}", "[Imgs]", weibo.ImgUrls[i]);
                         }
                     }
                     sw.Flush();

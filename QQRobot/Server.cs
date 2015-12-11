@@ -148,7 +148,7 @@ namespace QQRobot
             }
 
             Weibo[] weibos = taker.checkNew(newObjs);
-            if (weibos != null && weibos.Length > 0)
+            if (weibos != null)
             {
                 if (Callback != null)
                 {

@@ -23,6 +23,16 @@ namespace QQRobot
 
         }
 
+        private string cookie;
+        private string uid;
+        private string interval;
+        private string[] windows;
+        private string topCount;
+        private Handle handle;
+        private Server server;
+        private Sender heartbeatSender;
+        private System.Windows.Forms.Timer heartbeatTimer;
+
         public Form1()
         {
             InitializeComponent();
@@ -48,7 +58,11 @@ namespace QQRobot
             handle.shower.startBtn = button2;
             handle.shower.stopBtn = button3;
             handle.shower.doBtn = button4;
+            handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
+            heartbeatTimer = new System.Windows.Forms.Timer();
+            heartbeatTimer.Interval = 60 * 10 * 1000;
+            heartbeatTimer.Tick += HeartbeatTimer_Tick;
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -70,15 +84,8 @@ namespace QQRobot
             taker.setTopCount(topCount);
             server.Start(taker);
         }
-
-        private string cookie;
-        private string uid;
-        private string interval;
-        private string[] windows;
-        private string topCount;
-        private Handle handle;
-        private Server server;
         private ArrayList contols = new ArrayList();
+
         public void readConfig()
         {
             IniHelper ini = new IniHelper(".\\config.ini");
@@ -99,12 +106,18 @@ namespace QQRobot
                 listBox1.Items.Add(windows[i]);
             }
             handle.senders.Clear();
+            listBox2.Items.Clear();
             foreach (string win in windows)
             {
                 Sender sender = Sender.CreateSender(win,this);
                 if (sender != null)
                 {
+                    if(heartbeatSender == null)
+                    {
+                        heartbeatSender = sender;
+                    }
                     handle.senders.AddLast(sender);
+                    listBox2.Items.Add(sender.getWndName());
                 }
             }
         }
@@ -136,6 +149,14 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             server.StartOnce(taker);
+        }
+
+        private void HeartbeatTimer_Tick(object sender, EventArgs e)
+        {
+            if(heartbeatSender != null)
+            {
+                heartbeatSender.heartbeat();
+            }
         }
     }
 }

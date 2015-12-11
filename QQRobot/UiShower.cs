@@ -17,6 +17,7 @@ namespace QQRobot
         public Button startBtn;
         public Button stopBtn;
         public Button doBtn;
+        public Label sendCountLabel;
 
         public UiShower(Form1 f)
         {
@@ -55,6 +56,13 @@ namespace QQRobot
             mainForm.Invoke(new OnException(onException), args);
         }
 
+        public void showCount(string count)
+        {
+            string[] args = new string[1];
+            args[0] = count;
+            mainForm.Invoke(new OnSendCount(onSendCount), args);
+        }
+
         public delegate void SetStatus(string label, string text);
         private void setStatus(string label, string text)
         {
@@ -91,5 +99,10 @@ namespace QQRobot
             countDownLabel.Text = "抓取中";
         }
 
+        public delegate void OnSendCount(string countText);
+        private void onSendCount(string countText)
+        {
+            sendCountLabel.Text = countText;
+        }
     }
 }

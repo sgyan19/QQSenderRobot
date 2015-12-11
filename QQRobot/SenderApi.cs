@@ -20,6 +20,9 @@ namespace QQRobot
         private static extern void Pasteln(IntPtr hwnd);
 
         [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
+        private static extern void Heartbeat(IntPtr hwnd);
+
+        [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Sumbit(IntPtr hwnd);
 
         [DllImport("user32.dll")]
@@ -34,6 +37,8 @@ namespace QQRobot
         private static Regex WndNameRegex;
 
         private static IntPtr FindHwnd = (IntPtr)0x0;
+
+        private static string FindWndName = null;
 
         private static Object lockObj = new Object();
 
@@ -70,6 +75,17 @@ namespace QQRobot
             }
         }
 
+        public static void QQHeartbeat(IntPtr ptr)
+        {
+            if (IsWindow(ptr))
+            {
+                lock (lockObj)
+                {
+                    Heartbeat(ptr);
+                }
+            }
+        }
+
         public static void QQSumbit(IntPtr ptr)
         {
             if (IsWindow(ptr))
@@ -93,6 +109,11 @@ namespace QQRobot
             return FindHwnd;
         }
 
+        public static string GetFindWndName()
+        {
+            return FindWndName;
+        }
+
         public delegate bool WNDENUMPROC(IntPtr hWnd, int lParam);
 
         private static bool onEnumWindow(IntPtr hWnd, int lParam)
@@ -106,6 +127,7 @@ namespace QQRobot
             {
                 result = false;
                 FindHwnd = hWnd;
+                FindWndName = name.ToString();
             }
             return result;
         }

@@ -30,11 +30,11 @@ namespace ClipboardQQSender
 		}
 		Sleep(500);
 		keybd_event(VK_CONTROL, 0x1D, 0, 0);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x00000056, 0x002F0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x00000056, 0xC02F0001);
-		Sleep(200);
+		Sleep(100);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
 	}
 
@@ -46,15 +46,15 @@ namespace ClipboardQQSender
 		}
 		Sleep(500);
 		keybd_event(VK_CONTROL, 0x1D, 0, 0);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x00000056, 0x002F0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x00000056, 0xC02F0001);
-		Sleep(200);
+		Sleep(100);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
 	}
 
@@ -66,16 +66,28 @@ namespace ClipboardQQSender
 		}
 		Sleep(500);
 		keybd_event(VK_CONTROL, 0x1D, 0, 0);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x00000056, 0x002F0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x00000056, 0xC02F0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
-		Sleep(200);
+		Sleep(100);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
+	}
+
+	void sendVoid(HWND hwnd)
+	{
+		if (hwnd == 0x0)
+		{
+			return;
+		}
+		Sleep(500);
+		PostMessage(hwnd, WM_SYSKEYDOWN, 0x00000012, 0x20380001);
+		Sleep(100);
+		PostMessage(hwnd, WM_SYSKEYUP, 0x00000012, 0xC0380001);
 	}
 
 	void sendSumbit(HWND hwnd)
@@ -86,11 +98,11 @@ namespace ClipboardQQSender
 		}
 		Sleep(500);
 		keybd_event(VK_CONTROL, 0x1D, 0, 0);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
-		Sleep(200);
+		Sleep(100);
 		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
-		Sleep(200);
+		Sleep(100);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
 	}
 }

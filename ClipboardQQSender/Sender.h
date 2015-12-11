@@ -7,5 +7,6 @@ namespace ClipboardQQSender
 	void sendClipboard(HWND hwnd);
 	void sendClipboardln(HWND hwnd);
 	void sendClipboardAndSumbit(HWND hwnd);
+	void sendVoid(HWND hwnd);
 	void sendSumbit(HWND hwnd);
 }
