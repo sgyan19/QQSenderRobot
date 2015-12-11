@@ -35,7 +35,7 @@ namespace QQRobot
                     sendCount += senders.Count;
                     foreach (Sender sender in senders)
                     {
-                        sender.threadSend(weibo.Text, imgs);
+                        sender.send(weibo.Text, imgs);
                     }
                     shower.showCount("已发送：" + sendCount);
                 }
@@ -162,6 +162,7 @@ namespace QQRobot
         public void OnException(Exception e)
         {
             string text = format(e);
+            Count++;
             shower.showResult(String.Format("第{0}次，{1}条", Count, 0), text);
             takeLoger.log(text);
         }

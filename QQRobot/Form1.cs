@@ -104,7 +104,7 @@ namespace QQRobot
             listBox2.Items.Clear();
             foreach (string win in windows)
             {
-                Sender sender = Sender.CreateSender(win,this);
+                QQSender sender = QQSender.CreateSender(win,this);
                 if (sender != null)
                 {
                     handle.senders.AddLast(sender);

@@ -995,7 +995,7 @@ namespace BlackRain
                 httpRequest.Method = "GET";
                 httpRequest.Referer = referer;
                 httpRequest.AllowAutoRedirect = false;
-                httpRequest.Timeout = 10*1000;
+                httpRequest.Timeout = 5*1000;
                 //httpRequest.Timeout = 20000;
                 HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
                 Stream webstream = web.GetResponseStream();
