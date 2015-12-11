@@ -129,10 +129,14 @@ namespace QQRobot
                 foreach (Match linkMatch in linkMatches)
                 {
                     string name = mWeiboLabelReg.Replace(linkMatch.Groups["name"].Value, "");
-                    if(name.IndexOf('@') != 0)
+                    if(name[0] != '@')
                     {
                         string url = linkMatch.Groups["url"].Value.Replace("\\", "");
                         content = content.Replace(linkMatch.Value, name + ":[" + url + "]");
+                    }
+                    else
+                    {
+                        content = content.Replace(name, "[" + name + "]");
                     }
                 }
 
