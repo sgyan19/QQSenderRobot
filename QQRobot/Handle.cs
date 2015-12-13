@@ -161,8 +161,8 @@ namespace QQRobot
 
         public void OnException(Exception e)
         {
-            string text = format(e);
             Count++;
+            string text = format(e);
             shower.showResult(String.Format("第{0}次，{1}条", Count, 0), text);
             takeLoger.log(text);
         }
