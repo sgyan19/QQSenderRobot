@@ -32,6 +32,11 @@ namespace QQRobot
             return result;
         }
 
+        public Weibo[] getLastTake()
+        {
+            return lastTake;
+        }
+
         public abstract Weibo[] checkNew(Weibo[] newTakeData,Weibo[] oldTakeData);
     }
 }

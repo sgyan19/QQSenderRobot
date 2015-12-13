@@ -30,6 +30,7 @@ namespace QQRobot
         private string topCount;
         private Handle handle;
         private Server server;
+        private bool ifLog;
 
         public Form1()
         {
@@ -89,6 +90,7 @@ namespace QQRobot
             interval = ini.ReadValue("robot", "interval");
             uid = ini.ReadValue("robot", "uid");
             topCount = ini.ReadValue("robot","top");
+            ifLog = bool.Parse(ini.ReadValue("robot", "iflog"));
             windows = windowText.Split(',');
             cookie = File.ReadAllText(cookiePath);
             textBox1.Text = cookie;
@@ -101,6 +103,7 @@ namespace QQRobot
                 listBox1.Items.Add(windows[i]);
             }
             handle.senders.Clear();
+            handle.ifLog = ifLog;
             listBox2.Items.Clear();
             foreach (string win in windows)
             {
@@ -140,6 +143,15 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             server.StartOnce(taker);
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            string num = textBox6.Text;
+            int n = int.Parse(num);
+            if (n > 5) n = 5;
+            if (n < 0) return;
+            server.handLastTime(n);
         }
     }
 }

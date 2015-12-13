@@ -18,7 +18,7 @@ namespace QQRobot
         public int Count;
         public UiShower shower;
         public int sendCount;
-
+        public bool ifLog;
 
         public void NewWeibos(Weibo[] newWeibos, Weibo[] all)
         {
@@ -39,7 +39,7 @@ namespace QQRobot
                     }
                     shower.showCount("已发送：" + sendCount);
                 }
-                if(loger != null)
+                if(ifLog && loger != null)
                 {
                     loger.log(weibo);
                 }
@@ -47,13 +47,13 @@ namespace QQRobot
 
             if(newWeibos != null && newWeibos.Length > 0)
             {
-                if (takeLoger != null)
+                if ( ifLog && takeLoger != null )
                 {
                     takeLoger.log(format(all));
                 }
             }else
             {
-                if (takeLoger != null && Count != 1)
+                if ( ifLog && takeLoger != null && Count != 1 )
                 {
                     takeLoger.log(formatNoChange());
                 }
@@ -63,7 +63,7 @@ namespace QQRobot
         public void TakeWeiboes(Weibo[] takeWeibos)
         {
             Count++;
-            if (Count ==1 && takeLoger != null)
+            if (ifLog && Count ==1 && takeLoger != null)
             {
                 takeLoger.log(format(takeWeibos));
             }

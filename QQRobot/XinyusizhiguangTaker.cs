@@ -12,7 +12,7 @@ namespace QQRobot
 {
     class XinyusizhiguangTaker : BaseTaker
     {
-        public const string PageUrl = "http://weibo.com/u/{0}";
+        public const string PageUrl = "http://weibo.com/u/{0}?is_all=1";
         public const string WeiboItemTemplet = "<div class=\\\\\\\"WB_detail\\\\\\\">(?<item>[\\s\\S]*?)<a class=\\\\\\\"S_txt2\\\\\\\"";
         public const string WeiboTextTemplet = "<div class=\\\\\\\"WB_text W_f14\\\\\\\"[\\s\\S]*?>\\\\n[\\s]*?(?<content>[\\s\\S]*?)<\\\\/div>";
         public const string WeiboLabelTemplet = "<[\\s\\S]*?>";

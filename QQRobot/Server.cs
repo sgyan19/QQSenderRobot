@@ -156,5 +156,20 @@ namespace QQRobot
                 }
             }
         }
+
+        public void handLastTime(int count)
+        {
+            Weibo[] last = taker.getLastTake();
+            Weibo[] result = new Weibo[count];
+            int j = 0;
+            for(int i = count -1; i  >= 0; i --)
+            {
+                result[i] = last[j++];
+            }
+            if(Callback != null)
+            {
+                Callback.NewWeibos(result, last);
+            }
+        }
     }
 }

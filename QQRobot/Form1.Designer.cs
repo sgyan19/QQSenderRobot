@@ -48,6 +48,8 @@
             this.label8 = new System.Windows.Forms.Label();
             this.listBox2 = new System.Windows.Forms.ListBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.button5 = new System.Windows.Forms.Button();
+            this.textBox6 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -240,11 +242,33 @@
             this.label9.TabIndex = 19;
             this.label9.Text = "已发送：0";
             // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(257, 360);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(56, 23);
+            this.button5.TabIndex = 20;
+            this.button5.Text = "发送";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // textBox6
+            // 
+            this.textBox6.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox6.Location = new System.Drawing.Point(319, 361);
+            this.textBox6.Name = "textBox6";
+            this.textBox6.Size = new System.Drawing.Size(76, 21);
+            this.textBox6.TabIndex = 21;
+            this.textBox6.Text = "1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(407, 395);
+            this.Controls.Add(this.textBox6);
+            this.Controls.Add(this.button5);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.listBox2);
             this.Controls.Add(this.label8);
@@ -294,6 +318,8 @@
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ListBox listBox2;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.TextBox textBox6;
     }
 }
 
