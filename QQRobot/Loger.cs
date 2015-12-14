@@ -36,6 +36,7 @@ namespace QQRobot
         public Loger()
         {
             string newLogPath = logPath.Insert(logPath.LastIndexOf('.'), time());
+            logPath = newLogPath;
         }
 
         public Loger(String path)

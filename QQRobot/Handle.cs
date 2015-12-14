@@ -22,26 +22,36 @@ namespace QQRobot
 
         public void NewWeibos(Weibo[] newWeibos, Weibo[] all)
         {
-            foreach(Weibo weibo in newWeibos)
+            if(newWeibos.Length > 3)
             {
-                Image[] imgs = new Image[weibo.ImgUrls.Length];
-                for (int i = 0; i < weibo.ImgUrls.Length; i++)
+                Exception e = new Exception("超过3条新数据，可能存在对比异常");
+                string text = format(e);
+                shower.showResult(String.Format("第{0}次，{1}条", Count, newWeibos.Length), text);
+                takeLoger.log(text);
+            }
+            else
+            {
+                foreach (Weibo weibo in newWeibos)
                 {
-                    string path = download(weibo.ImgUrls[i]);
-                    imgs[i] = Image.FromFile(path);
-                }
-                if(senders != null && senders.Count > 0)
-                {
-                    sendCount += senders.Count;
-                    foreach (Sender sender in senders)
+                    Image[] imgs = new Image[weibo.ImgUrls.Length];
+                    for (int i = 0; i < weibo.ImgUrls.Length; i++)
                     {
-                        sender.send(weibo.Text, imgs);
+                        string path = download(weibo.ImgUrls[i]);
+                        imgs[i] = Image.FromFile(path);
                     }
-                    shower.showCount("已发送：" + sendCount);
-                }
-                if(ifLog && loger != null)
-                {
-                    loger.log(weibo);
+                    if (senders != null && senders.Count > 0)
+                    {
+                        sendCount += senders.Count;
+                        foreach (Sender sender in senders)
+                        {
+                            sender.send(weibo.Text, imgs);
+                        }
+                        shower.showCount("已发送：" + sendCount);
+                    }
+                    if (ifLog && loger != null)
+                    {
+                        loger.log(weibo);
+                    }
                 }
             }
 
