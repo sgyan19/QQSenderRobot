@@ -89,9 +89,9 @@ namespace QQRobot
         {
             int index = url.LastIndexOf('/');
             string name = url.Substring(index + 1, url.Length - index -1 ) ;
-            if(name.Length > 200)
+            if(name.Length > 100)
             {
-                name = name.Substring(0, 200);
+                name = name.Substring(0, 100);
             }
             if (!Directory.Exists("tmp"))
             {

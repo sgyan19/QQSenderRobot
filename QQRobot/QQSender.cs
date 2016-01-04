@@ -63,7 +63,9 @@ namespace QQRobot
 
         public void mainThreadSend(string msg,Image[] imgs)
         {
+            Clipboard.Clear();
             Clipboard.SetText(msg);
+            Clipboard.set
             SenderApi.QQPasteln(mHwnd);
             foreach(Image img in imgs)
             {

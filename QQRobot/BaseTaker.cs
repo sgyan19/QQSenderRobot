@@ -28,7 +28,9 @@ namespace QQRobot
         public Weibo[] checkNew(Weibo[] newTakeData)
         {
             Weibo[] result = checkNew(newTakeData, lastTake);
-            lastTake = newTakeData;
+            if (lastTake == null)
+                lastTake = newTakeData;
+            if (result != null && result.Length > 0 && result.Length < 5) lastTake = newTakeData;
             return result;
         }
 

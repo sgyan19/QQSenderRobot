@@ -93,9 +93,18 @@ namespace QQRobot
             LinkedList<Weibo> news = new LinkedList<Weibo>();
             if (oldTakeData != null && oldTakeData.Length > 0 && newTakeData.Length > 0)
             {
+                if (oldTakeData[0].Text == null) oldTakeData[0].Text = "";
+                int oldLen = oldTakeData[0].Text.Length;
                 for (int i = 0; i < newTakeData.Length; i++)
                 {
-                    if (newTakeData[i].Text == null || newTakeData[i].Text.Equals(oldTakeData[0].Text))
+                    if(newTakeData[i].Text == null)
+                    {
+                        continue;
+                    }
+                    int len = newTakeData[i].Text.Length > oldLen ? oldLen : newTakeData[i].Text.Length;
+                    string newText = newTakeData[i].Text.Substring(0, len);
+                    string oldText = oldTakeData[0].Text.Substring(0, len);
+                    if (string.Equals(newText,oldText))
                     {
                         break;
                     }
