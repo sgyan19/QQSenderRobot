@@ -13,13 +13,15 @@ namespace QQRobot
     class XinyusizhiguangTaker : BaseTaker
     {
         public const string PageUrl = "http://weibo.com/u/{0}?is_all=1";
-        public const string WeiboItemTemplet = "<div class=\\\\\\\"WB_detail\\\\\\\">(?<item>[\\s\\S]*?)<a class=\\\\\\\"S_txt2\\\\\\\"";
+        public const string WeiboItemTemplet = "<div class=\\\\\\\"WB_feed_detail clearfix\\\\\\\"[\\s\\S]*?\\\\\\\">(?<item>[\\s\\S]*?)<div class=\\\\\\\"WB_feed_handle\\\\\\\"";
         public const string WeiboTextTemplet = "<div class=\\\\\\\"WB_text W_f14\\\\\\\"[\\s\\S]*?>\\\\n[\\s]*?(?<content>[\\s\\S]*?)<\\\\/div>";
         public const string WeiboLabelTemplet = "<[\\s\\S]*?>";
         public const string WeiboFilterTemplet = "[ \\\\]";
         public const string WeiboImgTemplet = "<img[\\s\\S]*?src=\\\\\\\"(?<url>[\\s\\S]*?)\\\\\\\"[\\s\\S]*?>";
         public const string WeiboLinkTemplet = "<a[\\s\\S]*?href=\\\\\\\"(?<url>[\\S]*?)\\\\\\\"[\\s\\S]*?>(?<name>[\\s\\S]*?)<\\\\/a>";
-        
+
+        public const string WeiboContentImg = "ww[0-9].sinaimg.cn";
+
         private Regex mWeiboItemReg = new Regex(WeiboItemTemplet);
         private string mWeiboItemGoups = "item";
         private Regex mWeiboTextReg = new Regex(WeiboTextTemplet);
@@ -148,7 +150,7 @@ namespace QQRobot
                         content = content.Replace(name, "[" + name + "]");
                     }
                 }
-
+                content = content.Replace("O网页链接", "网页链接");
                 weibo.Text = mWeiboFilterReg.Replace(mWeiboLabelReg.Replace(content, ""), "") ;
             }
 
@@ -159,8 +161,28 @@ namespace QQRobot
             int i = 0;
             foreach (Match imgMatch in imgMathes)
             {
-                imgUrls[i++] = imgMatch.Groups[mWeiboImgGoups].Value.Replace("\\", "").Replace("thumbnail", "bmiddle").Replace("square", "bmiddle");
+                imgUrls[i++] = imgMatch.Groups[mWeiboImgGoups].Value.Replace("\\", "").Replace("thumbnail", "bmiddle").Replace("square", "bmiddle").Replace("orj480","mw690").Replace("thumb180", "mw690");
             }
+            if(imgUrls.Length > 0 )
+            {
+                ArrayList newImgUrlList = new ArrayList();
+                foreach(string item in imgUrls)
+                {
+                    Match match = Regex.Match(item, WeiboContentImg);
+                    if (match.Success)
+                    {
+                        newImgUrlList.Add(item);
+                    }
+                }
+                newImgUrlList.ToArray();
+                string[] newImgUrls = new string[newImgUrlList.Count];
+                for (int j = 0; j < newImgUrlList.Count; j++)
+                {
+                    newImgUrls[j] = (string)newImgUrlList[j];
+                }
+                weibo.ImgUrls = newImgUrls;
+            }
+
             return weibo;
         }
 

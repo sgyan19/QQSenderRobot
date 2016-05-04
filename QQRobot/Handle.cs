@@ -37,14 +37,28 @@ namespace QQRobot
                     for (int i = 0; i < weibo.ImgUrls.Length; i++)
                     {
                         string path = download(weibo.ImgUrls[i]);
-                        imgs[i] = Image.FromFile(path);
+                        if(path != null)
+                        {
+                            imgs[i] = Image.FromFile(path);
+                        }
+                    }
+                    Image[] sendImgs ;
+                    if (imgs.Length <= 0)
+                    {
+                        sendImgs = imgs;
+                    }
+                    else
+                    {
+                        sendImgs = new Image[1];
+                        Image longImage = CLongImgMaker.make(imgs);
+                        sendImgs[0] = longImage;
                     }
                     if (senders != null && senders.Count > 0)
                     {
                         sendCount += senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.send(weibo.Text, imgs);
+                            sender.send(weibo.Text, sendImgs);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
@@ -115,7 +129,13 @@ namespace QQRobot
                     }
                 }
                 */
-                wb.DownloadFile(url, path);
+                try
+                {
+                    wb.DownloadFile(url, path);
+                }catch(Exception e)
+                {
+                    return null;
+                }
             }
             return path;
         }
