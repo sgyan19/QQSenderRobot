@@ -10,6 +10,9 @@ using System.Collections;
 
 namespace BlackRain
 {
+    /// <summary>
+    /// http请求类
+    /// </summary>
     public class PageRequest
     {
         /// <summary>

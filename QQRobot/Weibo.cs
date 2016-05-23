@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
+    /// <summary>
+    /// 微博抓取结果数据结构
+    /// </summary>
     public class Weibo
     {
         public string Text;

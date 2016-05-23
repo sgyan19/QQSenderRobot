@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
+    /// <summary>
+    /// 日志类，用于输出抓取和发送日志。
+    /// </summary>
     class Loger
     {
         private string logPath = ".\\log.txt";
@@ -78,7 +81,11 @@ namespace QQRobot
                 }
             }
         }
-
+        /// <summary>
+        /// 输出多条微博，用于记录一次抓取结果
+        /// </summary>
+        /// <param name="weibos">多条抓取结果</param>
+        /// <param name="count">条数</param>
         public void log(Weibo[] weibos, int count)
         {
             lock (this)
@@ -109,7 +116,10 @@ namespace QQRobot
                 }
             }
         }
-
+        /// <summary>
+        /// 输出单条微博，用于记录单条发送。
+        /// </summary>
+        /// <param name="weibo"></param>
         public void log(Weibo weibo)
         {
             lock (this)

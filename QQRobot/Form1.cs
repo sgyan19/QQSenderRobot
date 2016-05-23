@@ -73,7 +73,7 @@ namespace QQRobot
 
         public void start()
         {
-            XinyusizhiguangTaker taker = new XinyusizhiguangTaker();
+            WeiboTaker taker = new WeiboTaker();
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);
@@ -137,7 +137,7 @@ namespace QQRobot
 
         private void button4_Click(object sender, EventArgs e)
         {
-            XinyusizhiguangTaker taker = new XinyusizhiguangTaker();
+            WeiboTaker taker = new WeiboTaker();
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);

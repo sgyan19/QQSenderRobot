@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+/// <summary>
+/// 配置文件读写接口，调用系统kernel32.dll的WritePrivateProfileString，GetPrivateProfileString方法。
+/// </summary>
+
 namespace QQRobot
 {
     class IniHelper

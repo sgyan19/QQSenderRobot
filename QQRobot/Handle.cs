@@ -9,16 +9,21 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
+    /// <summary>
+    /// 处理类，用于集中处理WeiboTaker等抓取器抓取到的结果。主要是3个方向：交给发送器"sende";打印日志"loger";刷新UI"UiShower".
+    /// </summary>
     class Handle : WeiboTakeEvent
     {
         public LinkedList<Sender> senders;
 
-        public Loger loger;
-        public Loger takeLoger;
-        public int Count;
-        public UiShower shower;
-        public int sendCount;
-        public bool ifLog;
+        public Loger loger;     // 发送结果日志
+        public Loger takeLoger; // 抓取结果日志
+        public int Count;       // 最后一次结果抓取计数
+        public UiShower shower; // ui刷新器
+        public int sendCount;   // 最后一次结果已发送数
+        public bool ifLog;      // 是否日志开关
+
+        WebClient wb = new WebClient(); // IE控件，用于下载微博图片
 
         public void NewWeibos(Weibo[] newWeibos, Weibo[] all)
         {
@@ -96,8 +101,6 @@ namespace QQRobot
                 shower.showResult(String.Format("第{0}次，{1}条",Count, takeWeibos.Length), format(takeWeibos));
             }
         }
-
-        WebClient wb = new WebClient();
 
         private string download(string url)
         {

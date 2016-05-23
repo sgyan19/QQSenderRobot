@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
+    /// <summary>
+    /// 预留推特数据结构
+    /// </summary>
     [Serializable]
     class TwitterMsg : Object
     {

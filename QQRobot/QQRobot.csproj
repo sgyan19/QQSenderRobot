@@ -98,7 +98,7 @@
     <Compile Include="UiShower.cs" />
     <Compile Include="Weibo.cs" />
     <Compile Include="WeiboTakeEvent.cs" />
-    <Compile Include="XinyusizhiguangTaker.cs" />
+    <Compile Include="WeiboTaker.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>

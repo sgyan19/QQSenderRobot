@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace QQRobot
 {
+    /// <summary>
+    /// 刷新界面类，保持一些需要刷新的控件，提供非ui线程发送代理更新界面的方法
+    /// </summary>
     class UiShower
     {
         public Form1 mainForm;
