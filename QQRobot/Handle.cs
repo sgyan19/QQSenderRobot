@@ -25,8 +25,23 @@ namespace QQRobot
 
         WebClient wb = new WebClient(); // IE控件，用于下载微博图片
 
-        public void NewWeibos(Weibo[] newWeibos, Weibo[] all)
+        public void NewWeibos(Weibo[] newWeibos, Weibo[] all, WeiboUser user)
         {
+            string userName = "";
+            Image userHeader = null;
+            if(user != null)
+            {
+                userName = user.UserName;
+                if(user.UserHeader == null)
+                {
+                    string path = download(user.UserHeaderUri);
+                    if (path != null)
+                    {
+                        user.UserHeader = Image.FromFile(path);
+                    }
+                }
+                userHeader = user.UserHeader;
+            }
             if(newWeibos.Length > 3)
             {
                 Exception e = new Exception("超过3条新数据，可能存在对比异常");
@@ -63,7 +78,7 @@ namespace QQRobot
                         sendCount += senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.send(weibo.Text, sendImgs);
+                            sender.sendWithUser(userName, userHeader, weibo.Text, sendImgs);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
@@ -89,7 +104,7 @@ namespace QQRobot
             }
         }
 
-        public void TakeWeiboes(Weibo[] takeWeibos)
+        public void TakeWeiboes(Weibo[] takeWeibos, WeiboUser user)
         {
             Count++;
             if (ifLog && Count ==1 && takeLoger != null)

@@ -161,7 +161,7 @@ namespace QQRobot
             {
                 if (Callback != null)
                 {
-                    Callback.TakeWeiboes(newObjs);
+                    Callback.TakeWeiboes(newObjs, taker.User);
                 }
             }
 
@@ -170,7 +170,7 @@ namespace QQRobot
             {
                 if (Callback != null)
                 {
-                    Callback.NewWeibos(weibos, newObjs);
+                    Callback.NewWeibos(weibos, newObjs, taker.User);
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace QQRobot
             }
             if(Callback != null)
             {
-                Callback.NewWeibos(result, last);
+                Callback.NewWeibos(result, last, taker.User);
             }
         }
     }

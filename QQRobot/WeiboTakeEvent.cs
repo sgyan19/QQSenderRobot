@@ -11,8 +11,8 @@ namespace QQRobot
     /// </summary>
     interface WeiboTakeEvent
     {
-        void TakeWeiboes(Weibo[] takeWeibos);
-        void NewWeibos(Weibo[] newWeibos,Weibo[] newAll);
+        void TakeWeiboes(Weibo[] takeWeibos, WeiboUser user);
+        void NewWeibos(Weibo[] newWeibos,Weibo[] newAll, WeiboUser user);
         void OnCountDown(int secounds);
         void OnStart();
         void OnStop();

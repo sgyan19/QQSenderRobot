@@ -14,6 +14,8 @@ namespace QQRobot
 
         protected Weibo[] lastTake;
 
+        public WeiboUser User;
+
         public Weibo[] Take()
         {
             string html = takePage();

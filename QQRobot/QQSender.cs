@@ -111,6 +111,50 @@ namespace QQRobot
             SenderApi.QQHeartbeat(mHwnd);
         }
 
+        public override void sendWithUser(string userName, Image userHeader, string msg, Image[] imgs)
+        {
+            object[] args = new object[4];
+            args[0] = userName;
+            args[1] = userHeader;
+            args[2] = msg;
+            args[3] = imgs;
+            form.Invoke(new SendWithUser(mainThreadSendWithUser), args);
+        }
+
+        /// <summary>
+        /// 核心发送方法
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="imgs"></param>
+        public void mainThreadSendWithUser(string userName, Image userHeader, string msg, Image[] imgs)
+        {
+            Clipboard.Clear();
+            if(userHeader != null)
+            {
+                Clipboard.SetImage(userHeader);
+                SenderApi.QQPaste(mHwnd);
+            }
+            if (!string.IsNullOrEmpty(userName))
+            {
+                Clipboard.Clear();
+                Clipboard.SetText(userName);
+                SenderApi.QQPasteln(mHwnd);
+                Thread.Sleep(1000);
+            }
+            Clipboard.SetText(msg);
+            SenderApi.QQPasteln(mHwnd);
+            foreach (Image img in imgs)
+            {
+                if (img != null)
+                {
+                    Clipboard.SetImage(img);
+                    Thread.Sleep(1000);
+                    SenderApi.QQPaste(mHwnd);
+                }
+            }
+            SenderApi.QQSumbit(mHwnd);
+        }
+
         ~QQSender()
         {
             heartbeatTimer.Stop();
