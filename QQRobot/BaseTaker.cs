@@ -32,7 +32,7 @@ namespace QQRobot
             Weibo[] result = checkNew(newTakeData, lastTake);
             if (lastTake == null)
                 lastTake = newTakeData;
-            if (result != null && result.Length > 0 && result.Length < 5) lastTake = newTakeData;
+            if (newTakeData != null && newTakeData.Length > 0) lastTake = newTakeData;
             return result;
         }
 
