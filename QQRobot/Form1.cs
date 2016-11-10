@@ -79,12 +79,13 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             server.Start(taker);
+            Win32Api.SystemUnsleepLock();
         }
         private ArrayList contols = new ArrayList();
 
         public void readConfig()
         {
-            IniHelper ini = new IniHelper(".\\config.ini");
+            Win32Api ini = new Win32Api(".\\config.ini");
             string cookiePath = ini.ReadValue("robot", "cookie");
             string windowText = ini.ReadValue("robot", "windows");
             interval = ini.ReadValue("robot", "interval");

@@ -86,7 +86,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Handle.cs" />
-    <Compile Include="IniHelper.cs" />
+    <Compile Include="Win32Api.cs" />
     <Compile Include="Loger.cs" />
     <Compile Include="PageRequest.cs" />
     <Compile Include="Program.cs" />

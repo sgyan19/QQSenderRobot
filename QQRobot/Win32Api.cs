@@ -9,8 +9,12 @@ using System.Text;
 
 namespace QQRobot
 {
-    class IniHelper
+    class Win32Api
     {
+
+        public const uint ES_SYSTEM_REQUIRED = 0x00000001;
+        public const uint ES_DISPLAY_REQUIRED = 0x00000002;
+        public const uint ES_CONTINUOUS = 0x80000000;
         // 声明INI文件的写操作函数 WritePrivateProfileString()
         [System.Runtime.InteropServices.DllImport("kernel32")]
         private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
@@ -19,8 +23,13 @@ namespace QQRobot
         [System.Runtime.InteropServices.DllImport("kernel32")]
         private static extern int GetPrivateProfileString(string section, string key, string def, System.Text.StringBuilder retVal, int size, string filePath);
 
+        // 声明INI文件的读操作函数 GetPrivateProfileString()
+        [System.Runtime.InteropServices.DllImport("kernel32")]
+        public static extern void SetThreadExecutionState(uint esFlags);
+
+
         private string sPath = null;
-        public IniHelper(string path)
+        public Win32Api(string path)
         {
             this.sPath = path;
         }
@@ -38,6 +47,15 @@ namespace QQRobot
             // section=配置节，key=键名，temp=上面，path=路径
             GetPrivateProfileString(section, key, "", temp, 255, sPath);
             return temp.ToString();
+        }
+
+        public static void SystemUnsleepLock()
+        {
+            SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED);
+        }
+        public static void SystemUnsleepLockRelase()
+        {
+            SetThreadExecutionState(ES_CONTINUOUS);
         }
     }
 }
