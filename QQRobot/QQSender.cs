@@ -136,10 +136,9 @@ namespace QQRobot
             }
             if (!string.IsNullOrEmpty(userName))
             {
-                Clipboard.Clear();
                 Clipboard.SetText(userName);
                 SenderApi.QQPasteln(mHwnd);
-                Thread.Sleep(1000);
+                Clipboard.Clear();
             }
             Clipboard.SetText(msg);
             SenderApi.QQPasteln(mHwnd);
