@@ -49,6 +49,15 @@ namespace QQRobot
             return temp.ToString();
         }
 
+        public string ReadValue(string section, string key, string def)
+        {
+            // 每次从ini中读取多少字节
+            System.Text.StringBuilder temp = new System.Text.StringBuilder(255);
+            // section=配置节，key=键名，temp=上面，path=路径
+            GetPrivateProfileString(section, key, def, temp, 255, sPath);
+            return temp.ToString();
+        }
+
         public static void SystemUnsleepLock()
         {
             SetThreadExecutionState(ES_CONTINUOUS | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED);

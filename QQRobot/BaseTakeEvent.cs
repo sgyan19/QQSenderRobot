@@ -9,10 +9,10 @@ namespace QQRobot
     /// <summary>
     /// server中回调的抓取结果事件
     /// </summary>
-    interface WeiboTakeEvent
+    interface BaseTakeEvent
     {
-        void TakeWeiboes(Weibo[] takeWeibos, WeiboUser user);
-        void NewWeibos(Weibo[] newWeibos,Weibo[] newAll, WeiboUser user);
+        void TakeData(BaseData[] takeData, BaseUser user);
+        void NewData(BaseData[] newData,BaseData[] newAll, BaseUser user);
         void OnCountDown(int secounds);
         void OnStart();
         void OnStop();

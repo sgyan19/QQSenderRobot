@@ -111,13 +111,14 @@ namespace QQRobot
             SenderApi.QQHeartbeat(mHwnd);
         }
 
-        public override void sendWithUser(string userName, Image userHeader, string msg, Image[] imgs)
+        public override void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs)
         {
-            object[] args = new object[4];
+            object[] args = new object[5];
             args[0] = userName;
             args[1] = userHeader;
-            args[2] = msg;
-            args[3] = imgs;
+            args[2] = source;
+            args[3] = msg;
+            args[4] = imgs;
             form.Invoke(new SendWithUser(mainThreadSendWithUser), args);
         }
 
@@ -148,8 +149,47 @@ namespace QQRobot
                 {
                     Clipboard.SetImage(img);
                     Thread.Sleep(1000);
-                    SenderApi.QQPaste(mHwnd);
+                    SenderApi.QQPasteln(mHwnd);
                 }
+            }
+            SenderApi.QQSumbit(mHwnd);
+        }
+
+        /// <summary>
+        /// 核心发送方法
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="imgs"></param>
+        public void mainThreadSendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs)
+        {
+            Clipboard.Clear();
+            if (userHeader != null)
+            {
+                Clipboard.SetImage(userHeader);
+                SenderApi.QQPaste(mHwnd);
+            }
+            if (!string.IsNullOrEmpty(userName))
+            {
+                Clipboard.SetText(userName);
+                SenderApi.QQPasteln(mHwnd);
+                Clipboard.Clear();
+            }
+            Clipboard.SetText(msg);
+            SenderApi.QQPasteln(mHwnd);
+            foreach (Image img in imgs)
+            {
+                if (img != null)
+                {
+                    Clipboard.SetImage(img);
+                    Thread.Sleep(1000);
+                    SenderApi.QQPasteln(mHwnd);
+                }
+            }
+            if (!string.IsNullOrEmpty(source))
+            {
+                Clipboard.Clear();
+                Clipboard.SetText(source);
+                SenderApi.QQPasteAndSumbit(mHwnd);
             }
             SenderApi.QQSumbit(mHwnd);
         }

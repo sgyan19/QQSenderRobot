@@ -86,7 +86,7 @@ namespace QQRobot
         /// </summary>
         /// <param name="weibos">多条抓取结果</param>
         /// <param name="count">条数</param>
-        public void log(Weibo[] weibos, int count)
+        public void log(BaseData[] weibos, int count)
         {
             lock (this)
             {
@@ -99,7 +99,7 @@ namespace QQRobot
                     sw.WriteLine("");
                     sw.WriteLine("{0}  [第{1}次]", DateTime.Now.ToString(), count);
                     sw.WriteLine("");
-                    foreach (Weibo weibo in weibos)
+                    foreach (BaseData weibo in weibos)
                     {
                         sw.WriteLine("    ===========================================================");
                         sw.WriteLine("    [Text]  {0}", weibo.Text);
@@ -120,7 +120,7 @@ namespace QQRobot
         /// 输出单条微博，用于记录单条发送。
         /// </summary>
         /// <param name="weibo"></param>
-        public void log(Weibo weibo)
+        public void log(BaseData weibo)
         {
             lock (this)
             {

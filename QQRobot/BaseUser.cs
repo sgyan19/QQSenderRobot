@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
-    class WeiboUser
+    class BaseUser
     {
         public string UserName;
         public string UserId;
         public string UserHeaderUri;
+        public string Source;
         public Image UserHeader;
     }
 }

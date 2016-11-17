@@ -16,7 +16,7 @@ namespace QQRobot
         private static Server singleton;
         private static Object lockObj = new Object();
 
-        public WeiboTakeEvent Callback; // 抓取结果回调
+        public BaseTakeEvent Callback; // 抓取结果回调
         private int flag = 0;       // 线程状态标识，其他线程通过改变标识操作线程执行流程
         private Thread thread;      // 线程核心
         private BaseTaker taker;    // 本线程的抓取器
@@ -155,22 +155,22 @@ namespace QQRobot
         private void runOnce()
         {
             string html = taker.takePage();
-            Weibo[] newObjs = taker.paser(html);
+            BaseData[] newObjs = taker.paser(html);
 
             if (newObjs != null && newObjs.Length > 0)
             {
                 if (Callback != null)
                 {
-                    Callback.TakeWeiboes(newObjs, taker.User);
+                    Callback.TakeData(newObjs, taker.User);
                 }
             }
 
-            Weibo[] weibos = taker.checkNew(newObjs);
+            BaseData[] weibos = taker.checkNew(newObjs);
             if (weibos != null)
             {
                 if (Callback != null)
                 {
-                    Callback.NewWeibos(weibos, newObjs, taker.User);
+                    Callback.NewData(weibos, newObjs, taker.User);
                 }
             }
         }
@@ -180,8 +180,8 @@ namespace QQRobot
         /// <param name="count"></param>
         public void handLastTime(int count)
         {
-            Weibo[] last = taker.getLastTake();
-            Weibo[] result = new Weibo[count];
+            BaseData[] last = taker.getLastTake();
+            BaseData[] result = new BaseData[count];
             int j = 0;
             for(int i = count -1; i  >= 0; i --)
             {
@@ -189,7 +189,7 @@ namespace QQRobot
             }
             if(Callback != null)
             {
-                Callback.NewWeibos(result, last, taker.User);
+                Callback.NewData(result, last, taker.User);
             }
         }
     }

@@ -28,6 +28,8 @@ namespace QQRobot
         private string interval;
         private string[] windows;
         private string topCount;
+        private string proxy;
+        private string takerKind;
         private Handle handle;
         private Server server;
         private bool ifLog;
@@ -73,11 +75,12 @@ namespace QQRobot
 
         public void start()
         {
-            WeiboTaker taker = new WeiboTaker();
+            BaseTaker taker = BaseTaker.factory(takerKind);
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);
             taker.setTopCount(topCount);
+            taker.setProxy(proxy);
             server.Start(taker);
             Win32Api.SystemUnsleepLock();
         }
@@ -93,12 +96,25 @@ namespace QQRobot
             topCount = ini.ReadValue("robot","top");
             ifLog = bool.Parse(ini.ReadValue("robot", "iflog"));
             windows = windowText.Split(',');
-            cookie = File.ReadAllText(cookiePath);
+            if (File.Exists(cookiePath))
+            {
+                try
+                {
+                    cookie = File.ReadAllText(cookiePath);
+                }catch(Exception e)
+                {
+                    cookie = "";
+                }
+            }
+            proxy = ini.ReadValue("robot", "proxy");
+            takerKind = ini.ReadValue("robot", "taker", "weibo");
             textBox1.Text = cookie;
             listBox1.Items.Clear();
             textBox3.Text = uid;
             textBox4.Text = interval;
             textBox5.Text = topCount;
+            textBox7.Text = takerKind;
+            textBox8.Text = proxy;
             for (int i = 0; i< windows.Length; i++)
             {
                 listBox1.Items.Add(windows[i]);
@@ -138,7 +154,8 @@ namespace QQRobot
 
         private void button4_Click(object sender, EventArgs e)
         {
-            WeiboTaker taker = new WeiboTaker();
+            BaseTaker taker = BaseTaker.factory(takerKind);
+
             taker.setCookie(cookie);
             taker.setUid(uid);
             taker.setInterval(interval);

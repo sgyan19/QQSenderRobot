@@ -12,7 +12,7 @@ namespace QQRobot
     /// <summary>
     /// 处理类，用于集中处理WeiboTaker等抓取器抓取到的结果。主要是3个方向：交给发送器"sende";打印日志"loger";刷新UI"UiShower".
     /// </summary>
-    class Handle : WeiboTakeEvent
+    class Handle : BaseTakeEvent
     {
         public LinkedList<Sender> senders;
 
@@ -25,10 +25,11 @@ namespace QQRobot
 
         WebClient wb = new WebClient(); // IE控件，用于下载微博图片
 
-        public void NewWeibos(Weibo[] newWeibos, Weibo[] all, WeiboUser user)
+        public void NewData(BaseData[] newWeibos, BaseData[] all, BaseUser user)
         {
             string userName = "";
             Image userHeader = null;
+            string source = null;
             if(user != null)
             {
                 userName = user.UserName;
@@ -37,10 +38,20 @@ namespace QQRobot
                     string path = download(user.UserHeaderUri);
                     if (path != null)
                     {
-                        user.UserHeader = Image.FromFile(path);
+                        try
+                        {
+                            user.UserHeader = Image.FromFile(path);
+                            user.UserHeader = CLongImgMaker.changeSize(user.UserHeader, 20, 20);
+                        }
+                        catch (Exception)
+                        {
+                            File.Delete(path);
+                        }
+                        
                     }
                 }
                 userHeader = user.UserHeader;
+                source = "本信息来自[" + user.Source + "]";
             }
             if(newWeibos.Length > 3)
             {
@@ -51,16 +62,12 @@ namespace QQRobot
             }
             else
             {
-                foreach (Weibo weibo in newWeibos)
+                foreach (BaseData weibo in newWeibos)
                 {
                     Image[] imgs = new Image[weibo.ImgUrls.Length];
                     for (int i = 0; i < weibo.ImgUrls.Length; i++)
                     {
-                        string path = download(weibo.ImgUrls[i]);
-                        if(path != null)
-                        {
-                            imgs[i] = Image.FromFile(path);
-                        }
+                        imgs[i] = download(weibo.ImgUrls[i],3);
                     }
                     Image[] sendImgs ;
                     if (imgs.Length <= 0)
@@ -78,7 +85,7 @@ namespace QQRobot
                         sendCount += senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.sendWithUser(userName, userHeader, weibo.Text, sendImgs);
+                            sender.sendWithUser(userName, userHeader, source, weibo.Text, sendImgs);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
@@ -104,7 +111,7 @@ namespace QQRobot
             }
         }
 
-        public void TakeWeiboes(Weibo[] takeWeibos, WeiboUser user)
+        public void TakeData(BaseData[] takeWeibos, BaseUser user)
         {
             Count++;
             if (ifLog && Count ==1 && takeLoger != null)
@@ -159,6 +166,48 @@ namespace QQRobot
         }
 
 
+        private Image download(string url,int count)
+        {
+            int index = url.LastIndexOf('/');
+            string name = url.Substring(index + 1, url.Length - index - 1);
+            if (name.Length > 100)
+            {
+                name = name.Substring(0, 100);
+            }
+            if (!Directory.Exists("tmp"))
+            {
+                Directory.CreateDirectory("tmp");
+            }
+            string path = "tmp\\" + name;
+        download:
+            if (!File.Exists(path))
+            {
+                try
+                {
+                    wb.DownloadFile(url, path);
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+            }
+            Image image = null; 
+            try
+            {
+                image = Image.FromFile(path);
+            }
+            catch (Exception)
+            {
+                if(count > 0)
+                {
+                    File.Delete(path);
+                    count--;
+                    goto download;
+                }
+            }
+            return image;
+        }
+
         private string format(Exception e)
         {
             StringBuilder builder = new StringBuilder();
@@ -178,12 +227,12 @@ namespace QQRobot
             return builder.ToString();
         }
 
-        private string format(Weibo[] all)
+        private string format(BaseData[] all)
         {
             StringBuilder builder = new StringBuilder();
             builder.AppendLine(String.Format("{0}  [第{1}次]", DateTime.Now.ToString(), Count));
 
-            foreach (Weibo weibo in all)
+            foreach (BaseData weibo in all)
             {
                 builder.AppendLine("    ===========================================================");
                 builder.AppendLine(String.Format("    [Text]  {0}", weibo.Text));

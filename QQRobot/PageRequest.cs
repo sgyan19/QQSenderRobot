@@ -1042,6 +1042,84 @@ namespace BlackRain
             }
             return _returnData;
         }
+
+        public string GetData(string _url, string _cookie, string referer, String proxy)
+        {
+            string _returnData = "";
+            _cookie = _cookie.Replace(';', ',');
+            _cookie = _cookie.TrimStart(',');
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                httpRequest.CookieContainer = new CookieContainer();
+                httpRequest.CookieContainer.SetCookies(uri, _cookie);
+                httpRequest.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
+                httpRequest.Headers.Add("Accept-Encoding", "gzip, deflate, br");//压缩
+                httpRequest.Headers.Add("Cache-Control", "gzip, deflate, br");//压缩
+                httpRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+                httpRequest.ContentType = "text/html; charset=gb2312";
+                httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
+                httpRequest.Method = "GET";
+                httpRequest.KeepAlive = true;
+                //httpRequest.Referer = referer;
+                httpRequest.AllowAutoRedirect = false;
+                httpRequest.Timeout = 10 * 1000;
+
+                if(proxy != null && proxy.Length > 0)
+                {
+                    WebProxy myProxy = new WebProxy();
+                    myProxy.Address = new Uri(proxy);
+                    httpRequest.Proxy = myProxy;
+                }
+
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                    _returnData = GZipDecompress(webstream);
+                else if (web.Headers["Content-Type"] != null)
+                {
+                    int index = web.Headers["Content-Type"].IndexOf("utf-8");
+                    if (index >= 0)
+                    {
+                        using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.UTF8))
+                        {
+                            _returnData = sr.ReadToEnd();
+                        }
+                    }
+                    else
+                    {
+                        index = web.Headers["Content-Type"].IndexOf("gbk");
+                        if (index >= 0)
+                        {
+                            using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.ASCII))
+                            {
+                                _returnData = sr.ReadToEnd();
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                    {
+                        _returnData = sr.ReadToEnd();
+                    }
+                }
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
+
         public string GetData(string _url, string _cookie, string referer,int timeout)
         {
             string _returnData = "";

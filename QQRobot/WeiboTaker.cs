@@ -45,43 +45,6 @@ namespace QQRobot
         private Regex mWeiboImageCropReg = new Regex(WeiboImageCropTemplet);
         private string mWeiboUserImgGroups = "url";
         private string mWeiboUserNameGroups = "name";
-        private string cookie;
-        private string uid;
-        private int topCount;
-        /// <summary>
-        /// 设置置顶数
-        /// </summary>
-        /// <param name="topCount"></param>
-        public void setTopCount(string topCount)
-        {
-            this.topCount = int.Parse(topCount);
-        }
-        /// <summary>
-        /// 设置cookie
-        /// </summary>
-        /// <param name="cookie"></param>
-        public void setCookie(string cookie)
-        {
-            this.cookie = cookie;
-        }
-        /// <summary>
-        /// 保险值，超过多少条微博，判断为对比异常。
-        /// </summary>
-        /// <param name="interval"></param>
-        public void setInterval(string interval)
-        {
-            Interval = int.Parse(interval);
-            if (Interval < 5)
-                Interval = 5;
-        }
-        /// <summary>
-        /// 设置微博用户id
-        /// </summary>
-        /// <param name="uid"></param>
-        public void setUid(string uid)
-        {
-            this.uid = uid;
-        }
 
         public WeiboTaker()
         {
@@ -93,7 +56,7 @@ namespace QQRobot
         /// <returns></returns>
         public override string takePage()
         {
-            return request.GetData(String.Format(PageUrl, uid), cookie, "http://weibo.com");
+            return request.GetData(String.Format(PageUrl, Uid), Cookie, "http://weibo.com",Proxy);
         }
 
         /// <summary>
@@ -101,9 +64,9 @@ namespace QQRobot
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public override Weibo[] paser(string html)
+        public override BaseData[] paser(string html)
         {
-            Weibo[] weibos = null;
+            BaseData[] weibos = null;
             if(User == null)
             {
                 paserUser(html);
@@ -119,12 +82,12 @@ namespace QQRobot
                     matchIndex++;
                 }
             }
-            weibos = new Weibo[weiboHtmls.Length];
+            weibos = new BaseData[weiboHtmls.Length];
             for (int i = 0; i < weiboHtmls.Length; i++)
             {
                 weibos[i] = paserItem(weiboHtmls[i]);
             }
-            weibos = deleteTop(topCount,weibos);
+            weibos = deleteTop(TopCount,weibos);
             return weibos;
         }
 
@@ -133,11 +96,12 @@ namespace QQRobot
             Match mathe = mWeiboUserReg.Match(html);
             if(mathe.Success)
             {
-                User = new WeiboUser();
-                User.UserId = uid;
+                User = new BaseUser();
+                User.UserId = Uid;
                 User.UserHeaderUri = mathe.Groups[mWeiboUserImgGroups].Value.Replace("\\", "");
                 User.UserHeaderUri = mWeiboImageCropReg.Replace(User.UserHeaderUri, "${1}" + "20");
                 User.UserName = mathe.Groups[mWeiboUserNameGroups].Value.Replace("\\", "");
+                User.Source = getTakerName();
             }
         }
 
@@ -147,12 +111,13 @@ namespace QQRobot
         /// <param name="newTakeData"></param>
         /// <param name="oldTakeData"></param>
         /// <returns></returns>
-        public override Weibo[] checkNew(Weibo[] newTakeData, Weibo[] oldTakeData)
+        public override BaseData[] checkNew(BaseData[] newTakeData, BaseData[] oldTakeData)
         {
-            Weibo[] result = null;
-            LinkedList<Weibo> news = new LinkedList<Weibo>();
+            BaseData[] result = null;
+            LinkedList<BaseData> news = new LinkedList<BaseData>();
             if (oldTakeData != null && oldTakeData.Length > 0 && newTakeData.Length > 0)
             {
+                if (oldTakeData[0].ImgUrls == null) oldTakeData[0].ImgUrls = new String[0];
                 if (oldTakeData[0].Text == null) oldTakeData[0].Text = "";
                 int oldLen = oldTakeData[0].Text.Length;
                 for (int i = 0; i < newTakeData.Length; i++)
@@ -164,22 +129,49 @@ namespace QQRobot
                     int len = newTakeData[i].Text.Length > oldLen ? oldLen : newTakeData[i].Text.Length;
                     string newText = newTakeData[i].Text.Substring(0, len);
                     string oldText = oldTakeData[0].Text.Substring(0, len);
-                    if (string.Equals(newText,oldText))
+                    if (string.Equals(newText, oldText))
                     {
                         break;
+                    }
+                    else
+                    {
+                        if (newTakeData[i].ImgUrls == null) newTakeData[i].ImgUrls = new String[0];
+                        if(oldTakeData[i].ImgUrls.Length == newTakeData[i].ImgUrls.Length)
+                        {
+                            bool same = true;
+                            for (int j = 0; j < oldTakeData[i].ImgUrls.Length; j++)
+                            {
+                                if(!String.Equals(oldTakeData[0].ImgUrls[j], newTakeData[i].ImgUrls[j]))
+                                {
+                                    same = false;
+                                    break;
+                                }
+                            }
+                            if (same && len > 10) 
+                            {
+                                len = 10;
+                                newText = newTakeData[i].Text.Substring(0, len);
+                                oldText = oldTakeData[0].Text.Substring(0, len);
+                                if(string.Equals(newText, oldText))
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        
                     }
                     news.AddFirst(newTakeData[i]);
                 }
             }
             if (news.Count == 0)
             {
-                result = new Weibo[0];
+                result = new BaseData[0];
             }
             else
             {
-                result = new Weibo[news.Count];
+                result = new BaseData[news.Count];
                 int i = 0;
-                foreach(Weibo weibo in news)
+                foreach(BaseData weibo in news)
                 {
                     result[i++] = weibo;
                 }
@@ -225,7 +217,7 @@ namespace QQRobot
                 string newItem = null;
                 try
                 {
-                    newItem = request.GetData(Host + url, cookie, "http://weibo.com");
+                    newItem = request.GetData(Host + url, Cookie, "http://weibo.com",Proxy);
                 }
                 catch (Exception)
                 {
@@ -243,9 +235,9 @@ namespace QQRobot
         /// </summary>
         /// <param name="weiboHtml"></param>
         /// <returns></returns>
-        private Weibo paserItem(string weiboHtml)
+        private BaseData paserItem(string weiboHtml)
         {
-            Weibo weibo = new Weibo();
+            BaseData weibo = new BaseData();
             weibo.Text = paserItemText(weiboHtml);
             MatchCollection imgMathes = mWeiboImgReg.Matches(weiboHtml);
 
@@ -284,18 +276,23 @@ namespace QQRobot
         /// <param name="topCount">置顶</param>
         /// <param name="data">微博结果</param>
         /// <returns></returns>
-        private Weibo[] deleteTop(int topCount,Weibo[] data)
+        private BaseData[] deleteTop(int topCount,BaseData[] data)
         {
             if(data.Length < topCount || topCount == 0)
             {
                 return data;
             }
-            Weibo[] newWeibos = new Weibo[data.Length - topCount];
+            BaseData[] newWeibos = new BaseData[data.Length - topCount];
             for (int i = topCount; i < data.Length; i++)
             {
                 newWeibos[i - topCount] = data[i];
             }
             return newWeibos;
+        }
+
+        override public string getTakerName()
+        {
+            return "新浪微博";
         }
     }
 }
