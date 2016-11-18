@@ -16,7 +16,9 @@ namespace QQRobot
         private const string ItemTemplet = "<div class=\\\"tweet js-stream-tweet js-actionable-tweet(?<item>[\\s\\S]*?)<div class=\\\"stream-item-footer\\\">";
         private const string ItemTextTemplet = "<p class=\\\"TweetTextSize TweetTextSize--[\\d]{1,3}px js-tweet-text tweet-text\\\" lang=\\\"[a-z]{1,3}\\\" data-aria-label-part=\\\"[\\d]\\\">(?<content>[\\s\\S]*?)</p>";
         private const string ItemImgTemplet = "<img data-aria-label-part src=\\\"(?<url>[\\S]*?)\\\" alt=";
-        public const string ItemLinkTemplet = "<a[\\s\\S]*?href=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
+        private const string ItemLinkTemplet = "<a[\\s\\S]*?href=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
+        private const string HtmlLabel1Templet = "<[\\s\\S]*?/>";
+        private const string HtmlLabel2Templet = "<[\\s\\S]*?>[\\s\\S]*?</[\\s\\S]*?>";
 
         private Regex mUserReg = new Regex(UserTemplet);
         private string mUserImgGroups = "url";
@@ -30,6 +32,8 @@ namespace QQRobot
         private Regex mItemLinkReg = new Regex(ItemLinkTemplet);
         private string mLinkUrlGroups = "url";
         private string mLinkNameGroups = "name";
+        private Regex mHtmlLabel1Reg = new Regex(HtmlLabel1Templet);
+        private Regex mHtmlLabel2Reg = new Regex(HtmlLabel2Templet);
 
         public override BaseData[] checkNew(BaseData[] newTakeData, BaseData[] oldTakeData)
         {
@@ -112,7 +116,7 @@ namespace QQRobot
                 int matchIndex = 0;
                 foreach (Match m in mathes)
                 {
-                    itemHtmls[matchIndex] = m.Groups[mItemGroups].Value.Replace("&amp;", "&");
+                    itemHtmls[matchIndex] = m.Groups[mItemGroups].Value.Replace("&amp;", "&").Replace("&nbsp;"," ");
                     matchIndex++;
                 }
             }
@@ -168,14 +172,14 @@ namespace QQRobot
                     if (name[0] != '@')
                     {
                         url = linkMatch.Groups[mLinkUrlGroups].Value.Replace("\\", "");
-                        content = content.Replace(linkMatch.Value, name + ": [" + url + "]");
+                        content = content.Replace(linkMatch.Value, name + ": [ " + url + " ]");
                     }
                     else
                     {
                         content = content.Replace(name, "[" + name + "]");
                     }
                 }
-                twitter.Text = content;
+                twitter.Text = mHtmlLabel2Reg.Replace(mHtmlLabel1Reg.Replace(content,""), "");
             }
 
             MatchCollection imgMatches = mItemImgsReg.Matches(twitterHtml);

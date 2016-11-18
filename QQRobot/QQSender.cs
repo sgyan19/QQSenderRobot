@@ -191,7 +191,10 @@ namespace QQRobot
                 Clipboard.SetText(source);
                 SenderApi.QQPasteAndSumbit(mHwnd);
             }
-            SenderApi.QQSumbit(mHwnd);
+            else
+            {
+                SenderApi.QQSumbit(mHwnd);
+            }
         }
 
         ~QQSender()

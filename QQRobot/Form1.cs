@@ -61,6 +61,8 @@ namespace QQRobot
             handle.shower.doBtn = button4;
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
+
+            //new WeiboAuthor().author();
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -81,6 +83,7 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             taker.setProxy(proxy);
+            handle.setProxy(proxy);
             server.Start(taker);
             Win32Api.SystemUnsleepLock();
         }

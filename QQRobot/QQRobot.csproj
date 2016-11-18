@@ -87,6 +87,7 @@
     </Compile>
     <Compile Include="Handle.cs" />
     <Compile Include="TwitterTaker.cs" />
+    <Compile Include="WeiboAuthor.cs" />
     <Compile Include="Win32Api.cs" />
     <Compile Include="Loger.cs" />
     <Compile Include="PageRequest.cs" />

@@ -23,6 +23,18 @@ namespace QQRobot
         public int sendCount;   // 最后一次结果已发送数
         public bool ifLog;      // 是否日志开关
 
+        public void setProxy(string proxy)
+        {
+            try
+            {
+                wb.Proxy = new WebProxy(proxy);
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         WebClient wb = new WebClient(); // IE控件，用于下载微博图片
 
         public void NewData(BaseData[] newWeibos, BaseData[] all, BaseUser user)
@@ -188,7 +200,19 @@ namespace QQRobot
                 }
                 catch (Exception e)
                 {
-                    return null;
+                    if (count > 0)
+                    {
+                        if (File.Exists(path))
+                        {
+                            File.Delete(path);
+                        }
+                        count--;
+                        goto download;
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
             }
             Image image = null; 
@@ -200,7 +224,10 @@ namespace QQRobot
             {
                 if(count > 0)
                 {
-                    File.Delete(path);
+                    if (File.Exists(path))
+                    {
+                        File.Delete(path);
+                    }
                     count--;
                     goto download;
                 }

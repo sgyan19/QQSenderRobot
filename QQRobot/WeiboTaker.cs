@@ -195,7 +195,7 @@ namespace QQRobot
                     if (name[0] != '@')
                     {
                         url = linkMatch.Groups["url"].Value.Replace("\\", "");
-                        content = content.Replace(linkMatch.Value, name + ":[" + url + "]");
+                        content = content.Replace(linkMatch.Value, name + ":[ " + url + " ]");
                     }
                     else
                     {
