@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -24,7 +25,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -63,6 +63,10 @@
     <ManifestKeyFile>gyani.pfx</ManifestKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -77,6 +81,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLongImgMaker.cs" />
+    <Compile Include="FileHelper.cs" />
     <Compile Include="Sender.cs" />
     <Compile Include="BaseTaker.cs" />
     <Compile Include="Form1.cs">
@@ -86,8 +91,10 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Handle.cs" />
+    <Compile Include="SimpleJSON.cs" />
     <Compile Include="TwitterTaker.cs" />
-    <Compile Include="WeiboAuthor.cs" />
+    <Compile Include="Weibo.cs" />
+    <Compile Include="WeiboApi.cs" />
     <Compile Include="Win32Api.cs" />
     <Compile Include="Loger.cs" />
     <Compile Include="PageRequest.cs" />

@@ -7,6 +7,7 @@ using System.Net.Cache;
 using System.IO;
 using System.IO.Compression;
 using System.Collections;
+using System.Collections.Specialized;
 
 namespace BlackRain
 {
@@ -830,6 +831,46 @@ namespace BlackRain
             return _returnData;
             #endregion
         }
+        public string GetData(string _url)
+        {
+            string _returnData = "";
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+                httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+                httpRequest.ContentType = "text/html; charset=gb2312";
+                httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
+                httpRequest.Method = "GET";
+
+                httpRequest.AllowAutoRedirect = false;
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                    _returnData = GZipDecompress(webstream);
+                else
+                {
+                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                    {
+                        _returnData = sr.ReadToEnd();
+                    }
+                }
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
         public string GetData(string _url, string _cookie)
         {
             string _returnData = "";
@@ -1042,7 +1083,6 @@ namespace BlackRain
             }
             return _returnData;
         }
-
         public string GetData(string _url, string _cookie, string referer, String proxy)
         {
             string _returnData = "";
@@ -1119,7 +1159,6 @@ namespace BlackRain
             }
             return _returnData;
         }
-
         public string GetData(string _url, string _cookie, string referer,int timeout)
         {
             string _returnData = "";
@@ -1499,5 +1538,107 @@ namespace BlackRain
             }
             return "";
         }
+
+
+        /// <summary>
+        /// 以Post 形式提交数据到 uri
+        /// </summary>
+        /// <param name="uri"></param>
+        /// <param name="files"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public byte[] PostData(string uri, IEnumerable<UploadFile> files, NameValueCollection values)
+        {
+            string boundary = "----------------------------" + DateTime.Now.Ticks.ToString("x");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.ContentType = "multipart/form-data; boundary=" + boundary;
+            request.Method = "POST";
+            request.KeepAlive = true;
+            request.Credentials = CredentialCache.DefaultCredentials;
+
+
+            MemoryStream stream = new MemoryStream();
+
+            byte[] line = Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
+
+            /*//提交文本字段
+            if (values != null)
+            {
+                string format = "{0}={1}&";
+                foreach (string key in values.Keys)
+                {
+                    string s = string.Format(format, key, values[key]);
+                    byte[] data = Encoding.UTF8.GetBytes(s);
+                    stream.Write(data, 0, data.Length);
+                }
+                stream.Write(line, 0, line.Length);
+            }*/
+
+            //提交文本字段
+            if (values != null)
+            {
+                string format = "\r\n--" + boundary + "\r\nContent-Disposition: form-data; name=\"{0}\";\r\n\r\n{1}";
+                foreach (string key in values.Keys)
+                {
+                    string s = string.Format(format, key, values[key]);
+                    byte[] data = Encoding.UTF8.GetBytes(s);
+                    stream.Write(data, 0, data.Length);
+                }
+                stream.Write(line, 0, line.Length);
+            }
+
+            //提交文件
+            if (files != null)
+            {
+                string fformat = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\n Content-Type: application/octet-stream\r\n\r\n";
+                foreach (UploadFile file in files)
+                {
+                    string s = string.Format(fformat, file.Name, file.Filename);
+                    byte[] data = Encoding.UTF8.GetBytes(s);
+                    stream.Write(data, 0, data.Length);
+
+
+
+                    stream.Write(file.Data, 0, file.Data.Length);
+                    stream.Write(line, 0, line.Length);
+                }
+            }
+
+
+            request.ContentLength = stream.Length;
+
+
+            Stream requestStream = request.GetRequestStream();
+
+            stream.Position = 0L;
+            stream.CopyTo(requestStream);
+            stream.Close();
+
+            requestStream.Close();
+
+
+
+            using (var response = request.GetResponse())
+            using (var responseStream = response.GetResponseStream())
+            using (var mstream = new MemoryStream())
+            {
+                responseStream.CopyTo(mstream);
+                return mstream.ToArray();
+            }
+        }
+    }
+    /// <summary>
+    /// 上传文件
+    /// </summary>
+    public class UploadFile
+    {
+        public UploadFile()
+        {
+            ContentType = "application/octet-stream";
+        }
+        public string Name { get; set; }
+        public string Filename { get; set; }
+        public string ContentType { get; set; }
+        public byte[] Data { get; set; }
     }
 }

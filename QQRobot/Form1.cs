@@ -62,7 +62,13 @@ namespace QQRobot
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
 
-            //new WeiboAuthor().author();
+            List<Weibo> weibos = new List<Weibo>();
+            Weibo weibo = new Weibo();
+            weibos.Add(weibo);
+            weibo.Text = "1212";
+            weibo.ImgUrls = new string[1];
+            weibo.ImgUrls[0] = "http://ww1.sinaimg.cn/mw690/5ed0f760jw1f6uc4cu91zj20go0cidhi.jpg";
+            WeiboApi.getInstance().sendWeibo(weibos);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
