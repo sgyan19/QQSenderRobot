@@ -11,3 +11,14 @@
 /x64
 /ClipboardQQSender/x64
 /QQRobot/bin
+/NetDimension.OpenAuth/bin
+/NetDimension.OpenAuth/obj
+/NetDimension.OpenAuth.Sina/bin
+/NetDimension.OpenAuth.Sina/obj
+/NetDimension.OpenAuth.Winform/bin
+/NetDimension.OpenAuth.Winform/obj
+/WeiboTokenAuthor2.0/bin
+/WeiboTokenAuthor2.0/obj
+/ipch
+/packages
+*.opendb
