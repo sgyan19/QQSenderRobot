@@ -29,22 +29,24 @@ namespace QQRobot
         private const string AUTHOR_API = "/authorize";
         private const string TOKEN_API = "/access_token";
 
-        private const string API_URL = "https://upload.api.weibo.com/2";
-        private const string USER_INFO_API = "/users/show.json";
-        private const string USER_WEIBO_LIST_API = "/statuses/timeline_batch.json";
+        private const string API_SER = "https://api.weibo.com/2";
+        private const string USER_INFO = "/users/show.json";
+        private const string WEIBO_LIST = "/statuses/timeline_batch.json";
+        private const string WEIBO_TEXT = "/statuses/update.json";
 
-        private const string USER_SEND_WEIBO_API = "/statuses/upload.json";
+        private const string UPLOAD_SER = "http://api.weibo.com/2";
+        private const string WEIBO_UPLOAD = "/statuses/upload.json";
 
         // form 闪记
         private const string WEIBO_APP_KEY = "1242380827";
-        private const string WEIBO_REDIRECT_URL = "http://www.sina.com";
+        private const string WEIBO_REDIRECT_URL = "https://www.sina.com";
         private const string WEIBO_SCOPE = "email,direct_messages_read,direct_messages_write,"
                             + "friendships_groups_read,friendships_groups_write,statuses_to_me_read,"
                             + "follow_app_official_microblog,"
                             + "invitation_write";
 
         private PageRequest mRequest = new PageRequest();
-        private string mToken = "2.00H7ollCZtgRxDc42d182d5ajIR83D";
+        private string mToken = "2.00H7ollCfc8pZB9f6d1bf208tvzytB";
 
         private string getAuthorUri()
         {
@@ -65,7 +67,7 @@ namespace QQRobot
         {
             #region request url
             StringBuilder builder = new StringBuilder();
-            builder.Append(API_URL).Append(USER_INFO_API).Append("?access_token=").Append(mToken);
+            builder.Append(API_SER).Append(USER_INFO).Append("?access_token=").Append(mToken);
             if(args.Length > 0 && args[0] != null)
             {
                 builder.Append("&uid=").Append(args[0]);
@@ -98,7 +100,7 @@ namespace QQRobot
         {
             #region request arg
             StringBuilder builder = new StringBuilder();
-            builder.Append(API_URL).Append(USER_WEIBO_LIST_API).Append("?access_token=").Append(mToken);
+            builder.Append(API_SER).Append(WEIBO_LIST).Append("?access_token=").Append(mToken);
             int argsIndex = 0;
             if (args.Length > argsIndex && args[argsIndex] != null)
             {
@@ -156,9 +158,18 @@ namespace QQRobot
             return rel;
         }
 
-        public void sendWeibo(List<Weibo> data)
+        public void sendWeiboText(Weibo weibo)
         {
-            string url = API_URL + USER_SEND_WEIBO_API;
+            string url = API_SER + WEIBO_TEXT;
+            StringBuilder builder = new StringBuilder();
+            builder.Append("access_token").Append(mToken);
+            string data = "access_token=" + mToken + "&status=" + weibo.Text;
+            mRequest.PostData(url, data, "");
+        }
+
+        public void sendWeibos(List<Weibo> data)
+        {
+            string url = UPLOAD_SER + WEIBO_UPLOAD;
             StringBuilder builder = new StringBuilder();
             if (data != null && data.Count > 0)
             {
@@ -170,14 +181,19 @@ namespace QQRobot
                     files.Clear();
                     args.Set("access_token", mToken);
                     args.Set("status", item.Text);
+                    args.Set("source", "1445565505");
                     if (item.ImgUrls != null)
                     {
                         foreach (string uri in item.ImgUrls)
                         {
-                            string path = FileHelper.getInstance().download(null, uri);
+                            if (string.IsNullOrEmpty(uri))
+                            {
+                                continue;
+                            }
+                            string path = FileHelper.getInstance().download(uri, null);
                             UploadFile file = new UploadFile();
                             file.Name = "pic";
-                            file.Filename = "pic";
+                            file.Filename = "pic.png";
                             file.Data = File.ReadAllBytes(path);
                             files.Add(file);
                         }
@@ -187,4 +203,4 @@ namespace QQRobot
             }
         }
     }
-}
+}                                                                                                                                        

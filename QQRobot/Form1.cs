@@ -23,10 +23,13 @@ namespace QQRobot
 
         }
 
+        private WebClient wb = new WebClient();
+
         private string cookie;
         private string uid;
         private string interval;
         private string[] windows;
+        private string[] weiboTokens;
         private string topCount;
         private string proxy;
         private string takerKind;
@@ -61,14 +64,6 @@ namespace QQRobot
             handle.shower.doBtn = button4;
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
-
-            List<Weibo> weibos = new List<Weibo>();
-            Weibo weibo = new Weibo();
-            weibos.Add(weibo);
-            weibo.Text = "1212";
-            weibo.ImgUrls = new string[1];
-            weibo.ImgUrls[0] = "http://ww1.sinaimg.cn/mw690/5ed0f760jw1f6uc4cu91zj20go0cidhi.jpg";
-            WeiboApi.getInstance().sendWeibo(weibos);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -89,7 +84,6 @@ namespace QQRobot
             taker.setInterval(interval);
             taker.setTopCount(topCount);
             taker.setProxy(proxy);
-            handle.setProxy(proxy);
             server.Start(taker);
             Win32Api.SystemUnsleepLock();
         }
@@ -100,11 +94,13 @@ namespace QQRobot
             Win32Api ini = new Win32Api(".\\config.ini");
             string cookiePath = ini.ReadValue("robot", "cookie");
             string windowText = ini.ReadValue("robot", "windows");
+            string tokenText = ini.ReadValue("robot", "weibo_sender_tokens");
             interval = ini.ReadValue("robot", "interval");
             uid = ini.ReadValue("robot", "uid");
             topCount = ini.ReadValue("robot","top");
             ifLog = bool.Parse(ini.ReadValue("robot", "iflog"));
             windows = windowText.Split(',');
+            weiboTokens = tokenText.Split(',');
             if (File.Exists(cookiePath))
             {
                 try
@@ -128,6 +124,10 @@ namespace QQRobot
             {
                 listBox1.Items.Add(windows[i]);
             }
+            for (int i = 0; i < weiboTokens.Length; i++)
+            {
+                listBox1.Items.Add(weiboTokens[i]);
+            }
             handle.senders.Clear();
             handle.ifLog = ifLog;
             listBox2.Items.Clear();
@@ -137,7 +137,16 @@ namespace QQRobot
                 if (sender != null)
                 {
                     handle.senders.AddLast(sender);
-                    listBox2.Items.Add(sender.getWndName());
+                    listBox2.Items.Add(sender.getName());
+                }
+            }
+            foreach (string token in weiboTokens)
+            {
+                WeiboSender sender = WeiboSender.CreateSender(token);
+                if (sender != null)
+                {
+                    handle.senders.AddLast(sender);
+                    listBox2.Items.Add(sender.getName());
                 }
             }
         }
@@ -164,8 +173,8 @@ namespace QQRobot
         private void button4_Click(object sender, EventArgs e)
         {
             BaseTaker taker = BaseTaker.factory(takerKind);
-
             taker.setCookie(cookie);
+            taker.setProxy(proxy);
             taker.setUid(uid);
             taker.setInterval(interval);
             taker.setTopCount(topCount);

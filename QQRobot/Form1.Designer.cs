@@ -158,9 +158,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(10, 79);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(53, 12);
+            this.label3.Size = new System.Drawing.Size(47, 12);
             this.label3.TabIndex = 9;
-            this.label3.Text = "QQ窗口：";
+            this.label3.Text = "sender:";
             // 
             // label4
             // 
@@ -224,9 +224,9 @@
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(134, 79);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(65, 12);
+            this.label8.Size = new System.Drawing.Size(77, 12);
             this.label8.TabIndex = 17;
-            this.label8.Text = "有效窗口：";
+            this.label8.Text = "有效sender：";
             // 
             // listBox2
             // 

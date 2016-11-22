@@ -15,7 +15,9 @@ namespace QQRobot
         public abstract void send(string msg, Image[] imgs);
         public delegate void Send(string msg, Image[] imgs);
 
-        public abstract void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs);
-        public delegate void SendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs);
+        public abstract void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string imgPATH);
+        public delegate void SendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string imgPATH);
+
+        public abstract string getName();
     }
 }

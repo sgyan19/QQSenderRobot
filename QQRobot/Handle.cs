@@ -23,20 +23,6 @@ namespace QQRobot
         public int sendCount;   // 最后一次结果已发送数
         public bool ifLog;      // 是否日志开关
 
-        public void setProxy(string proxy)
-        {
-            try
-            {
-                wb.Proxy = new WebProxy(proxy);
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-
-        WebClient wb = new WebClient(); // IE控件，用于下载微博图片
-
         public void NewData(BaseData[] newWeibos, BaseData[] all, BaseUser user)
         {
             string userName = "";
@@ -45,23 +31,6 @@ namespace QQRobot
             if(user != null)
             {
                 userName = user.UserName;
-                if(user.UserHeader == null)
-                {
-                    string path = download(user.UserHeaderUri);
-                    if (path != null)
-                    {
-                        try
-                        {
-                            user.UserHeader = Image.FromFile(path);
-                            user.UserHeader = CLongImgMaker.changeSize(user.UserHeader, 20, 20);
-                        }
-                        catch (Exception)
-                        {
-                            File.Delete(path);
-                        }
-                        
-                    }
-                }
                 userHeader = user.UserHeader;
                 source = "本信息来自[" + user.Source + "]";
             }
@@ -76,20 +45,19 @@ namespace QQRobot
             {
                 foreach (BaseData weibo in newWeibos)
                 {
-                    Image[] imgs = new Image[weibo.ImgUrls.Length];
-                    for (int i = 0; i < weibo.ImgUrls.Length; i++)
+                    Image longImage = null;
+                    if (weibo != null && weibo.Taker != null)
                     {
-                        imgs[i] = download(weibo.ImgUrls[i],3);
+                        longImage = weibo.Taker.makeLongImage(weibo);
                     }
                     Image[] sendImgs ;
-                    if (imgs.Length <= 0)
+                    if(longImage == null)
                     {
-                        sendImgs = imgs;
+                        sendImgs = new Image[0];
                     }
                     else
                     {
                         sendImgs = new Image[1];
-                        Image longImage = CLongImgMaker.make(imgs);
                         sendImgs[0] = longImage;
                     }
                     if (senders != null && senders.Count > 0)
@@ -97,7 +65,7 @@ namespace QQRobot
                         sendCount += senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.sendWithUser(userName, userHeader, source, weibo.Text, sendImgs);
+                            sender.sendWithUser(userName, userHeader, source, weibo.Text, sendImgs, weibo.LongImgPath);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
@@ -134,105 +102,6 @@ namespace QQRobot
             {
                 shower.showResult(String.Format("第{0}次，{1}条",Count, takeWeibos.Length), format(takeWeibos));
             }
-        }
-
-        private string download(string url)
-        {
-            int index = url.LastIndexOf('/');
-            string name = url.Substring(index + 1, url.Length - index -1 ) ;
-            if(name.Length > 100)
-            {
-                name = name.Substring(0, 100);
-            }
-            if (!Directory.Exists("tmp"))
-            {
-                Directory.CreateDirectory("tmp");
-            }
-            string path = "tmp\\" + name;
-            if (!File.Exists(path))
-            {
-                /*
-                try
-                {
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    int i = 1;
-                    while (File.Exists(path))
-                    {
-                        path += "(" + i + ")";
-                        i++;
-                    }
-                }
-                */
-                try
-                {
-                    wb.DownloadFile(url, path);
-                }catch(Exception e)
-                {
-                    return null;
-                }
-            }
-            return path;
-        }
-
-
-        private Image download(string url,int count)
-        {
-            int index = url.LastIndexOf('/');
-            string name = url.Substring(index + 1, url.Length - index - 1);
-            if (name.Length > 100)
-            {
-                name = name.Substring(0, 100);
-            }
-            if (!Directory.Exists("tmp"))
-            {
-                Directory.CreateDirectory("tmp");
-            }
-            string path = "tmp\\" + name;
-        download:
-            if (!File.Exists(path))
-            {
-                try
-                {
-                    wb.DownloadFile(url, path);
-                }
-                catch (Exception e)
-                {
-                    if (count > 0)
-                    {
-                        if (File.Exists(path))
-                        {
-                            File.Delete(path);
-                        }
-                        count--;
-                        goto download;
-                    }
-                    else
-                    {
-                        return null;
-                    }
-                }
-            }
-            Image image = null; 
-            try
-            {
-                image = Image.FromFile(path);
-            }
-            catch (Exception)
-            {
-                if(count > 0)
-                {
-                    if (File.Exists(path))
-                    {
-                        File.Delete(path);
-                    }
-                    count--;
-                    goto download;
-                }
-            }
-            return image;
         }
 
         private string format(Exception e)

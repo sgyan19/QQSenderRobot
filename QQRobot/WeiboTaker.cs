@@ -67,10 +67,6 @@ namespace QQRobot
         public override BaseData[] paser(string html)
         {
             BaseData[] weibos = null;
-            if(User == null)
-            {
-                paserUser(html);
-            }
             MatchCollection mathes = mWeiboItemReg.Matches(html);
             string[] weiboHtmls = new string[mathes.Count];
             if (mathes.Count > 0)
@@ -91,7 +87,7 @@ namespace QQRobot
             return weibos;
         }
 
-        private void paserUser(String html)
+        public override BaseUser paserUser(String html)
         {
             Match mathe = mWeiboUserReg.Match(html);
             if(mathe.Success)
@@ -103,6 +99,7 @@ namespace QQRobot
                 User.UserName = mathe.Groups[mWeiboUserNameGroups].Value.Replace("\\", "");
                 User.Source = getTakerName();
             }
+            return User;
         }
 
         /// <summary>

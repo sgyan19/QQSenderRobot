@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQRobot", "QQRobot\QQRobot.csproj", "{8585F112-CCFB-4150-8996-9343C540F6A4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119} = {45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F} = {76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testRex", "testRex\testRex.csproj", "{E516B936-D3F1-44C2-9537-013BE20EC48D}"
@@ -15,6 +16,23 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E26C6F06-A413-4725-81D5-EAF9AB284160}"
 	ProjectSection(SolutionItems) = preProject
 		ReadMe.txt = ReadMe.txt
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDimension.OpenAuth", "NetDimension.OpenAuth\NetDimension.OpenAuth.csproj", "{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetDimension.OpenAuth.Sina", "NetDimension.OpenAuth.Sina\NetDimension.OpenAuth.Sina.csproj", "{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}"
+EndProject
+Project("{911E67C6-3D85-4FCE-B560-20A9C3E3FF48}") = "NuGet", ".nuget\NuGet.exe", "{53B9F28F-637E-4878-9031-2AE364ECB5FE}"
+	ProjectSection(DebuggerProjectSystem) = preProject
+		PortSupplier = 00000000-0000-0000-0000-000000000000
+		Executable = C:\Users\guoyao\Documents\Visual Studio 2015\Projects\QQSenderRobot\.nuget\NuGet.exe
+		RemoteMachine = GUOYAO-PC
+		StartingDirectory = C:\Users\guoyao\Documents\Visual Studio 2015\Projects\QQSenderRobot\.nuget
+		Environment = 默认值
+		LaunchingEngine = 00000000-0000-0000-0000-000000000000
+		UseLegacyDebugEngines = No
+		LaunchSQLEngine = No
+		AttachLaunchAction = No
 	EndProjectSection
 EndProject
 Global
@@ -61,6 +79,36 @@ Global
 		{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}.Release|x64.Build.0 = Release|x64
 		{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}.Release|x86.ActiveCfg = Release|Win32
 		{45B7A69B-DA3A-4684-A6BE-9EFF60E7B119}.Release|x86.Build.0 = Release|Win32
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|x64.Build.0 = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Debug|x86.Build.0 = Debug|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|x64.ActiveCfg = Release|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|x64.Build.0 = Release|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|x86.ActiveCfg = Release|Any CPU
+		{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}.Release|x86.Build.0 = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|x64.Build.0 = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Debug|x86.Build.0 = Debug|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x64.ActiveCfg = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x64.Build.0 = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x86.ActiveCfg = Release|Any CPU
+		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x86.Build.0 = Release|Any CPU
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|Any CPU.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x64.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x86.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|Any CPU.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x64.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x86.ActiveCfg = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

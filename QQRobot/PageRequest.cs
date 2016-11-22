@@ -1549,9 +1549,15 @@ namespace BlackRain
         /// <returns></returns>
         public byte[] PostData(string uri, IEnumerable<UploadFile> files, NameValueCollection values)
         {
-            string boundary = "----------------------------" + DateTime.Now.Ticks.ToString("x");
+            string boundary = "7fb5f21c-d335-4411-8dfc-ca4fcd87c832"; //"----------------------------" + DateTime.Now.Ticks.ToString("x");
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
             request.ContentType = "multipart/form-data; boundary=" + boundary;
+            request.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+            request.Headers.Add("Accept-Encoding", "gzip,deflate");
+            request.Headers.Add("Pragma", "no-cache");
+
+            request.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
             request.Method = "POST";
             request.KeepAlive = true;
             request.Credentials = CredentialCache.DefaultCredentials;
@@ -1559,25 +1565,25 @@ namespace BlackRain
 
             MemoryStream stream = new MemoryStream();
 
-            byte[] line = Encoding.ASCII.GetBytes("\r\n--" + boundary + "\r\n");
+            byte[] line = Encoding.UTF8.GetBytes("--" + boundary + "\r\n");
 
             /*//提交文本字段
             if (values != null)
             {
                 string format = "{0}={1}&";
+                string args = "";
                 foreach (string key in values.Keys)
                 {
-                    string s = string.Format(format, key, values[key]);
-                    byte[] data = Encoding.UTF8.GetBytes(s);
-                    stream.Write(data, 0, data.Length);
+                    args += string.Format(format, key, values[key]);
                 }
-                stream.Write(line, 0, line.Length);
-            }*/
-
+                byte[] postData = Encoding.UTF8.GetBytes(args);
+                stream.Write(postData, 0, postData.Length);
+            }
+            */
             //提交文本字段
             if (values != null)
             {
-                string format = "\r\n--" + boundary + "\r\nContent-Disposition: form-data; name=\"{0}\";\r\n\r\n{1}";
+                string format = "--" + boundary + "\r\nContent-Type: text/plain; charset=utf-8\r\nContent-Disposition: form-data; name={0}\r\n\r\n{1}\r\n";
                 foreach (string key in values.Keys)
                 {
                     string s = string.Format(format, key, values[key]);
@@ -1590,7 +1596,7 @@ namespace BlackRain
             //提交文件
             if (files != null)
             {
-                string fformat = "Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"\r\n Content-Type: application/octet-stream\r\n\r\n";
+                string fformat = "Content-Disposition: form-data; name={0}; filename={1}\r\nContent-Type: application/octet-stream\r\nContent-Transfer-Encoding: binary\r\n\r\n";
                 foreach (UploadFile file in files)
                 {
                     string s = string.Format(fformat, file.Name, file.Filename);

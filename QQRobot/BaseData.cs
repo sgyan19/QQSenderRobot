@@ -14,5 +14,8 @@ namespace QQRobot
         public string Text;
         public string[] ImgUrls;
         public string TimeStamp;
+        public string LongImgPath;
+
+        public BaseTaker Taker;
     }
 }

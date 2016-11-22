@@ -105,10 +105,6 @@ namespace QQRobot
 
         public override BaseData[] paser(string html)
         {
-            if (User == null)
-            {
-                paserUser(html);
-            }
             MatchCollection mathes = mItemReg.Matches(html);
             string[] itemHtmls = new string[mathes.Count];
             if (mathes.Count > 0)
@@ -134,12 +130,12 @@ namespace QQRobot
         {
             return request.GetData(String.Format(PageUrl, Uid), Cookie, Host, Proxy);
         }
-        
+
         /// <summary>
         /// 整页html提取用户信息，头像，昵称
         /// </summary>
         /// <param name="html"></param>
-        private void paserUser(String html)
+        public override BaseUser paserUser(String html)
         {
             Match mathe = mUserReg.Match(html);
             if (mathe.Success)
@@ -150,6 +146,7 @@ namespace QQRobot
                 User.UserName = mathe.Groups[mUserNameGroups].Value.Replace("\\", "");
                 User.Source = getTakerName();
             }
+            return User;
         }
 
         /// <summary>

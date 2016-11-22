@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
-    class BaseUser
+    public class BaseUser
     {
         public string UserName;
         public string UserId;

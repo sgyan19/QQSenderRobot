@@ -80,7 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CLongImgMaker.cs" />
+    <Compile Include="ImageHelper.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="Sender.cs" />
     <Compile Include="BaseTaker.cs" />
@@ -95,6 +95,8 @@
     <Compile Include="TwitterTaker.cs" />
     <Compile Include="Weibo.cs" />
     <Compile Include="WeiboApi.cs" />
+    <Compile Include="WeiboApi2.cs" />
+    <Compile Include="WeiboSender.cs" />
     <Compile Include="Win32Api.cs" />
     <Compile Include="Loger.cs" />
     <Compile Include="PageRequest.cs" />
@@ -146,6 +148,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetDimension.OpenAuth.Sina\NetDimension.OpenAuth.Sina.csproj">
+      <Project>{76fc909d-bda2-4fce-9b9f-b503a13df44f}</Project>
+      <Name>NetDimension.OpenAuth.Sina</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NetDimension.OpenAuth\NetDimension.OpenAuth.csproj">
+      <Project>{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}</Project>
+      <Name>NetDimension.OpenAuth</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -111,14 +111,15 @@ namespace QQRobot
             SenderApi.QQHeartbeat(mHwnd);
         }
 
-        public override void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs)
+        public override void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string longImgPath)
         {
-            object[] args = new object[5];
+            object[] args = new object[6];
             args[0] = userName;
             args[1] = userHeader;
             args[2] = source;
             args[3] = msg;
             args[4] = imgs;
+            args[5] = longImgPath;
             form.Invoke(new SendWithUser(mainThreadSendWithUser), args);
         }
 
@@ -127,7 +128,7 @@ namespace QQRobot
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="imgs"></param>
-        public void mainThreadSendWithUser(string userName, Image userHeader, string msg, Image[] imgs)
+        public void mainThreadSendWithUser(string userName, Image userHeader, string msg, Image[] imgs, string longImgPath)
         {
             Clipboard.Clear();
             if(userHeader != null)
@@ -160,7 +161,7 @@ namespace QQRobot
         /// </summary>
         /// <param name="msg"></param>
         /// <param name="imgs"></param>
-        public void mainThreadSendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs)
+        public void mainThreadSendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string longImgPath)
         {
             Clipboard.Clear();
             if (userHeader != null)
@@ -195,6 +196,11 @@ namespace QQRobot
             {
                 SenderApi.QQSumbit(mHwnd);
             }
+        }
+
+        public override string getName()
+        {
+            return getWndName();
         }
 
         ~QQSender()

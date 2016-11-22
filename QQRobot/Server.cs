@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace QQRobot
         private int flag = 0;       // 线程状态标识，其他线程通过改变标识操作线程执行流程
         private Thread thread;      // 线程核心
         private BaseTaker taker;    // 本线程的抓取器
-
+        private BackgroundWorker onceWork;
 
         public static Server getInstance()
         {
@@ -71,7 +72,15 @@ namespace QQRobot
             {
                 this.taker = taker;
             }
-            new Thread(new ThreadStart(runOnce)).Start() ;
+            if(onceWork == null)
+            {
+                onceWork = new BackgroundWorker();
+                onceWork.WorkerReportsProgress = false; // 设置可以通告进度
+                onceWork.WorkerSupportsCancellation = false; // 设置可以取消
+                onceWork.DoWork += new DoWorkEventHandler(new DoWorkEventHandler(doWorkFunc));
+            }
+            //new Thread(new ThreadStart(runOnce)).Start() ;
+            onceWork.RunWorkerAsync();
         }
 
         public void Stop()
@@ -149,14 +158,41 @@ namespace QQRobot
                 Callback.OnStop();
             }
         }
+
+        private void doWorkFunc(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                runOnce();
+            }
+            catch(Exception ex)
+            {
+                if(Callback != null)
+                {
+                    Callback.OnException(ex);
+                }
+            }
+        }
+
         /// <summary>
         /// 同步执行一次抓取
         /// </summary>
         private void runOnce()
         {
             string html = taker.takePage();
+            if (taker.User == null)
+            {
+                taker.paserUser(html);
+                taker.downloadUserHeader(taker.User);
+            }
             BaseData[] newObjs = taker.paser(html);
-
+            foreach (BaseData item in newObjs)
+            {
+                if (newObjs != null)
+                {
+                    item.Taker = taker;
+                }
+            }
             if (newObjs != null && newObjs.Length > 0)
             {
                 if (Callback != null)

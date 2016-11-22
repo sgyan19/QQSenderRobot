@@ -26,7 +26,7 @@ namespace QQRobot
 
         WebClient wb = new WebClient(); // IE控件，用于下载微博图片
 
-        public string download(string proxy,string url)
+        public string download(string url, string proxy)
         {
             try
             {
