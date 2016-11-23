@@ -76,10 +76,11 @@ namespace QQRobot
             {
                 onceWork = new BackgroundWorker();
                 onceWork.WorkerReportsProgress = false; // 设置可以通告进度
-                onceWork.WorkerSupportsCancellation = false; // 设置可以取消
+                onceWork.WorkerSupportsCancellation = true; // 设置可以取消
                 onceWork.DoWork += new DoWorkEventHandler(new DoWorkEventHandler(doWorkFunc));
             }
             //new Thread(new ThreadStart(runOnce)).Start() ;
+            onceWork.CancelAsync();
             onceWork.RunWorkerAsync();
         }
 

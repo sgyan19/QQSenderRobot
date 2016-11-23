@@ -36,14 +36,16 @@ namespace QQRobot
         private Handle handle;
         private Server server;
         private bool ifLog;
+        private bool ifHeader = true;
+        private bool ifFooter = true;
+
 
         public Form1()
         {
             InitializeComponent();
             init();
             readConfig();
-
-
+            IEnumerable<Twitter> twitters = TwitterApi.getInstance().GetTwitts("fangshimin", 10).Result;
         }
 
         public void init()
@@ -98,9 +100,17 @@ namespace QQRobot
             interval = ini.ReadValue("robot", "interval");
             uid = ini.ReadValue("robot", "uid");
             topCount = ini.ReadValue("robot","top");
-            ifLog = bool.Parse(ini.ReadValue("robot", "iflog"));
-            windows = windowText.Split(',');
-            weiboTokens = tokenText.Split(',');
+            try
+            { ifLog = bool.Parse(ini.ReadValue("robot", "iflog"));}
+            catch (Exception) { }
+            try
+            { ifHeader = bool.Parse(ini.ReadValue("robot", "show_user_info", "true")); }
+            catch (Exception) { }
+            try
+            { ifFooter = bool.Parse(ini.ReadValue("robot", "show_source","true")); }
+            catch (Exception) { }
+            windows = string.IsNullOrEmpty(windowText)? new string[0] : windowText.Split(',');
+            weiboTokens = string.IsNullOrEmpty(tokenText) ? new string[0] : tokenText.Split(',');
             if (File.Exists(cookiePath))
             {
                 try

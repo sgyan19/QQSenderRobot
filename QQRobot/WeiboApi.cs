@@ -31,7 +31,7 @@ namespace QQRobot
 
         private const string API_SER = "https://api.weibo.com/2";
         private const string USER_INFO = "/users/show.json";
-        private const string WEIBO_LIST = "/statuses/timeline_batch.json";
+        private const string WEIBO_LIST = "/statuses/user_timeline.json";
         private const string WEIBO_TEXT = "/statuses/update.json";
 
         private const string UPLOAD_SER = "http://api.weibo.com/2";
@@ -104,7 +104,7 @@ namespace QQRobot
             int argsIndex = 0;
             if (args.Length > argsIndex && args[argsIndex] != null)
             {
-                builder.Append("&uids=").Append(args[argsIndex]);
+                builder.Append("&uid=").Append(args[argsIndex]);
             }
             argsIndex++;
             if (args.Length > argsIndex && args[argsIndex] != null)

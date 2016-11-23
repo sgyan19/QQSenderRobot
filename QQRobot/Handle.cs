@@ -22,17 +22,25 @@ namespace QQRobot
         public UiShower shower; // ui刷新器
         public int sendCount;   // 最后一次结果已发送数
         public bool ifLog;      // 是否日志开关
+        public bool showHeader;
+        public bool showFooter;
 
         public void NewData(BaseData[] newWeibos, BaseData[] all, BaseUser user)
         {
-            string userName = "";
+            string userName = null;
             Image userHeader = null;
             string source = null;
             if(user != null)
             {
-                userName = user.UserName;
-                userHeader = user.UserHeader;
-                source = "本信息来自[" + user.Source + "]";
+                if (showHeader)
+                {
+                    userName = user.UserName;
+                    userHeader = user.UserHeader;
+                }
+                if (showFooter)
+                {
+                    source = "本信息来自[" + user.Source + "]";
+                }
             }
             if(newWeibos.Length > 3)
             {

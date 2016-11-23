@@ -31,7 +31,7 @@ namespace QQRobot
             }
             else if (string.Equals(name, "twitter"))
             {
-                taker = new TwitterTaker();
+                taker = new TwitterTaker2();
             }
             return taker;
         }

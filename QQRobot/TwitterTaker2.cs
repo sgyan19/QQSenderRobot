@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
-    class TwitterTaker : BaseTaker
+    class TwitterTaker2 : BaseTaker
     {
         public const string Host = "https://twitter.com/";
         public const string PageUrl = "https://twitter.com/{0}";
 
         private const string UserTemplet = "<img class=\\\"ProfileAvatar-image \\\" src=\\\"(?<url>[\\S]*?)\\\" alt=\\\"(?<name>[\\S]*?)\\\">";
         private const string ItemTemplet = "<div class=\\\"tweet js-stream-tweet js-actionable-tweet(?<item>[\\s\\S]*?)<div class=\\\"stream-item-footer\\\">";
+        private const string ItemPermalinkTemplet = "data-permalink-path=\\\"(?<url>[\\S]*?)\\\"";
         private const string ItemTextTemplet = "<p class=\\\"TweetTextSize TweetTextSize--[\\d]{1,3}px js-tweet-text tweet-text\\\" lang=\\\"[a-z]{1,3}\\\" data-aria-label-part=\\\"[\\d]\\\">(?<content>[\\s\\S]*?)</p>";
         private const string ItemImgTemplet = "<img data-aria-label-part src=\\\"(?<url>[\\S]*?)\\\" alt=";
         private const string ItemLinkTemplet = "<a[\\s\\S]*?href=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
@@ -28,6 +29,8 @@ namespace QQRobot
         private string mUserNameGroups = "name";
         private Regex mItemReg = new Regex(ItemTemplet);
         private string mItemGroups = "item";
+        private Regex mItemPermalLinkReg = new Regex(ItemPermalinkTemplet);
+        private string mPermalLinkUrlGroups = "url";
         private Regex mItemTextReg = new Regex(ItemTextTemplet);
         private string mTextContentGroups = "content";
         private Regex mItemImgsReg = new Regex(ItemImgTemplet);
@@ -163,52 +166,60 @@ namespace QQRobot
         private BaseData paserItem(string twitterHtml)
         {
             BaseData twitter = new BaseData();
-            Match textMatch = mItemTextReg.Match(twitterHtml);
-            if (textMatch.Success)
+            Match pLinkMatch = mItemPermalLinkReg.Match(twitterHtml);
+            if (pLinkMatch.Success)
             {
-                string content = textMatch.Groups[mTextContentGroups].Value;
-                content = mHtmlLabel4Reg.Replace(mHtmlLabel3Reg.Replace(content, ""), "");
-                string url = "";
-                MatchCollection linkMatches2 = mItemLink2Reg.Matches(content);
-                foreach (Match linkMatch in linkMatches2)
-                {
-                    string name = linkMatch.Groups[mLinkNameGroups].Value;
-                    if (name[0] != '@')
-                    {
-                        url = linkMatch.Groups[mLinkUrlGroups].Value.Replace("\\", "");
-                        content = content.Replace(linkMatch.Value, name + ":  " + url + " ");
-                    }
-                    else
-                    {
-                        content = content.Replace(name, " " + name + " ");
-                    }
-                }
-                MatchCollection linkMatches = mItemLinkReg.Matches(content);
-                foreach (Match linkMatch in linkMatches)
-                {
-                    string name = linkMatch.Groups[mLinkNameGroups].Value;
-                    if (name[0] != '@')
-                    {
-                        url = linkMatch.Groups[mLinkUrlGroups].Value.Replace("\\", "");
-                        content = content.Replace(linkMatch.Value, name + ":  " + url + " ");
-                    }
-                    else
-                    {
-                        content = content.Replace(name, " " + name + " ");
-                    }
-                }
-                
-                twitter.Text = mHtmlLabel1Reg.Replace(content, "");
+                string url = pLinkMatch.Groups[mPermalLinkUrlGroups].Value;
+                string newHtml = request.GetData(Host + url, Cookie, Host, Proxy);
             }
+            
+                Match textMatch = mItemTextReg.Match(twitterHtml);
+                if (textMatch.Success)
+                {
+                    string content = textMatch.Groups[mTextContentGroups].Value;
+                    content = mHtmlLabel4Reg.Replace(mHtmlLabel3Reg.Replace(content, ""), "");
+                    string url = "";
+                    MatchCollection linkMatches2 = mItemLink2Reg.Matches(content);
+                    foreach (Match linkMatch in linkMatches2)
+                    {
+                        string name = linkMatch.Groups[mLinkNameGroups].Value;
+                        if (name[0] != '@')
+                        {
+                            url = linkMatch.Groups[mLinkUrlGroups].Value.Replace("\\", "");
+                            content = content.Replace(linkMatch.Value, name + ":  " + url + " ");
+                        }
+                        else
+                        {
+                            content = content.Replace(name, " " + name + " ");
+                        }
+                    }
+                    MatchCollection linkMatches = mItemLinkReg.Matches(content);
+                    foreach (Match linkMatch in linkMatches)
+                    {
+                        string name = linkMatch.Groups[mLinkNameGroups].Value;
+                        if (name[0] != '@')
+                        {
+                            url = linkMatch.Groups[mLinkUrlGroups].Value.Replace("\\", "");
+                            content = content.Replace(linkMatch.Value, name + ":  " + url + " ");
+                        }
+                        else
+                        {
+                            content = content.Replace(name, " " + name + " ");
+                        }
+                    }
 
-            MatchCollection imgMatches = mItemImgsReg.Matches(twitterHtml);
-            string[] imgUrls = new string[imgMatches.Count];
-            int i = 0;
-            foreach (Match match in imgMatches)
-            {
-                imgUrls[i++] = match.Groups[mImgUrlGroups].Value.Replace("\\", "");
-            }
-            twitter.ImgUrls = imgUrls;
+                    twitter.Text = mHtmlLabel1Reg.Replace(content, "");
+                }
+
+                MatchCollection imgMatches = mItemImgsReg.Matches(twitterHtml);
+                string[] imgUrls = new string[imgMatches.Count];
+                int i = 0;
+                foreach (Match match in imgMatches)
+                {
+                    imgUrls[i++] = match.Groups[mImgUrlGroups].Value.Replace("\\", "");
+                }
+                twitter.ImgUrls = imgUrls;
+            
             return twitter;
         }
 

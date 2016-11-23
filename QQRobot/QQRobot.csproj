@@ -92,7 +92,9 @@
     </Compile>
     <Compile Include="Handle.cs" />
     <Compile Include="SimpleJSON.cs" />
+    <Compile Include="TwitterApi.cs" />
     <Compile Include="TwitterTaker.cs" />
+    <Compile Include="TwitterTaker2.cs" />
     <Compile Include="Weibo.cs" />
     <Compile Include="WeiboApi.cs" />
     <Compile Include="WeiboApi2.cs" />
@@ -105,7 +107,7 @@
     <Compile Include="QQSender.cs" />
     <Compile Include="SenderApi.cs" />
     <Compile Include="Server.cs" />
-    <Compile Include="TwitterMsg.cs" />
+    <Compile Include="Twitter.cs" />
     <Compile Include="UiShower.cs" />
     <Compile Include="BaseData.cs" />
     <Compile Include="BaseTakeEvent.cs" />
