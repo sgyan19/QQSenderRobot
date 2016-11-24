@@ -45,7 +45,12 @@ namespace QQRobot
             InitializeComponent();
             init();
             readConfig();
-            IEnumerable<Twitter> twitters = TwitterApi.getInstance().GetTwitts("fangshimin", 10).Result;
+            /*
+            IEnumerable<Twitter> twitters = TwitterApi.getInstance().GetTwitters("fangshimin", null ,null ,proxy);
+            foreach (Twitter item in twitters)
+            {
+                Console.WriteLine(item.Text);
+            }*/
         }
 
         public void init()
@@ -74,7 +79,14 @@ namespace QQRobot
             {
                 server.Stop();
                 Thread.Sleep(2000);
-                server.AbortStop();
+                try
+                {
+                    server.AbortStop();
+                }
+                catch (Exception)
+                {
+
+                }
             }
         }
 
@@ -130,6 +142,8 @@ namespace QQRobot
             textBox5.Text = topCount;
             textBox7.Text = takerKind;
             textBox8.Text = proxy;
+            checkBox1.Checked = ifHeader;
+            checkBox2.Checked = ifFooter;
             for (int i = 0; i< windows.Length; i++)
             {
                 listBox1.Items.Add(windows[i]);
@@ -140,6 +154,8 @@ namespace QQRobot
             }
             handle.senders.Clear();
             handle.ifLog = ifLog;
+            handle.showHeader = ifHeader;
+            handle.showFooter = ifFooter;
             listBox2.Items.Clear();
             foreach (string win in windows)
             {

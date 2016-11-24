@@ -9,10 +9,10 @@ namespace QQRobot
 {
     public class BaseUser
     {
-        public string UserName;
-        public string UserId;
-        public string UserHeaderUri;
-        public string Source;
-        public Image UserHeader;
+        public string UserName { set; get; }
+        public string UserId { set; get; }
+        public string UserHeaderUri { set; get; }
+        public string Source { set; get; }
+        public Image UserHeader { set; get; }
     }
 }

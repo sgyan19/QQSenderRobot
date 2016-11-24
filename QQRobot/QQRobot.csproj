@@ -95,6 +95,7 @@
     <Compile Include="TwitterApi.cs" />
     <Compile Include="TwitterTaker.cs" />
     <Compile Include="TwitterTaker2.cs" />
+    <Compile Include="TwitterUser.cs" />
     <Compile Include="Weibo.cs" />
     <Compile Include="WeiboApi.cs" />
     <Compile Include="WeiboApi2.cs" />

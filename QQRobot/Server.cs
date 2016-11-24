@@ -80,8 +80,11 @@ namespace QQRobot
                 onceWork.DoWork += new DoWorkEventHandler(new DoWorkEventHandler(doWorkFunc));
             }
             //new Thread(new ThreadStart(runOnce)).Start() ;
-            onceWork.CancelAsync();
-            onceWork.RunWorkerAsync();
+            //onceWork.CancelAsync();
+            if (!onceWork.IsBusy)
+            {
+                onceWork.RunWorkerAsync();
+            }
         }
 
         public void Stop()

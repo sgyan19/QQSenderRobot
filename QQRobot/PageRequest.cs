@@ -23,6 +23,144 @@ namespace BlackRain
         /// <param name="_data">请求数据</param>
         /// <param name="_cookie">请求时的Cookie</param>
         /// <returns>返回请求得到的值</returns>
+        public string PostData(int type, Dictionary<string, string> headers, params string[] args)
+        {
+            string data;
+            switch (type)
+            {
+                case 0:
+                    data = PostData0(args[0], args[1], args[2]);
+                    break;
+                case 1:
+                    data = PostData1(args[0], args[1], args[2], headers);
+                    break;
+                default:
+                    data = "";
+                    break;
+            }
+            return data;
+        }
+        public string PostData0(string _url, string _data, string proxy)
+        {
+            #region 创建HttpWebRequest请求对象
+            //创建HttpWebRequest请求对象
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(new Uri(_url));
+            if (httpWebRequest == null)
+            {
+                throw new ApplicationException(string.Format("Invalid url string: {0}", _url));
+            }
+            #endregion
+
+            #region 对httpWebRequest对象属性填充
+            //对httpWebRequest对象属性填充
+            httpWebRequest.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.Revalidate);
+            httpWebRequest.Timeout = 20000;
+            httpWebRequest.KeepAlive = true;
+            httpWebRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+            //httpWebRequest.Headers.Add("Accept-Encoding", "gzip,deflate;bzip2,sdch");
+            httpWebRequest.Headers.Add("Pragma", "no-cache");
+            httpWebRequest.Headers.Add("Accept-Charset", "GB2312,utf-8;q=0.7,*;q=0.7");
+            //httpWebRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+            httpWebRequest.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)";
+            httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+            httpWebRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
+            httpWebRequest.Method = "POST";
+            #endregion
+
+            if (string.IsNullOrEmpty(proxy))
+            {
+                try
+                {
+                    WebProxy webProxy = new WebProxy(proxy);
+                    httpWebRequest.Proxy = webProxy;
+                }
+                catch (Exception) { }
+            }
+
+            #region post内容写入请求流中
+            //Post请求的内容
+            byte[] postData = Encoding.UTF8.GetBytes(_data);
+            httpWebRequest.ContentLength = postData.Length;
+            Stream requestStream = httpWebRequest.GetRequestStream();
+            requestStream.Write(postData, 0, postData.Length);
+            requestStream.Close();
+            #endregion
+
+            #region 发送post请求到服务器并读取服务器返回信息
+            HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            Stream responseStream = httpWebResponse.GetResponseStream();
+            #endregion
+
+            #region 读取服务器返回信息
+            string _returnValue = "";
+            using (StreamReader responseReader = new StreamReader(responseStream))
+            {
+                _returnValue = responseReader.ReadToEnd();
+            }
+            responseStream.Close();
+            httpWebResponse.Close();
+            return _returnValue;
+            #endregion
+        }
+        public string PostData1(string _url, string _data, string proxy, Dictionary<string, string> headers)
+        {
+            #region 创建HttpWebRequest请求对象
+            //创建HttpWebRequest请求对象
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(new Uri(_url));
+            if (httpWebRequest == null)
+            {
+                throw new ApplicationException(string.Format("Invalid url string: {0}", _url));
+            }
+            #endregion
+
+            #region 对httpWebRequest对象属性填充
+            //对httpWebRequest对象属性填充
+            httpWebRequest.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.Revalidate);
+            httpWebRequest.Timeout = 20000;
+            httpWebRequest.KeepAlive = true;
+            httpWebRequest.UserAgent = "Mozilla/5.0 (Windows; U; Windows NT 5.1; zh-CN; rv:1.9.1.5) Gecko/20091102 Firefox/3.5.5 (.NET CLR 3.5.30729)";
+            foreach (var item in headers)
+            {
+                httpWebRequest.Headers.Add(item.Key, item.Value);
+            }
+            httpWebRequest.Method = "POST";
+            #endregion
+
+            if (!string.IsNullOrEmpty(proxy))
+            {
+                try
+                {
+                    WebProxy webProxy = new WebProxy(proxy);
+                    httpWebRequest.Proxy = webProxy;
+                }
+                catch (Exception) { }
+            }
+
+            #region post内容写入请求流中
+            //Post请求的内容
+            byte[] postData = Encoding.UTF8.GetBytes(_data);
+            httpWebRequest.ContentLength = postData.Length;
+            Stream requestStream = httpWebRequest.GetRequestStream();
+            requestStream.Write(postData, 0, postData.Length);
+            requestStream.Close();
+            #endregion
+
+            #region 发送post请求到服务器并读取服务器返回信息
+            HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse();
+            Stream responseStream = httpWebResponse.GetResponseStream();
+            #endregion
+
+            #region 读取服务器返回信息
+            string _returnValue = "";
+            using (StreamReader responseReader = new StreamReader(responseStream))
+            {
+                _returnValue = responseReader.ReadToEnd();
+            }
+            responseStream.Close();
+            httpWebResponse.Close();
+            return _returnValue;
+            #endregion
+        }
         public string PostData(string _url, string _data, CookieCollection _cookie)
         {
             #region 创建HttpWebRequest请求对象
@@ -724,6 +862,121 @@ namespace BlackRain
         /// <param name="_url">请求地址</param>
         /// <param name="_cookie">请求的Cookie</param>
         /// <returns>返回请求得到的值</returns>
+        public string GetData(int type, Dictionary<string, string> headers, params string[] args)
+        {
+            string data;
+            switch (type)
+            {
+                case 0:
+                    data = GetData0(args[0], args[1]);
+                    break;
+                case 1:
+                    data = GetData1(args[0], args[1], headers);
+                    break;
+                default:
+                    data = "";
+                    break;
+            }
+            return data;
+        }
+        public string GetData0(string _url, string proxy)
+        {
+            string _returnData = "";
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+                httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+                httpRequest.ContentType = "text/html; charset=gb2312";
+                httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
+                httpRequest.Method = "GET";
+                httpRequest.AllowAutoRedirect = false;
+                if (string.IsNullOrEmpty(proxy))
+                {
+                    try
+                    {
+                        WebProxy webProxy = new WebProxy(proxy);
+                        httpRequest.Proxy = webProxy;
+                    }
+                    catch (Exception) { }
+                }
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                    _returnData = GZipDecompress(webstream);
+                else
+                {
+                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                    {
+                        _returnData = sr.ReadToEnd();
+                    }
+                }
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
+        public string GetData1(string _url, string proxy, Dictionary<string, string> headers)
+        {
+            string _returnData = "";
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+                httpRequest.ContentType = "text/html; charset=gb2312";
+                httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
+                httpRequest.Method = "GET";
+                httpRequest.AllowAutoRedirect = false;
+                foreach (var item in headers)
+                {
+                    httpRequest.Headers.Add(item.Key, item.Value);
+                }
+                if (string.IsNullOrEmpty(proxy))
+                {
+                    try
+                    {
+                        WebProxy webProxy = new WebProxy(proxy);
+                        httpRequest.Proxy = webProxy;
+                    }
+                    catch (Exception) { }
+                }
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                    _returnData = GZipDecompress(webstream);
+                else
+                {
+                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                    {
+                        _returnData = sr.ReadToEnd();
+                    }
+                }
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
         public string GetData(string _url, CookieCollection _cookie)
         {
             #region 创建HttpWebRequest请求对象
