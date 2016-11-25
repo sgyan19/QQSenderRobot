@@ -67,7 +67,7 @@ namespace BlackRain
             httpWebRequest.Method = "POST";
             #endregion
 
-            if (string.IsNullOrEmpty(proxy))
+            if (!string.IsNullOrEmpty(proxy))
             {
                 try
                 {
@@ -897,7 +897,7 @@ namespace BlackRain
                 httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
                 httpRequest.Method = "GET";
                 httpRequest.AllowAutoRedirect = false;
-                if (string.IsNullOrEmpty(proxy))
+                if (!string.IsNullOrEmpty(proxy))
                 {
                     try
                     {
@@ -947,7 +947,7 @@ namespace BlackRain
                 {
                     httpRequest.Headers.Add(item.Key, item.Value);
                 }
-                if (string.IsNullOrEmpty(proxy))
+                if (!string.IsNullOrEmpty(proxy))
                 {
                     try
                     {
