@@ -14,5 +14,8 @@ namespace QQRobot
     {
         public string Id { set; get; }
         public TwitterUser  User{ set; get; }
+        public string ReplyId { set; get; }
+        public TwitterUser ReplyUser { set; get; }
+        public Twitter Reply { set; get; }
     }
 }

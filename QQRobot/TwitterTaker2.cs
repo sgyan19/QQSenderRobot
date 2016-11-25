@@ -10,9 +10,13 @@ namespace QQRobot
 {
     class TwitterTaker2 : BaseTaker
     {
+        private const string AtEndTemplet = "(@[a-z ]*?)$";
+        private const string AtStartTemplet = "^(@[a-z]*?) ";
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
 
+        private Regex mAtEndNameReg = new Regex(AtEndTemplet);
+        private Regex mStartAtNameReg = new Regex(AtStartTemplet);
         public TwitterTaker2()
         {
             SafeCount = int.MaxValue;
@@ -42,27 +46,7 @@ namespace QQRobot
             {
                 return null;
             }
-            IEnumerable<Twitter> tws = enumerableTwitts.Select((t) => new Twitter
-            {
-                Text = t["text"],
-                Id = t["id_str"],
-                TimeStamp = t["created_at"],
-                ImgUrls = t["entities"]["media"] == null ? new string[0] : (t["entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
-                User = new TwitterUser
-                {
-                    UserName = t["user"]["name"],
-                    ScreenName = t["user"]["screen_name"],
-                    UserId = t["user"]["id_str"],
-                    UserHeaderUri = t["user"]["profile_image_url"],
-                    Uri = t["user"]["url"],
-                    Location = t["user"]["location"],
-                    Description = t["user"]["description"],
-                    FriendsCount = t["user"]["friends_count"],
-                    ListedCount = t["user"]["listed_count"],
-                    FavouritesCount = t["user"]["favourites_count"],
-                    FollowersCount = t["user"]["followers_count"],
-                },
-            });
+            IEnumerable<Twitter> tws = enumerableTwitts.Select((t) => paserTwitterFormJson(t));
             twitters = tws == null ? new Twitter[0] : tws.ToArray<Twitter>();
             if(twitters.Length > 0)
             {
@@ -136,6 +120,74 @@ namespace QQRobot
                 }
             }
             lastTake = mTakeHistory.ToArray<BaseData>();
+        }
+
+        private Twitter paserTwitterFormJson(JSONNode json)
+        {
+            return new Twitter
+            {
+                Text = json["text"],
+                Id = json["id_str"],
+                TimeStamp = json["created_at"],
+                ImgUrls = json["entities"]["media"] == null ? new string[0] : (json["entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
+                User = paserUserFormJson(json),
+                ReplyId = json["in_reply_to_status_id"],
+                ReplyUser = new TwitterUser
+                {
+                    ScreenName = json["in_reply_to_screen_name"],
+                    UserId = json["in_reply_to_user_id_str"],
+                },
+            };
+        }
+
+        private TwitterUser paserUserFormJson(JSONNode json)
+        {
+            return new TwitterUser
+            {
+                UserName = json["user"]["name"],
+                ScreenName = json["user"]["screen_name"],
+                UserId = json["user"]["id_str"],
+                UserHeaderUri = json["user"]["profile_image_url"],
+                Uri = json["user"]["url"],
+                Location = json["user"]["location"],
+                Description = json["user"]["description"],
+                FriendsCount = json["user"]["friends_count"],
+                ListedCount = json["user"]["listed_count"],
+                FavouritesCount = json["user"]["favourites_count"],
+                FollowersCount = json["user"]["followers_count"],
+            };
+        }
+
+        public override BaseData onUse(BaseData data)
+        {
+            Twitter d = data as Twitter;
+            if (string.IsNullOrEmpty(d.ReplyId) || string.Equals(d.ReplyId, "null"))
+                return d;
+            string text = mAtEndNameReg.Replace(d.Text, "") + string.Format("//@{0} ", d.ReplyUser.ScreenName);
+            List<string> urls = new List<string>();
+            urls.AddRange(d.ImgUrls);
+            recursionReply(d, ref text , urls);
+            d.Text = text.Replace(((TwitterUser)User).ScreenName, ((TwitterUser)User).UserName);
+            d.ImgUrls = urls.ToArray();
+            return d;
+        }
+
+        private void recursionReply(Twitter data, ref string fullText, List<string> fullUrl)
+        {
+            if (string.IsNullOrEmpty(data.ReplyId))
+            {
+                return ;
+            }
+            Twitter reply = null;
+            try
+            {
+                reply = paserTwitterFormJson(JSON.Parse(TwitterApi.getInstance().GetTwitter(data.ReplyId, null, Proxy)));
+                fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""),"") + string.Format("//@{0} ", reply.ReplyUser.ScreenName);
+                fullUrl.AddRange(reply.ImgUrls);
+                recursionReply(reply,ref fullText, fullUrl);
+                data.Reply = reply;
+            }
+            catch (Exception) { }
         }
     }
 }

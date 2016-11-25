@@ -54,9 +54,11 @@ namespace QQRobot
                 foreach (BaseData weibo in newWeibos)
                 {
                     Image longImage = null;
+                    BaseData useWeibo = weibo;
                     if (weibo != null && weibo.Taker != null)
                     {
                         longImage = weibo.Taker.makeLongImage(weibo);
+                        useWeibo = weibo.Taker.onUse(weibo);
                     }
                     Image[] sendImgs ;
                     if(longImage == null)
@@ -73,13 +75,13 @@ namespace QQRobot
                         sendCount += 1;// senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.sendWithUser(userName, userHeader, source, weibo.Text, sendImgs, weibo.LongImgPath);
+                            sender.sendWithUser(userName, userHeader, source, useWeibo.Text, sendImgs, useWeibo.LongImgPath);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
                     if (ifLog && loger != null)
                     {
-                        loger.log(weibo);
+                        loger.log(useWeibo);
                     }
                 }
             }

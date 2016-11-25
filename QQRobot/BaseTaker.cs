@@ -156,6 +156,11 @@ namespace QQRobot
             return newData;
         }
 
+        public virtual BaseData onUse(BaseData data)
+        {
+            return data;
+        }
+
         public virtual void downloadUserHeader(BaseUser user)
         {
             if (user != null)

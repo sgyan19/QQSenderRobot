@@ -26,14 +26,23 @@ namespace QQRobot
             return instance;
         }
 
-        protected TwitterApi() { }
+        protected TwitterApi()
+        {
+            AccessToken = "AAAAAAAAAAAAAAAAAAAAAL3fIAAAAAAAEfVOgPGO28dyJXjtiMHinyAUQOs%3Dg7PR2ALfEZb20tK8a1K5Eqec92TkHE8lNX3v2vgk";
+        }
         private PageRequest mRequest = new PageRequest();
 
         public string OAuthConsumerSecret { get; set; }        
         public string OAuthConsumerKey { get; set; }
+        public string AccessToken { get; set; }
+
 
         public string GetAccessToken(string proxy)
         {
+            if (!string.IsNullOrEmpty(AccessToken))
+            {
+                return AccessToken;
+            }
             var customerInfo = Convert.ToBase64String(new UTF8Encoding().GetBytes(OAuthConsumerKey + ":" + OAuthConsumerSecret));
             string html =  mRequest.PostData(1, new Dictionary<string, string> (){
                 {"Authorization", "Basic " + customerInfo },
@@ -54,6 +63,18 @@ namespace QQRobot
             {
                 address += string.Format("&since_id={0}", sinceId);
             }
+            return mRequest.GetData(1, new Dictionary<string, string>(){
+                {"Authorization", "Bearer " + accessToken },
+            }, address, proxy);
+        }
+
+        public string GetTwitter(string tweetId , string accessToken = null, string proxy = null)
+        {
+            if (accessToken == null)
+            {
+                accessToken = GetAccessToken(proxy);
+            }
+            string address = string.Format("https://api.twitter.com/1.1/statuses//show.json?id={0}&include_my_retweet=true", tweetId);
             return mRequest.GetData(1, new Dictionary<string, string>(){
                 {"Authorization", "Bearer " + accessToken },
             }, address, proxy);

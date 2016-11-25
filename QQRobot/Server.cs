@@ -218,6 +218,7 @@ namespace QQRobot
         /// <param name="count"></param>
         public void handLastTime(int count)
         {
+            if (taker == null) return;
             BaseData[] last = taker.getLastTake();
             BaseData[] result = new BaseData[count];
             int j = 0;

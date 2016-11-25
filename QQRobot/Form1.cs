@@ -13,6 +13,7 @@ using System.Collections;
 using System.Net;
 using System.IO;
 using System.Threading;
+using SimpleJSON;
 
 namespace QQRobot
 {
@@ -45,12 +46,8 @@ namespace QQRobot
             InitializeComponent();
             init();
             readConfig();
-            /*
-            IEnumerable<Twitter> twitters = TwitterApi.getInstance().GetTwitters("fangshimin", null ,null ,proxy);
-            foreach (Twitter item in twitters)
-            {
-                Console.WriteLine(item.Text);
-            }*/
+            //JSONNode json = JSON.Parse(TwitterApi.getInstance().GetTwitter("801958626390896641", null, proxy));
+            //Console.WriteLine(json.ToString());
         }
 
         public void init()
