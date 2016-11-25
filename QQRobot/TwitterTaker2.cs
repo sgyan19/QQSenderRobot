@@ -163,6 +163,7 @@ namespace QQRobot
             Twitter d = data as Twitter;
             if (string.IsNullOrEmpty(d.ReplyId) || string.Equals(d.ReplyId, "null"))
                 return d;
+            if (d.Reply != null) return d;
             string text = mAtEndNameReg.Replace(d.Text, "") + string.Format("//@{0} ", d.ReplyUser.ScreenName);
             List<string> urls = new List<string>();
             urls.AddRange(d.ImgUrls);
@@ -178,16 +179,32 @@ namespace QQRobot
             {
                 return ;
             }
+            int times = 3;
+            string jsonStr = "";
             Twitter reply = null;
+        tryRequest:
             try
             {
-                reply = paserTwitterFormJson(JSON.Parse(TwitterApi.getInstance().GetTwitter(data.ReplyId, null, Proxy)));
-                fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""),"") + string.Format("//@{0} ", reply.ReplyUser.ScreenName);
-                fullUrl.AddRange(reply.ImgUrls);
-                recursionReply(reply,ref fullText, fullUrl);
-                data.Reply = reply;
+                times--;
+                jsonStr = TwitterApi.getInstance().GetTwitter(data.ReplyId, null, Proxy);
+            }
+            catch (Exception)
+            {
+                if (times >= 0)
+                    goto tryRequest;
+            }
+            try
+            {
+                reply = paserTwitterFormJson(JSON.Parse(jsonStr));
             }
             catch (Exception) { }
+            try
+            {
+                fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""), "") + ((string.IsNullOrEmpty(reply.ReplyId) || string.Equals(reply.ReplyId, "null")) ? "" : string.Format("//@{0} ", reply.ReplyUser.ScreenName));
+                fullUrl.AddRange(reply.ImgUrls);
+                recursionReply(reply, ref fullText, fullUrl);
+                data.Reply = reply;
+            }catch  (Exception) { }
         }
     }
 }

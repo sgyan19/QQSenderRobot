@@ -57,8 +57,8 @@ namespace QQRobot
                     BaseData useWeibo = weibo;
                     if (weibo != null && weibo.Taker != null)
                     {
-                        longImage = weibo.Taker.makeLongImage(weibo);
                         useWeibo = weibo.Taker.onUse(weibo);
+                        longImage = weibo.Taker.makeLongImage(weibo);
                     }
                     Image[] sendImgs ;
                     if(longImage == null)
