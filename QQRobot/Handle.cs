@@ -42,9 +42,9 @@ namespace QQRobot
                     source = "本信息来自[" + user.Source + "]";
                 }
             }
-            if(newWeibos.Length > 3)
+            if(newWeibos.Length > 5)
             {
-                Exception e = new Exception("超过3条新数据，可能存在对比异常");
+                Exception e = new Exception(string.Format("{0}条新数据，超过5条新数据，可能存在对比异常", newWeibos.Length));
                 string text = format(e);
                 shower.showResult(String.Format("第{0}次，{1}条", Count, newWeibos.Length), text);
                 takeLoger.log(text);

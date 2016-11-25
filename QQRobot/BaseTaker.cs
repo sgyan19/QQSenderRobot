@@ -18,6 +18,7 @@ namespace QQRobot
         public string Cookie { set; get; }
         public string Uid { set; get; }
         public int TopCount { set; get; }
+        public int SafeCount { set; get; }
         protected BaseData[] lastTake;
         protected WebClient wb = new WebClient(); // IE控件，用于下载微博图片
         public BaseUser User { set; get; }
@@ -39,25 +40,14 @@ namespace QQRobot
             }
             return taker;
         }
+        protected BaseTaker()
+        {
+            SafeCount = 3;
+        }
 
         public BaseData[] Take()
         {
-            string html = takePage();
-            if (User == null)
-            {
-                paserUser(html);
-                downloadUserHeader(User);
-            }
-
-            BaseData[] newObjs = paser(html);
-            foreach (BaseData item in newObjs)
-            {
-                if(newObjs != null)
-                {
-                    item.Taker = this;
-                }
-            }
-            return checkNew(newObjs, lastTake);
+            return null;
         }
 
         /// <summary>

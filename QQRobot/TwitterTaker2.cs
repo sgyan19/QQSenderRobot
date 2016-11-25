@@ -12,12 +12,22 @@ namespace QQRobot
     {
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
+
+        public TwitterTaker2()
+        {
+            SafeCount = int.MaxValue;
+        }
+
         public override BaseData[] checkNew(BaseData[] newTakeData, BaseData[] oldTakeData)
         {
             BaseData[] result = null;
-            if(oldTakeData != null && oldTakeData.Length > 0 && newTakeData.Length < 3)
+            if(oldTakeData != null && oldTakeData.Length > 0 && newTakeData.Length > 0)
             {
-                result = newTakeData;
+                result = new BaseData[newTakeData.Length];
+                for (int i = 0; i < newTakeData.Length; i++)
+                {
+                    result[newTakeData.Length - 1 - i] = newTakeData[i];
+                }
             }
             return result;
         }
@@ -119,10 +129,10 @@ namespace QQRobot
         {
             if (newTake != null && newTake.Length > 0)
             {
-                mTakeHistory.AddRange(newTake);
-                while(mTakeHistory.Count > HistorySize)
+                mTakeHistory.InsertRange(0, newTake);
+                while (mTakeHistory.Count > HistorySize)
                 {
-                    mTakeHistory.RemoveAt(0);
+                    mTakeHistory.RemoveAt(mTakeHistory.Count - 1);
                 }
             }
             lastTake = mTakeHistory.ToArray<BaseData>();
