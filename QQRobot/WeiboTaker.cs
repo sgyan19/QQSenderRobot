@@ -291,5 +291,10 @@ namespace QQRobot
         {
             return "新浪微博";
         }
+
+        public override BaseData[] createData(int count)
+        {
+            return new Weibo[count];
+        }
     }
 }

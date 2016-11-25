@@ -190,6 +190,7 @@ namespace QQRobot
                 taker.downloadUserHeader(taker.User);
             }
             BaseData[] newObjs = taker.paser(html);
+            if (newObjs == null) newObjs = taker.createData(0);
             foreach (BaseData item in newObjs)
             {
                 if (newObjs != null)
@@ -197,12 +198,9 @@ namespace QQRobot
                     item.Taker = taker;
                 }
             }
-            if (newObjs != null && newObjs.Length > 0)
+            if (Callback != null)
             {
-                if (Callback != null)
-                {
-                    Callback.TakeData(newObjs, taker.User);
-                }
+                Callback.TakeData(taker.getShowData(newObjs), taker.User);
             }
 
             BaseData[] weibos = taker.checkNew(newObjs);

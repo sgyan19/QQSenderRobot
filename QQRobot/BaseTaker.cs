@@ -31,6 +31,10 @@ namespace QQRobot
             }
             else if (string.Equals(name, "twitter"))
             {
+                taker = new TwitterTaker();
+            }
+            else if (string.Equals(name, "twitter2"))
+            {
                 taker = new TwitterTaker2();
             }
             return taker;
@@ -113,9 +117,7 @@ namespace QQRobot
         public BaseData[] checkNew(BaseData[] newTakeData)
         {
             BaseData[] result = checkNew(newTakeData, lastTake);
-            if (lastTake == null)
-                lastTake = newTakeData;
-            if (newTakeData != null && newTakeData.Length > 0) lastTake = newTakeData;
+            updateLastTake(newTakeData);
             return result;
         }
 
@@ -145,6 +147,23 @@ namespace QQRobot
                 data.LongImgPath = ImageHelper.save(longImage);
             }
             return longImage;
+        }
+
+        public virtual void updateLastTake(BaseData[] newTake)
+        {
+            if (lastTake == null)
+                lastTake = newTake;
+            if (newTake != null && newTake.Length > 0) lastTake = newTake;
+        }
+
+        public virtual BaseData[] createData(int count)
+        {
+            return new BaseData[count];
+        }
+
+        public virtual BaseData[] getShowData(BaseData[] newData)
+        {
+            return newData;
         }
 
         public virtual void downloadUserHeader(BaseUser user)

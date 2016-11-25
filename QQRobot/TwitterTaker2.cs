@@ -10,10 +10,15 @@ namespace QQRobot
 {
     class TwitterTaker2 : BaseTaker
     {
+        private const int HistorySize = 15;
+        private List<BaseData> mTakeHistory = new List<BaseData>();
         public override BaseData[] checkNew(BaseData[] newTakeData, BaseData[] oldTakeData)
         {
             BaseData[] result = null;
-            
+            if(oldTakeData != null && oldTakeData.Length > 0 && newTakeData.Length < 3)
+            {
+                result = newTakeData;
+            }
             return result;
         }
 
@@ -29,10 +34,10 @@ namespace QQRobot
             }
             IEnumerable<Twitter> tws = enumerableTwitts.Select((t) => new Twitter
             {
-                Text = t["text"].ToString(),
-                Id = t["id_str"].ToString(),
+                Text = t["text"],
+                Id = t["id_str"],
                 TimeStamp = t["created_at"],
-                TImgUrls = t["entities"]["media"] == null ? null : (t["entities"]["media"] as JSONArray).Childs.Select((m) => (m["media_url"].ToString())),
+                ImgUrls = t["entities"]["media"] == null ? new string[0] : (t["entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
                 User = new TwitterUser
                 {
                     UserName = t["user"]["name"],
@@ -47,11 +52,13 @@ namespace QQRobot
                     FavouritesCount = t["user"]["favourites_count"],
                     FollowersCount = t["user"]["followers_count"],
                 },
-            }); ;
+            });
             twitters = tws == null ? new Twitter[0] : tws.ToArray<Twitter>();
             if(twitters.Length > 0)
             {
                 User = twitters[0].User;
+                User.Source = getTakerName();
+                downloadUserHeader(User);
             }
             return twitters;
         }
@@ -95,6 +102,30 @@ namespace QQRobot
         override public string getTakerName()
         {
             return "twitter";
+        }
+
+        public override BaseData[] createData(int count)
+        {
+            return new Twitter[count];
+        }
+
+        public override BaseData[] getShowData(BaseData[] newData)
+        {
+            BaseData[]  showData = newData.Length == 0 && lastTake != null ? lastTake : newData;
+            return showData;
+        }
+
+        public override void updateLastTake(BaseData[] newTake)
+        {
+            if (newTake != null && newTake.Length > 0)
+            {
+                mTakeHistory.AddRange(newTake);
+                while(mTakeHistory.Count > HistorySize)
+                {
+                    mTakeHistory.RemoveAt(0);
+                }
+            }
+            lastTake = mTakeHistory.ToArray<BaseData>();
         }
     }
 }

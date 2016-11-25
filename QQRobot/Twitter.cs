@@ -14,6 +14,5 @@ namespace QQRobot
     {
         public string Id { set; get; }
         public TwitterUser  User{ set; get; }
-        public IEnumerable<string> TImgUrls { set; get; }
     }
 }

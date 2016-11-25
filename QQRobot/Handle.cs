@@ -70,7 +70,7 @@ namespace QQRobot
                     }
                     if (senders != null && senders.Count > 0)
                     {
-                        sendCount += senders.Count;
+                        sendCount += 1;// senders.Count;
                         foreach (Sender sender in senders)
                         {
                             sender.sendWithUser(userName, userHeader, source, weibo.Text, sendImgs, weibo.LongImgPath);

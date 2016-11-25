@@ -227,5 +227,10 @@ namespace QQRobot
         {
             return "twitter";
         }
+
+        public override BaseData[] createData(int count)
+        {
+            return new Twitter[count];
+        }
     }
 }
