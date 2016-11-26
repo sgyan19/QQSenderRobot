@@ -10,8 +10,8 @@ namespace QQRobot
 {
     class TwitterTaker2 : BaseTaker
     {
-        private const string AtEndTemplet = "(@[a-z ]*?)$";
-        private const string AtStartTemplet = "^(@[a-z]*?) ";
+        private const string AtEndTemplet = "@([a-zA-Z\\d_ ]*?)$";
+        private const string AtStartTemplet = "^(@[a-zA-Z\\d_]*?) ";
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
 
