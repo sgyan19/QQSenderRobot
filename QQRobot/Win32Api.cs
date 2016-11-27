@@ -11,6 +11,16 @@ namespace QQRobot
 {
     class Win32Api
     {
+        private static Win32Api instance;
+
+        public static Win32Api getInstance()
+        {
+            if (instance == null)
+            {
+                instance = new Win32Api();
+            }
+            return instance;
+        }
 
         public const uint ES_SYSTEM_REQUIRED = 0x00000001;
         public const uint ES_DISPLAY_REQUIRED = 0x00000002;
@@ -29,9 +39,10 @@ namespace QQRobot
 
 
         private string sPath = null;
-        public Win32Api(string path)
+        public Win32Api setPath(string path)
         {
-            this.sPath = path;
+            sPath = path;
+            return this;
         }
 
         public void WriteValue(string section, string key, string value)

@@ -39,6 +39,7 @@ namespace QQRobot
         private bool ifLog;
         private bool ifHeader = true;
         private bool ifFooter = true;
+        private bool autoStartServer = true;
 
 
         public Form1()
@@ -52,6 +53,7 @@ namespace QQRobot
 
         public void init()
         {
+            Directory.SetCurrentDirectory(Application.StartupPath);
             handle = new Handle();
             handle.loger = new Loger();
             handle.takeLoger = new Loger("takeLog.txt");
@@ -102,7 +104,7 @@ namespace QQRobot
 
         public void readConfig()
         {
-            Win32Api ini = new Win32Api(".\\config.ini");
+            Win32Api ini = Win32Api.getInstance().setPath(".\\config.ini");
             string cookiePath = ini.ReadValue("robot", "cookie");
             string windowText = ini.ReadValue("robot", "windows");
             string tokenText = ini.ReadValue("robot", "weibo_sender_tokens");
@@ -132,6 +134,7 @@ namespace QQRobot
             }
             proxy = ini.ReadValue("robot", "proxy");
             takerKind = ini.ReadValue("robot", "taker", "weibo");
+            autoStartServer = bool.Parse(ini.ReadValue("robot", "auto_start", "false"));
             textBox1.Text = cookie;
             listBox1.Items.Clear();
             textBox3.Text = uid;
@@ -154,6 +157,7 @@ namespace QQRobot
             handle.showHeader = ifHeader;
             handle.showFooter = ifFooter;
             listBox2.Items.Clear();
+            bool qqWindowReady = windows.Length <= 0 ? true : false;
             foreach (string win in windows)
             {
                 QQSender sender = QQSender.CreateSender(win,this);
@@ -161,6 +165,7 @@ namespace QQRobot
                 {
                     handle.senders.AddLast(sender);
                     listBox2.Items.Add(sender.getName());
+                    qqWindowReady = true;
                 }
             }
             foreach (string token in weiboTokens)
@@ -170,6 +175,21 @@ namespace QQRobot
                 {
                     handle.senders.AddLast(sender);
                     listBox2.Items.Add(sender.getName());
+                }
+            }
+
+
+            if (autoStartServer && handle.senders.Count > 0)
+            {
+                if (qqWindowReady)
+                {
+                    SynchronizationContext.Current.Post(new SendOrPostCallback(t => { button2_Click(null, null); }), null);
+                    //this.Invoke((Action) delegate{ button2_Click(null, null); });
+                    
+                }else
+                {
+                    Thread.Sleep(15000);
+                    readConfig();
                 }
             }
         }
