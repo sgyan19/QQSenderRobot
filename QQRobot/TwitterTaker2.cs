@@ -12,11 +12,13 @@ namespace QQRobot
     {
         private const string AtEndTemplet = "@([a-zA-Z\\d_ ]*?)$";
         private const string AtStartTemplet = "^(@[a-zA-Z\\d_]*?) ";
+        private const string HttpUriTemplet = "https{0,1}://\\S{1,}";
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
 
         private Regex mAtEndNameReg = new Regex(AtEndTemplet);
         private Regex mStartAtNameReg = new Regex(AtStartTemplet);
+        private Regex mHttpUriReg = new Regex(HttpUriTemplet);
         public TwitterTaker2()
         {
             SafeCount = int.MaxValue;
@@ -161,15 +163,38 @@ namespace QQRobot
         public override BaseData onUse(BaseData data)
         {
             Twitter d = data as Twitter;
-            if (string.IsNullOrEmpty(d.ReplyId) || string.Equals(d.ReplyId, "null"))
-                return d;
-            if (d.Reply != null) return d;
-            string text = mAtEndNameReg.Replace(d.Text, "") + string.Format("//@{0} ", d.ReplyUser.ScreenName);
-            List<string> urls = new List<string>();
-            urls.AddRange(d.ImgUrls);
-            recursionReply(d, ref text , urls);
-            d.Text = text.Replace(((TwitterUser)User).ScreenName, ((TwitterUser)User).UserName);
-            d.ImgUrls = urls.ToArray();
+            if (d.Reply == null)
+            {
+                if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))
+                {
+                    string text = mAtEndNameReg.Replace(d.Text, "") + string.Format(" //@{0} ", d.ReplyUser.ScreenName);
+
+                    List<string> urls = new List<string>();
+                    urls.AddRange(d.ImgUrls);
+                    recursionReply(d, ref text, urls);
+                    d.Text = text.Replace(((TwitterUser)User).ScreenName, ((TwitterUser)User).UserName);
+                    d.ImgUrls = urls.ToArray();
+                }
+                MatchCollection matches = mHttpUriReg.Matches(d.Text);
+                foreach (Match match in matches)
+                {
+                    string location = null;
+                reTry:
+                    try
+                    {
+                        location = request.Location(match.Value, Proxy, null);
+                    }
+                    catch (TimeoutException)
+                    {
+                        goto reTry;
+                    }
+                    if (!string.IsNullOrEmpty(location))
+                    {
+                        d.Text = mHttpUriReg.Replace(d.Text, location);
+                    }
+                }
+            }
+            
             return d;
         }
 
@@ -200,7 +225,7 @@ namespace QQRobot
             catch (Exception) { }
             try
             {
-                fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""), "") + ((string.IsNullOrEmpty(reply.ReplyId) || string.Equals(reply.ReplyId, "null")) ? "" : string.Format("//@{0} ", reply.ReplyUser.ScreenName));
+                fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""), "") + ((string.IsNullOrEmpty(reply.ReplyId) || string.Equals(reply.ReplyId, "null")) ? "" : string.Format(" //@{0} ", reply.ReplyUser.ScreenName));
                 fullUrl.AddRange(reply.ImgUrls);
                 recursionReply(reply, ref fullText, fullUrl);
                 data.Reply = reply;

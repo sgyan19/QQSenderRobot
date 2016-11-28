@@ -1885,6 +1885,117 @@ namespace BlackRain
                 return mstream.ToArray();
             }
         }
+        public Dictionary<string, string> Head(int type, Dictionary<string, string> headers, params string[] args)
+        {
+            switch (type)
+            {
+                case 0:
+                    Head1(args[0], args[1], headers);
+                    break;
+                default:
+                    break;
+            }
+            return null;
+        }
+        public Dictionary<string, string> Head1(string _url, string proxy, Dictionary<string, string> headers)
+        {
+            Dictionary<string, string> _returnData = new Dictionary<string, string>();
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+                httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
+                httpRequest.ContentType = "text/html; charset=gb2312";
+                httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
+                httpRequest.Method = "HEAD";
+                httpRequest.AllowAutoRedirect = false;
+                if (!string.IsNullOrEmpty(proxy))
+                {
+                    try
+                    {
+                        WebProxy webProxy = new WebProxy(proxy);
+                        httpRequest.Proxy = webProxy;
+                    }
+                    catch (Exception) { }
+                }
+
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                foreach (string key in web.Headers.AllKeys)
+                {
+                    _returnData.Add(key, web.Headers[key]);
+                }
+                /*
+                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                    _returnData = GZipDecompress(webstream);
+                else
+                {
+                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                    {
+                        _returnData = sr.ReadToEnd();
+                    }
+                }
+                */
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
+
+        public string Location(string _url, string proxy, Dictionary<string, string> headers)
+        {
+            string _returnData = "";
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.AllowAutoRedirect = false;
+                if(headers != null)
+                {
+                    foreach (var item in headers)
+                    {
+                        httpRequest.Headers.Add(item.Key, item.Value);
+                    }
+                }
+                if (!string.IsNullOrEmpty(proxy))
+                {
+                    try
+                    {
+                        WebProxy webProxy = new WebProxy(proxy);
+                        httpRequest.Proxy = webProxy;
+                    }
+                    catch (Exception) { }
+                }
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.StatusCode == HttpStatusCode.Moved || web.StatusCode == HttpStatusCode.Found)
+                {
+                    _returnData = web.Headers["Location"];
+                }
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
     }
     /// <summary>
     /// 上传文件

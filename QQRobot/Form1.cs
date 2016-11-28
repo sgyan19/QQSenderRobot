@@ -49,6 +49,7 @@ namespace QQRobot
             readConfig();
             //JSONNode json = JSON.Parse(TwitterApi.getInstance().GetTwitter("801958626390896641", null, proxy));
             //Console.WriteLine(json.ToString());
+            //new PageRequest().Location(  "https://t.co/UizmmdoTmk", proxy, null);
         }
 
         public void init()
