@@ -37,6 +37,11 @@ namespace QQRobot
         [System.Runtime.InteropServices.DllImport("kernel32")]
         public static extern void SetThreadExecutionState(uint esFlags);
 
+        /// <summary>
+        /// 模拟windows登录域
+        /// </summary>
+        [System.Runtime.InteropServices.DllImport("advapi32.DLL", SetLastError = true)]
+        public static extern int LogonUser(string lpszUsername, string lpszDomain, string lpszPassword, int dwLogonType, int dwLogonProvider, ref IntPtr phToken);
 
         private string sPath = null;
         public Win32Api setPath(string path)
@@ -76,6 +81,13 @@ namespace QQRobot
         public static void SystemUnsleepLockRelase()
         {
             SetThreadExecutionState(ES_CONTINUOUS);
+        }
+
+        IntPtr admin_token = default(IntPtr);
+
+        public void Login(string name, string pwd)
+        {
+            LogonUser(name, "", pwd, 9, 0, ref admin_token);
         }
     }
 }
