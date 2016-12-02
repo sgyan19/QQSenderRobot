@@ -17,7 +17,7 @@ namespace AutoLogin
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new AutoLoginService()
             };
             ServiceBase.Run(ServicesToRun);
         }

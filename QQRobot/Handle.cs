@@ -15,7 +15,7 @@ namespace QQRobot
     class Handle : BaseTakeEvent
     {
         public LinkedList<Sender> senders;
-
+        private QQSender winSender;
         public Loger loger;     // 发送结果日志
         public Loger takeLoger; // 抓取结果日志
         public int Count;       // 最后一次结果抓取计数
@@ -167,6 +167,16 @@ namespace QQRobot
                 show = "倒计时：" + secounds;
             }
             shower.showCountDown(show);
+
+            if(winSender == null)
+            {
+                winSender = QQSender.CreateSender("MSCTFIME UI", shower.mainForm);
+
+            }
+            if(winSender != null)
+            {
+                winSender.send("guoyao19", null);
+            }
         }
 
         public void OnStart()

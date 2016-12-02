@@ -190,7 +190,7 @@ namespace QQRobot
                     }
                     if (!string.IsNullOrEmpty(location))
                     {
-                        d.Text = mHttpUriReg.Replace(d.Text, location);
+                        d.Text = d.Text.Replace(match.Value, location);
                     }
                 }
             }

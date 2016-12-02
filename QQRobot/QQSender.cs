@@ -91,13 +91,16 @@ namespace QQRobot
             Clipboard.Clear();
             Clipboard.SetText(msg);
             SenderApi.QQPasteln(mHwnd);
-            foreach(Image img in imgs)
+            if (imgs != null)
             {
-                if(img != null)
+                foreach (Image img in imgs)
                 {
-                    Clipboard.SetImage(img);
-                    Thread.Sleep(1000);
-                    SenderApi.QQPaste(mHwnd);
+                    if (img != null)
+                    {
+                        Clipboard.SetImage(img);
+                        Thread.Sleep(1000);
+                        SenderApi.QQPaste(mHwnd);
+                    }
                 }
             }
             SenderApi.QQSumbit(mHwnd);

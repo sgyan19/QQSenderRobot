@@ -1,6 +1,6 @@
 ﻿namespace AutoLogin
 {
-    partial class Service1
+    partial class AutoLoginService
     {
         /// <summary> 
         /// 必需的设计器变量。
@@ -28,8 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            // 
+            // AutoLoginService
+            // 
+            this.ServiceName = "AutoLoginService";
+
         }
 
         #endregion

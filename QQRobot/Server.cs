@@ -110,7 +110,7 @@ namespace QQRobot
         }
 
         private int countdown;
-
+        private IntPtr mWnd;
         /// <summary>
         /// 线程工作主方法
         /// </summary>
