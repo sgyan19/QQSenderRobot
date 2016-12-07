@@ -101,7 +101,6 @@
     <Compile Include="WeiboApi.cs" />
     <Compile Include="WeiboApi2.cs" />
     <Compile Include="WeiboSender.cs" />
-    <Compile Include="Win32Api.cs" />
     <Compile Include="Loger.cs" />
     <Compile Include="PageRequest.cs" />
     <Compile Include="Program.cs" />
@@ -161,6 +160,10 @@
     <ProjectReference Include="..\NetDimension.OpenAuth\NetDimension.OpenAuth.csproj">
       <Project>{38B68338-7FC0-4AB7-B8A7-674E0BCBF899}</Project>
       <Name>NetDimension.OpenAuth</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SocketWin32Api\SocketWin32Api.csproj">
+      <Project>{3b8f1817-7646-4c78-868e-2ff3ad954f43}</Project>
+      <Name>SocketWin32Api</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

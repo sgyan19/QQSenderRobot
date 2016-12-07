@@ -61,7 +61,7 @@ namespace QQRobot
 
         public override string takePage()
         {
-            return TwitterApi.getInstance().GetTwitters(Uid, lastTake == null || lastTake.Length <= 0 ? null : (lastTake[0] as Twitter).Id, null, Proxy);
+            return TwitterApi.getInstance().GetTwitters2(Uid, lastTake == null || lastTake.Length <= 0 ? null : (lastTake[0] as Twitter).Id, null, Proxy, Cookie);
         }
 
         /// <summary>
@@ -134,6 +134,7 @@ namespace QQRobot
                 ImgUrls = json["entities"]["media"] == null ? new string[0] : (json["entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
                 User = paserUserFormJson(json),
                 ReplyId = json["in_reply_to_status_id"],
+                Truncated = json["truncated"],
                 ReplyUser = new TwitterUser
                 {
                     ScreenName = json["in_reply_to_screen_name"],
@@ -163,6 +164,29 @@ namespace QQRobot
         public override BaseData onUse(BaseData data)
         {
             Twitter d = data as Twitter;
+            int times = 3;
+            if (bool.Parse(d.Truncated))
+            {
+                Twitter newData = null;
+            tryRequest:
+                try
+                {
+                    times--;
+                    string tr = TwitterApi.getInstance().GetTwitter(d.Id, null, Proxy);
+                    JSONNode jsonNode = JSON.Parse(tr);
+                    newData = paserTwitterFormJson(jsonNode);
+                }
+                catch (Exception)
+                {
+                    if (times >= 0)
+                        goto tryRequest;
+                }
+                if(newData != null)
+                {
+                    d = newData;
+                }
+            }
+
             if (d.Reply == null)
             {
                 if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))

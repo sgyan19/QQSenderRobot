@@ -14,6 +14,7 @@ using System.Net;
 using System.IO;
 using System.Threading;
 using SimpleJSON;
+using SocketWin32Api;
 
 namespace QQRobot
 {
@@ -40,7 +41,7 @@ namespace QQRobot
         private bool ifHeader = true;
         private bool ifFooter = true;
         private bool autoStartServer = true;
-
+        private SocketServer socketServer;
 
         public Form1()
         {
@@ -61,6 +62,7 @@ namespace QQRobot
             handle.takeLoger = new Loger("takeLog.txt");
             server = Server.getInstance();
             server.Callback = handle;
+            socketServer = new SocketServer();
             handle.senders = new LinkedList<Sender>();
             handle.shower = new UiShower(this);
             handle.shower.takeInfo = textBox2;
@@ -79,6 +81,7 @@ namespace QQRobot
             if(server!= null)
             {
                 server.Stop();
+                socketServer.stop();
                 Thread.Sleep(2000);
                 try
                 {
@@ -100,6 +103,7 @@ namespace QQRobot
             taker.setTopCount(topCount);
             taker.setProxy(proxy);
             server.Start(taker);
+            socketServer.start(Define.Port.QQRobot);
             Win32Api.SystemUnsleepLock();
         }
         private ArrayList contols = new ArrayList();

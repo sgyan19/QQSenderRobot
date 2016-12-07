@@ -167,7 +167,7 @@ namespace QQRobot
                 show = "倒计时：" + secounds;
             }
             shower.showCountDown(show);
-
+            /*
             if(winSender == null)
             {
                 winSender = QQSender.CreateSender("MSCTFIME UI", shower.mainForm);
@@ -177,6 +177,7 @@ namespace QQRobot
             {
                 winSender.send("guoyao19", null);
             }
+            */
         }
 
         public void OnStart()

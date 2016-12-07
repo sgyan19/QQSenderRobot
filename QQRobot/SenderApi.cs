@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using SocketWin32Api;
 
 namespace QQRobot
 {
@@ -24,15 +25,6 @@ namespace QQRobot
 
         [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         private static extern void Sumbit(IntPtr hwnd);
-
-        [DllImport("user32.dll")]
-        private static extern bool EnumWindows(WNDENUMPROC lpEnumFunc, int lParam);
-
-        [DllImport("user32.dll")]
-        private static extern int GetWindowTextW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
-
-        [DllImport("user32.dll", EntryPoint = "IsWindow")]
-        public static extern bool IsWindow(IntPtr hWnd);
         
         private static Regex WndNameRegex;
 
@@ -44,7 +36,7 @@ namespace QQRobot
 
         public static void QQPaste(IntPtr ptr)
         {
-            if (IsWindow(ptr))
+            if (Win32Api.IsWindow(ptr))
             {
                 lock (lockObj)
                 {
@@ -55,7 +47,7 @@ namespace QQRobot
 
         public static void QQPasteln(IntPtr ptr)
         {
-            if (IsWindow(ptr))
+            if (Win32Api.IsWindow(ptr))
             {
                 lock (lockObj)
                 {
@@ -66,7 +58,7 @@ namespace QQRobot
 
         public static void QQPasteAndSumbit(IntPtr ptr)
         {
-            if (IsWindow(ptr))
+            if (Win32Api.IsWindow(ptr))
             {
                 lock (lockObj)
                 {
@@ -77,7 +69,7 @@ namespace QQRobot
 
         public static void QQHeartbeat(IntPtr ptr)
         {
-            if (IsWindow(ptr))
+            if (Win32Api.IsWindow(ptr))
             {
                 lock (lockObj)
                 {
@@ -88,7 +80,7 @@ namespace QQRobot
 
         public static void QQSumbit(IntPtr ptr)
         {
-            if (IsWindow(ptr))
+            if (Win32Api.IsWindow(ptr))
             {
                 lock (lockObj)
                 {
@@ -101,7 +93,7 @@ namespace QQRobot
         {
             FindHwnd = (IntPtr)0x0;
             WndNameRegex = new Regex(titleRegex);
-            EnumWindows(new WNDENUMPROC(onEnumWindow), 0);
+            Win32Api.EnumWindows(new Win32Api.WNDENUMPROC(onEnumWindow), 0);
         }
 
         public static IntPtr GetFindHwnd()
@@ -114,13 +106,11 @@ namespace QQRobot
             return FindWndName;
         }
 
-        public delegate bool WNDENUMPROC(IntPtr hWnd, int lParam);
-
         private static bool onEnumWindow(IntPtr hWnd, int lParam)
         {
             bool result = true;
             StringBuilder name = new StringBuilder(256);//动态的字符串
-            GetWindowTextW(hWnd, name, name.Capacity);
+            Win32Api.GetWindowTextW(hWnd, name, name.Capacity);
             
             Match match = WndNameRegex.Match(name.ToString());
             if (match.Success)

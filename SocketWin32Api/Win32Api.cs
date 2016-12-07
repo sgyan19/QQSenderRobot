@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using System.Runtime.InteropServices;
-namespace QQRobot
+
+namespace SocketWin32Api
 {
-    class Win32Api
+    public class Win32Api
     {
         private static Win32Api instance;
 
@@ -75,13 +76,13 @@ namespace QQRobot
             WINSTA_ALL_ACCESS = 0x0000037f
         }
 
-        private const int LOGON32_LOGON_INTERACTIVE         = 2;
-        private const int LOGON32_LOGON_NETWORK             = 3;
-        private const int LOGON32_LOGON_BATCH               = 4;
-        private const int LOGON32_LOGON_SERVICE             = 5;
-        private const int LOGON32_LOGON_UNLOCK              = 7;
-        private const int LOGON32_LOGON_NETWORK_CLEARTEXT   = 8;
-        private const int LOGON32_LOGON_NEW_CREDENTIALS     = 9;
+        private const int LOGON32_LOGON_INTERACTIVE = 2;
+        private const int LOGON32_LOGON_NETWORK = 3;
+        private const int LOGON32_LOGON_BATCH = 4;
+        private const int LOGON32_LOGON_SERVICE = 5;
+        private const int LOGON32_LOGON_UNLOCK = 7;
+        private const int LOGON32_LOGON_NETWORK_CLEARTEXT = 8;
+        private const int LOGON32_LOGON_NEW_CREDENTIALS = 9;
 
         public const uint ES_SYSTEM_REQUIRED = 0x00000001;
         public const uint ES_DISPLAY_REQUIRED = 0x00000002;
@@ -137,6 +138,39 @@ namespace QQRobot
         [DllImport("user32.DLL", SetLastError = true)]
         public static extern bool SetThreadDesktop(IntPtr hDesktop);
 
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetDesktopWindow();
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetProcessWindowStation();
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern IntPtr GetCurrentThreadId();
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetThreadDesktop(IntPtr dwThread);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr OpenWindowStation(string a, bool b, int c);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr OpenDesktop(string lpszDesktop, uint dwFlags,
+        bool fInherit, uint dwDesiredAccess);
+        [DllImport("rpcrt4.dll", SetLastError = true)]
+        public static extern IntPtr RpcImpersonateClient(int i);
+        [DllImport("rpcrt4.dll", SetLastError = true)]
+        public static extern IntPtr RpcRevertToSelf();
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr SetProcessWindowStation(IntPtr a);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr CloseWindowStation(IntPtr a);
+
+        public delegate bool WNDENUMPROC(IntPtr hWnd, int lParam);
+
+        [DllImport("user32.dll")]
+        public static extern bool EnumWindows(WNDENUMPROC lpEnumFunc, int lParam);
+
+        [DllImport("user32.dll")]
+        public static extern int GetWindowTextW(IntPtr hWnd, [MarshalAs(UnmanagedType.LPWStr)]StringBuilder lpString, int nMaxCount);
+
+        [DllImport("user32.dll", EntryPoint = "IsWindow")]
+        public static extern bool IsWindow(IntPtr hWnd);
+
         private string sPath = null;
         public Win32Api setPath(string path)
         {
@@ -178,7 +212,7 @@ namespace QQRobot
         }
 
         IntPtr admin_token = default(IntPtr);
-        
+
         public IntPtr Login(string name, string pwd)
         {
             LogonUser(name, ".", pwd, LOGON32_LOGON_NEW_CREDENTIALS, 0, ref admin_token);
@@ -205,18 +239,18 @@ namespace QQRobot
             {
                 throw new Exception("Login faild, errCode = " + GetLastError());
             }
-            
+
             IntPtr hDesk = OpenDesktop("Default", 0, false,
-                //ACCESS_MASK.DESKTOP_CREATEMENU |
-                //ACCESS_MASK.DESKTOP_CREATEWINDOW |
-                //ACCESS_MASK.DESKTOP_HOOKCONTROL |
-                //ACCESS_MASK.DESKTOP_ENUMERATE |
-                //ACCESS_MASK.DESKTOP_JOURNALPLAYBACK |
-                //ACCESS_MASK.DESKTOP_JOURNALRECORD |
-                //ACCESS_MASK.DESKTOP_READOBJECTS |
-                ACCESS_MASK.DESKTOP_SWITCHDESKTOP 
-                /*ACCESS_MASK.DESKTOP_WRITEOBJECTS*/);
-            if(hDesk == IntPtr.Zero)
+                ACCESS_MASK.DESKTOP_CREATEMENU |
+                ACCESS_MASK.DESKTOP_CREATEWINDOW |
+                ACCESS_MASK.DESKTOP_HOOKCONTROL |
+                ACCESS_MASK.DESKTOP_ENUMERATE |
+                ACCESS_MASK.DESKTOP_JOURNALPLAYBACK |
+                ACCESS_MASK.DESKTOP_JOURNALRECORD |
+                ACCESS_MASK.DESKTOP_READOBJECTS |
+                ACCESS_MASK.DESKTOP_SWITCHDESKTOP |
+                ACCESS_MASK.DESKTOP_WRITEOBJECTS);
+            if (hDesk == IntPtr.Zero)
             {
                 throw new Exception("OpenDesktop faild, errCode = " + GetLastError());
             }
@@ -225,7 +259,45 @@ namespace QQRobot
             {
                 throw new Exception("SetThreadDesktop faild, errCode = " + GetLastError());
             }
-            
+
+        }
+
+        public IntPtr FindWindow(string name)
+        {
+            GetDesktopWindow();
+            IntPtr hwinstaSave = GetProcessWindowStation();
+            IntPtr dwThreadId = GetCurrentThreadId();
+            IntPtr hdeskSave = GetThreadDesktop(dwThreadId);
+            IntPtr hwinstaUser = OpenWindowStation("WinSta0", false, 33554432);
+            if (hwinstaUser == IntPtr.Zero)
+            {
+                RpcRevertToSelf();
+                return IntPtr.Zero;
+            }
+            SetProcessWindowStation(hwinstaUser);
+            IntPtr hdeskUser = OpenDesktop("Default", 0, false, 33554432);
+            RpcRevertToSelf();
+            if (hdeskUser == IntPtr.Zero)
+            {
+                SetProcessWindowStation(hwinstaSave);
+                CloseWindowStation(hwinstaUser);
+                return IntPtr.Zero;
+            }
+            SetThreadDesktop(hdeskUser);
+            IntPtr dwGuiThreadId = dwThreadId;
+
+            //SenderApi.StartQQFindHwnd("四人帮");
+            IntPtr mWnd = IntPtr.Zero;//= SenderApi.GetFindHwnd();
+
+
+            dwGuiThreadId = IntPtr.Zero;
+            SetThreadDesktop(hdeskSave);
+            SetProcessWindowStation(hwinstaSave);
+            CloseDesktop(hdeskUser);
+            CloseWindowStation(hwinstaUser);
+
+            return mWnd;
+
         }
     }
 }

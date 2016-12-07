@@ -17,5 +17,6 @@ namespace QQRobot
         public string ReplyId { set; get; }
         public TwitterUser ReplyUser { set; get; }
         public Twitter Reply { set; get; }
+        public string Truncated { set; get; }
     }
 }

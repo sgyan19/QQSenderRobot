@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SocketWin32Api;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -34,7 +35,7 @@ namespace QQRobot
             SenderApi.StartQQFindHwnd(wndNameRegex);
             IntPtr hwnd = SenderApi.GetFindHwnd();
             string wndName = SenderApi.GetFindWndName();
-            if (SenderApi.IsWindow(hwnd))
+            if (Win32Api.IsWindow(hwnd))
             {
                 instance = new QQSender();
                 instance.mHwnd = hwnd;
