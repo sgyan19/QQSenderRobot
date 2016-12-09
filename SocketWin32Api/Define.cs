@@ -10,8 +10,8 @@ namespace SocketWin32Api
     {
         public enum Port
         {
-            Service = 19190,
-            Form = 19191,
+            Service = 19192,
+            Form = 19193,
         }
         public enum RequestCode
         {
