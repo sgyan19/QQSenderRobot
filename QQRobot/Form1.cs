@@ -15,6 +15,7 @@ using System.IO;
 using System.Threading;
 using SimpleJSON;
 using SocketWin32Api;
+using SocketWin32Api.Define;
 
 namespace QQRobot
 {
@@ -74,6 +75,7 @@ namespace QQRobot
             handle.shower.doBtn = button4;
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
+            socketServer.start((int)Port.Form);
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
@@ -103,7 +105,6 @@ namespace QQRobot
             taker.setTopCount(topCount);
             taker.setProxy(proxy);
             server.Start(taker);
-            socketServer.start(Define.Port.QQRobot);
             Win32Api.SystemUnsleepLock();
         }
         private ArrayList contols = new ArrayList();

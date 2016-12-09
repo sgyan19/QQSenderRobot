@@ -1,4 +1,4 @@
-﻿namespace AutoLogin
+﻿namespace QQRobotService
 {
     partial class ProjectInstaller
     {
@@ -39,7 +39,10 @@
             // 
             // serviceInstaller1
             // 
+            this.serviceInstaller1.Description = "my robot service";
+            this.serviceInstaller1.DisplayName = "robot";
             this.serviceInstaller1.ServiceName = "QQRobotService";
+            this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
             // 

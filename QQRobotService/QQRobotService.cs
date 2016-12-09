@@ -1,4 +1,7 @@
-﻿using System;
+﻿using log4net;
+using SocketWin32Api;
+using SocketWin32Api.Define;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -7,23 +10,15 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading.Tasks;
-using log4net;
-using System.Net.Sockets;
-using System.Net;
-using SimpleJSON;
-using System.Threading;
-using QQRobot;
-using SocketWin32Api;
 
-[assembly: log4net.Config.XmlConfigurator(Watch = true)]
-namespace AutoLogin
+namespace QQRobotService
 {
-    public partial class AutoLoginService : ServiceBase
+    public partial class QQRobotService : ServiceBase
     {
         private ILog mLoger;
         private SocketServer mSocketServer;
 
-        public AutoLoginService()
+        public QQRobotService()
         {
             InitializeComponent();
             mLoger = LogManager.GetLogger("AutoLogin.logging");
@@ -35,7 +30,7 @@ namespace AutoLogin
         {
             mLoger.Info("OnStart");
             mLoger.Info("Bind port 19190");
-            mSocketServer.start(Define.Port.AutoLogin);
+            mSocketServer.start((int)Port.Service);
             mLoger.Info("OnStart end");
         }
 

@@ -90,6 +90,18 @@ namespace ClipboardQQSender
 		PostMessage(hwnd, WM_SYSKEYUP, 0x00000011, 0xC0380001);
 	}
 
+	void sendReturn(HWND hwnd)
+	{
+		if (hwnd == 0x0)
+		{
+			return;
+		}
+		Sleep(500);
+		PostMessage(hwnd, WM_KEYDOWN, 0x0000000D, 0x001C0001);
+		Sleep(100);
+		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
+	}
+
 	void sendSumbit(HWND hwnd)
 	{
 		if (hwnd == 0x0)
@@ -104,5 +116,21 @@ namespace ClipboardQQSender
 		PostMessage(hwnd, WM_KEYUP, 0x0000000D, 0xC01C0001);
 		Sleep(100);
 		keybd_event(VK_CONTROL, 0x1D, KEYEVENTF_KEYUP, 0);
+	}
+
+	void sendSumbit2(HWND hwnd) 
+	{
+		if (hwnd != 0x0) 
+		{
+			Sleep(200);
+			//keybd_event(VK_MENU, 0x38, 0, 0);
+			PostMessage((HWND)724026, WM_SYSKEYDOWN, VK_MENU, 0x20380001);
+			PostMessage((HWND)724026, WM_SYSKEYDOWN, 0x53, 0x201F0001);
+			Sleep(200);
+			//PostMessage((HWND)724026, WM_SYSCHAR, 0x73, 0x201F0001);
+			PostMessage((HWND)724026, WM_SYSKEYUP, 0x53, 0xC01F0001);
+			Sleep(200);
+			PostMessage((HWND)724026, WM_KEYUP, VK_MENU, 0xC0380001);
+		}
 	}
 }

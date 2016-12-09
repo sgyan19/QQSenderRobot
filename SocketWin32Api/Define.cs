@@ -6,12 +6,35 @@ using System.Threading.Tasks;
 
 namespace SocketWin32Api
 {
-    public class Define
+    namespace Define
     {
-        public static class Port
+        public enum Port
         {
-            public const int AutoLogin = 19190;
-            public const int QQRobot = 19191;
+            Service = 19190,
+            Form = 19191,
+        }
+        public enum RequestCode
+        {
+            FindWindow = 2,
+            SendWindowInfo = 3,
+
+            RemoteFindWindow = 1002,
+            RemoteSendWindowText = 1003,
+            DisConnect = 9999,
+        }
+
+        public class RequestKey
+        {
+            public const string Code = "code";
+            public const string Args = "args";
+        }
+
+        public class ResponseKey
+        {
+            public const string Code = "code";
+            public const string Data = "data";
+            public const string Message = "message";
+            public const string Error = "error";
         }
     }
 }

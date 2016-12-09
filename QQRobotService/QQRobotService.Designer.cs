@@ -1,6 +1,6 @@
-﻿namespace AutoLogin
+﻿namespace QQRobotService
 {
-    partial class AutoLoginService
+    partial class QQRobotService
     {
         /// <summary> 
         /// 必需的设计器变量。
@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             // 
-            // AutoLoginService
+            // QQRobotService
             // 
-            this.ServiceName = "AutoLoginService";
+            this.ServiceName = "QQRobotService";
 
         }
 

@@ -22,5 +22,11 @@
 /ipch
 /packages
 *.opendb
-AutoLogin/bin
-AutoLogin/obj
+AutoLogin
+QQRobotService/bin
+QQRobotService/obj
+testSendWindow/debug
+testSendWindow/release
+SocketWin32Api/bin
+SocketWin32Api/obj
+

@@ -262,7 +262,7 @@ namespace SocketWin32Api
 
         }
 
-        public IntPtr FindWindow(string name)
+        public IntPtr FindWindowServer(string name)
         {
             GetDesktopWindow();
             IntPtr hwinstaSave = GetProcessWindowStation();

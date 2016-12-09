@@ -41,7 +41,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Define.cs" />
+    <Compile Include="WindowSendApi.cs" />
     <Compile Include="SimpleJSON.cs" />
+    <Compile Include="SocketClient.cs" />
     <Compile Include="SocketServer.cs" />
     <Compile Include="Win32Api.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
