@@ -61,7 +61,7 @@ namespace QQRobot
 
         public override string takePage()
         {
-            return TwitterApi.getInstance().GetTwitters2(Uid, lastTake == null || lastTake.Length <= 0 ? null : (lastTake[0] as Twitter).Id, null, Proxy, Cookie);
+            return TwitterApi.getInstance().GetTwitters(Uid, lastTake == null || lastTake.Length <= 0 ? null : (lastTake[0] as Twitter).Id, null, Proxy);
         }
 
         /// <summary>
