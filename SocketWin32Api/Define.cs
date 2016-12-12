@@ -10,14 +10,15 @@ namespace SocketWin32Api
     {
         public enum Port
         {
-            Service = 19192,
+            Service = 19194,
             Form = 19193,
         }
         public enum RequestCode
         {
+            RunCmd = 1,
             FindWindow = 2,
             SendWindowInfo = 3,
-
+            
             RemoteFindWindow = 1002,
             RemoteSendWindowText = 1003,
             DisConnect = 9999,

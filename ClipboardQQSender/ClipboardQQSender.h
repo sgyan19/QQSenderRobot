@@ -23,3 +23,5 @@ CLIPBOARDQQSENDER_API void Return(HWND value);
 CLIPBOARDQQSENDER_API void Sumbit(HWND value);
 
 CLIPBOARDQQSENDER_API void Sumbit2(HWND value);
+
+CLIPBOARDQQSENDER_API int Cmd(const char * command);

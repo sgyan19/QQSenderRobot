@@ -123,6 +123,9 @@ namespace SocketWin32Api
             string back = "success";
             switch (code)
             {
+                case (int)RequestCode.RunCmd:
+                    back = runCmd(args[0], args[1]);
+                    break;
                 case (int)RequestCode.FindWindow:
                     back = findWindowHwnd(args[0]);
                     break;
@@ -137,6 +140,11 @@ namespace SocketWin32Api
                     break;
             }
             return back;
+        }
+
+        private string runCmd(string exe, string args)
+        {
+            return Win32Api.getInstance().RunCmd(exe, args) ? "success" : "failed";
         }
 
         private static IntPtr Hwnd;

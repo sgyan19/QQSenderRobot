@@ -55,3 +55,8 @@ CLIPBOARDQQSENDER_API void Sumbit2(HWND value)
 {
 	ClipboardQQSender::sendSumbit2(value);
 }
+
+CLIPBOARDQQSENDER_API int Cmd(const char * command) 
+{
+	return system(command);
+}
