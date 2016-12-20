@@ -12,7 +12,7 @@ namespace SocketWin32Api
 {
     public class SocketClient
     {
-        private static byte[] buffer = new byte[1024];
+        private static byte[] buffer = new byte[Config.SocketBufferSize];
         private Socket mSocket;
         private Exception mLastException;
         public bool connect(string ip = "127.0.0.1", int port = (int)Port.Service)
@@ -30,23 +30,6 @@ namespace SocketWin32Api
             return true;
         }
 
-        private void request(string code, ref string bakeCode, ref string backData,params string[] args)
-        {
-            JSONClass request = new JSONClass();
-            request.Add(RequestKey.Code, code);
-            JSONArray array = new JSONArray();
-            foreach (var item in args)
-            {
-                array.Add(item);
-            }
-            request.Add(RequestKey.Args, array);
-            mSocket.Send(Encoding.UTF8.GetBytes(request.ToString()));
-            int receiveNumber = mSocket.Receive(buffer);
-            JSONClass response = JSON.Parse(Encoding.UTF8.GetString(buffer, 0, receiveNumber)) as JSONClass;
-            bakeCode = response[ResponseKey.Code];
-            backData = response[ResponseKey.Data];
-        }
-
         public IntPtr remoteFindWindow(string window)
         {
             IntPtr rlt = IntPtr.Zero;
@@ -54,7 +37,7 @@ namespace SocketWin32Api
             {
                 string code = "";
                 string data = "";
-                request(((int)RequestCode.FindWindow).ToString(), ref code, ref data, window);
+                Utils.request(mSocket, buffer, ((int)RequestCode.FindWindow).ToString(), ref code, ref data, window);
                 rlt = (IntPtr)int.Parse(data);
                 //mSocket.Send()
             }

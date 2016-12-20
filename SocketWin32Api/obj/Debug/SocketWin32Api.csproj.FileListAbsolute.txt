@@ -8,3 +8,5 @@ D:\visual studio\Projects\QQSenderRobot\SocketWin32Api\bin\Debug\SocketWin32Api.
 D:\visual studio\Projects\QQSenderRobot\SocketWin32Api\obj\Debug\SocketWin32Api.csprojResolveAssemblyReference.cache
 D:\visual studio\Projects\QQSenderRobot\SocketWin32Api\obj\Debug\SocketWin32Api.dll
 D:\visual studio\Projects\QQSenderRobot\SocketWin32Api\obj\Debug\SocketWin32Api.pdb
+C:\Users\guoyao\Documents\Visual Studio 2015\Projects\QQSenderRobot\Debug\SocketWin32Api.dll
+C:\Users\guoyao\Documents\Visual Studio 2015\Projects\QQSenderRobot\Debug\SocketWin32Api.pdb

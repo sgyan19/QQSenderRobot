@@ -36,17 +36,18 @@ int main()
 		Sleep(200);
 		//keybd_event(VK_MENU, 0x38, 0, 0);
 		PostMessage((HWND)724026, WM_SYSKEYDOWN, VK_MENU, 0x20380001);
+		Sleep(200);
 		PostMessage((HWND)724026, WM_SYSKEYDOWN, 0x53, 0x201F0001);
 		Sleep(200);
 		//PostMessage((HWND)724026, WM_SYSCHAR, 0x73, 0x201F0001);
-		PostMessage((HWND)724026, WM_SYSKEYUP, 0x53, 0xC01F0001);
 		Sleep(200);
 		PostMessage((HWND)724026, WM_KEYUP, VK_MENU, 0xC0380001);
+		Sleep(200);
+		PostMessage((HWND)724026, WM_KEYUP, 0x53, 0xC01F0001);
 		//keybd_event(VK_MENU, 0x38, KEYEVENTF_KEYUP, 0);
 		//SendMessage((HWND)724026, WM_CHAR, 10, 0x011C0001);
 		//PostMessage((HWND)724026, WM_SYSKEYUP, 0x53, 0x201F0001);
 		//SendMessage((HWND)724026, WM_KEYUP, VK_CONTROL, 0x011D0001);
-
 		/*
 		SENDFUNC submit = (SENDFUNC)GetProcAddress
 			(hDllInst, "Sumbit");

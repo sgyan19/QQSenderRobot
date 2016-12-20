@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -40,7 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConvsationManager.cs" />
     <Compile Include="Define.cs" />
+    <Compile Include="Hastable.cs" />
+    <Compile Include="Utils.cs" />
     <Compile Include="WindowSendApi.cs" />
     <Compile Include="SimpleJSON.cs" />
     <Compile Include="SocketClient.cs" />

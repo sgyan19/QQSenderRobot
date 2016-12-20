@@ -19,7 +19,7 @@ namespace SocketWin32Api
         private Task mAutoCheckTask;
         private Socket mServerSocket;
         private int mPort;
-        private static byte[] buffer = new byte[1024];
+        private static byte[] buffer = new byte[Config.SocketBufferSize];
 
         private Hashtable mSocketMap = new Hashtable();
 
@@ -50,7 +50,7 @@ namespace SocketWin32Api
             {
                 mServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 mServerSocket.Bind(new IPEndPoint(IPAddress.Parse("0.0.0.0"), mPort));
-                mServerSocket.Listen(3);
+                mServerSocket.Listen(10);
                 mListenerTask.Start();
             }
             catch (SocketException e)
@@ -82,25 +82,40 @@ namespace SocketWin32Api
 
                     int code = -1;
                     string[] args;
-
+                    string requestId;
                     try
                     {
                         JSONNode node = JSON.Parse(json);
                         code = int.Parse(node[RequestKey.Code]);
                         args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
+                        requestId = node[RequestKey.RequestId];
+                        if (requestId == null) requestId = "";
                     }
                     catch
                     {
                         args = new string[0];
+                        requestId = "";
                     }
                     if(code == (int)RequestCode.DisConnect)
                     {
                         break;
                     }
-                    string end = handleCommand(code, args);
+                    string end;
+                    try
+                    {
+                        end = handleCommand(s, json, code, args);
+                    }
+                    catch (Exception ex)
+                    {
+                        end = ex.Message;
+                        code = 1;
+                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(ex.StackTrace);
+                    }
                     JSONClass response = new JSONClass();
                     response.Add(ResponseKey.Code, "0");
                     response.Add(ResponseKey.Data, end);
+                    response.Add(ResponseKey.RequestId, requestId);
                     s.Send(Encoding.UTF8.GetBytes(response.ToString()));
                 }
             }
@@ -118,7 +133,7 @@ namespace SocketWin32Api
 
         }
 
-        private string handleCommand(int code, params string[] args)
+        private string handleCommand(Socket socket, string request, int code, params string[] args)
         {
             string back = "success";
             switch (code)
@@ -133,8 +148,15 @@ namespace SocketWin32Api
                     back = PasteToWindow((IntPtr)int.Parse(args[0]), args[1]);
                     break;
                 case (int)RequestCode.RemoteFindWindow:
-                    var socket = getConnectedSocketClient(args[0], args[1]);
-                    back = socket.remoteFindWindow(args[2]).ToString();
+                    var socketClient = getConnectedSocketClient(args[0], args[1]);
+                    back = socketClient.remoteFindWindow(args[2]).ToString();
+                    break;
+                case (int)RequestCode.ConversationLongLink:
+                    ConvsationManager.getInstance().addSocket(socket);
+                    break;
+                case (int)RequestCode.ConversationNote:
+                    ConvsationManager.getInstance().broadcast(socket, request);
+                    back = request;
                     break;
                 default:
                     break;
@@ -193,10 +215,9 @@ namespace SocketWin32Api
                 socket.connect(ip, int.Parse(port));
                 mSocketMap.Add(addr, socket);
             }
-            else if (socket.isConnected())
+            else if (!socket.isConnected())
             {
                 socket.Close();
-                socket = new SocketClient();
                 socket.connect(ip, int.Parse(port));
                 mSocketMap.Add(addr, socket);
             }
