@@ -30,6 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\libs\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,6 +46,7 @@
     <Compile Include="ConvsationManager.cs" />
     <Compile Include="Define.cs" />
     <Compile Include="Hastable.cs" />
+    <Compile Include="LogHelper.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WindowSendApi.cs" />
     <Compile Include="SimpleJSON.cs" />

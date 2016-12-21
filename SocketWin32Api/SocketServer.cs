@@ -1,4 +1,5 @@
-﻿using SimpleJSON;
+﻿using log4net;
+using SimpleJSON;
 using SocketWin32Api.Define;
 using System;
 using System.Collections;
@@ -22,6 +23,12 @@ namespace SocketWin32Api
         private static byte[] buffer = new byte[Config.SocketBufferSize];
 
         private Hashtable mSocketMap = new Hashtable();
+        private LogHelper mLogHelper = new LogHelper();
+
+        public void setLoger(ILog log)
+        {
+            mLogHelper.CoreLog = log;
+        }
 
         public void start(int port = 19190)
         {
@@ -64,6 +71,7 @@ namespace SocketWin32Api
             {
                 Socket clientSocket = mServerSocket.Accept();
                 //clientSocket.Send(Encoding.UTF8.GetBytes("Server Say Hello"));
+                mLogHelper.InfoFormat("accept address = {0}", ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString());
                 Task.Factory.StartNew(new Action<object>(socketReceiveWork), clientSocket);
             }
         }
@@ -79,6 +87,8 @@ namespace SocketWin32Api
                     //通过clientSocket接收数据  
                     int receiveNumber = s.Receive(buffer);
                     json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
+                    
+                    mLogHelper.InfoFormat("address = {0}, Receive = {1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), json);
 
                     int code = -1;
                     string[] args;
@@ -112,20 +122,27 @@ namespace SocketWin32Api
                         Console.WriteLine(ex.Message);
                         Console.WriteLine(ex.StackTrace);
                     }
-                    JSONClass response = new JSONClass();
-                    response.Add(ResponseKey.Code, "0");
-                    response.Add(ResponseKey.Data, end);
-                    response.Add(ResponseKey.RequestId, requestId);
-                    s.Send(Encoding.UTF8.GetBytes(response.ToString()));
+                    if (end != null)
+                    { 
+                        JSONClass response = new JSONClass();
+                        response.Add(ResponseKey.Code, "0");
+                        response.Add(ResponseKey.Data, end);
+                        response.Add(ResponseKey.RequestId, requestId);
+                        string responseJson = response.ToString();
+                        mLogHelper.InfoFormat("response = {0}", responseJson);
+                        s.Send(Encoding.UTF8.GetBytes(responseJson));
+                    }
                 }
             }
             catch (Exception ex)
             {
+                mLogHelper.ErrorFormat("address = {0}, while Receivere Exception = {1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), ex.Message);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
             finally
             {
+                mLogHelper.InfoFormat("address = {0},socket close", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
                 s.Shutdown(SocketShutdown.Both);
                 s.Disconnect(true);
                 s.Close();
@@ -155,7 +172,8 @@ namespace SocketWin32Api
                     ConvsationManager.getInstance().addSocket(socket);
                     break;
                 case (int)RequestCode.ConversationNote:
-                    ConvsationManager.getInstance().broadcast(socket, request);
+                    int count = ConvsationManager.getInstance().broadcast(socket, request);
+                    mLogHelper.InfoFormat("address = {0}, Conversation broadcast = {1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), count);
                     back = request;
                     break;
                 default:

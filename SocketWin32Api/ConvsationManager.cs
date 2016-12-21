@@ -38,21 +38,31 @@ namespace SocketWin32Api
             ConvsationSockets.Add(socket);
         }
 
-        public void broadcast(Socket sender, string noteRequest)
+        public int broadcast(Socket sender, string noteRequest)
         {
+            if (!ConvsationSockets.Contains(sender))
+            {
+                ConvsationSockets.Add(sender);
+            }
             HashSet<Socket>.Enumerator en = ConvsationSockets.GetEnumerator();
-            ConvsationSockets.RemoveWhere(socket => (!socket.Connected));
+            ConvsationSockets.RemoveWhere(socket => (socket == null || !socket.Connected));
             JSONClass response = new JSONClass();
             response.Add(ResponseKey.Code, "0");
             response.Add(ResponseKey.Data, noteRequest);
             string responseStr = response.ToString();
             foreach (Socket item in ConvsationSockets)
             {
-                if(item != null && item != sender)
+                if(item != sender)
                 {
                     item.Send(Encoding.UTF8.GetBytes(responseStr));
                 }
             }
+            return ConvsationSockets.Count() - 1;
+        }
+
+        public int clientCount()
+        {
+            return ConvsationSockets.Count();
         }
     }
 }

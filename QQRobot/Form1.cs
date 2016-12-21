@@ -16,7 +16,9 @@ using System.Threading;
 using SimpleJSON;
 using SocketWin32Api;
 using SocketWin32Api.Define;
+using log4net;
 
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 namespace QQRobot
 {
     public partial class Form1 : Form
@@ -43,6 +45,7 @@ namespace QQRobot
         private bool ifFooter = true;
         private bool autoStartServer = true;
         private SocketServer socketServer;
+        private ILog mLog;
 
         public Form1()
         {
@@ -53,6 +56,7 @@ namespace QQRobot
             //Console.WriteLine(json.ToString());
             //new PageRequest().Location(  "https://t.co/UizmmdoTmk", proxy, null);
             //bool locked = Win32Api.getInstance().isLockedWindow();
+            
         }
 
         public void init()
@@ -76,6 +80,7 @@ namespace QQRobot
             handle.shower.sendCountLabel = label9;
             FormClosed += Form1_FormClosed;
             socketServer.start((int)Port.Form);
+            socketServer.setLoger(LogManager.GetLogger("SocketServer"));
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
