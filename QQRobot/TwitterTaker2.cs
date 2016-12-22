@@ -131,7 +131,7 @@ namespace QQRobot
                 Text = json["text"],
                 Id = json["id_str"],
                 TimeStamp = json["created_at"],
-                ImgUrls = json["entities"]["media"] == null ? new string[0] : (json["entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
+                ImgUrls = json["extended_entities"]["media"] == null ? new string[0] : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
                 User = paserUserFormJson(json),
                 ReplyId = json["in_reply_to_status_id"],
                 Truncated = json["truncated"],
