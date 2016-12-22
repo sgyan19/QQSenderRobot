@@ -39,7 +39,7 @@ namespace QQRobot
                 }
                 if (showFooter)
                 {
-                    source = "本信息来自[" + user.Source + "]";
+                    source = "本信息来自[" + user.Source + "] ";
                 }
             }
             if(newWeibos.Length > 5)
@@ -53,6 +53,7 @@ namespace QQRobot
             {
                 foreach (BaseData weibo in newWeibos)
                 {
+                    string newFooter = source + (weibo.TimeStamp == null ? "" : weibo.TimeStamp);
                     Image longImage = null;
                     BaseData useWeibo = weibo;
                     if (weibo != null && weibo.Taker != null)
@@ -75,7 +76,7 @@ namespace QQRobot
                         sendCount += 1;// senders.Count;
                         foreach (Sender sender in senders)
                         {
-                            sender.sendWithUser(userName, userHeader, source, useWeibo.Text, sendImgs, useWeibo.LongImgPath);
+                            sender.sendWithUser(userName, userHeader, newFooter, useWeibo.Text, sendImgs, useWeibo.LongImgPath);
                         }
                         shower.showCount("已发送：" + sendCount);
                     }
