@@ -206,7 +206,7 @@ namespace QQRobot
                     List<string> urls = new List<string>();
                     urls.AddRange(d.ImgUrls);
                     recursionReply(d, ref text, urls);
-                    d.Text = text.Replace(((TwitterUser)User).ScreenName, ((TwitterUser)User).UserName);
+                    d.Text = text.Replace( "@"+ ((TwitterUser)User).ScreenName, "@" + ((TwitterUser)User).UserName);
                     d.ImgUrls = urls.ToArray();
                 }
             }

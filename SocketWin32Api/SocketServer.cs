@@ -71,7 +71,7 @@ namespace SocketWin32Api
             {
                 Socket clientSocket = mServerSocket.Accept();
                 //clientSocket.Send(Encoding.UTF8.GetBytes("Server Say Hello"));
-                mLogHelper.InfoFormat("accept address = {0}", ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString());
+                mLogHelper.InfoFormat("accept addr:{0}", ((IPEndPoint)clientSocket.RemoteEndPoint).Address.ToString());
                 Task.Factory.StartNew(new Action<object>(socketReceiveWork), clientSocket);
             }
         }
@@ -87,9 +87,11 @@ namespace SocketWin32Api
                     //通过clientSocket接收数据  
                     int receiveNumber = s.Receive(buffer);
                     json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
-                    
-                    mLogHelper.InfoFormat("address = {0}, Receive = {1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), json);
-
+                    mLogHelper.InfoFormat("addr:{0}, Receive:{1}, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), json, receiveNumber);
+                    if (receiveNumber <= 0)
+                    {
+                        break;
+                    }
                     int code = -1;
                     string[] args;
                     string requestId;
@@ -129,20 +131,24 @@ namespace SocketWin32Api
                         response.Add(ResponseKey.Data, end);
                         response.Add(ResponseKey.RequestId, requestId);
                         string responseJson = response.ToString();
-                        mLogHelper.InfoFormat("response = {0}", responseJson);
+                        mLogHelper.InfoFormat("addr:{0}, response:{1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), responseJson);
                         s.Send(Encoding.UTF8.GetBytes(responseJson));
+                    }
+                    else
+                    {
+                        mLogHelper.InfoFormat("addr:{0}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
                     }
                 }
             }
             catch (Exception ex)
             {
-                mLogHelper.ErrorFormat("address = {0}, while Receivere Exception = {1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), ex.Message);
+                mLogHelper.ErrorFormat("addr:{0}, while Receivere Exception:{1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), ex.Message);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
             finally
             {
-                mLogHelper.InfoFormat("address = {0},socket close", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
+                mLogHelper.InfoFormat("addr:{0}, socket close", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
                 s.Shutdown(SocketShutdown.Both);
                 s.Disconnect(true);
                 s.Close();
@@ -170,13 +176,15 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationLongLink:
                     ConvsationManager.getInstance().addSocket(socket);
+                    mLogHelper.InfoFormat("addr:{0}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString());
                     break;
                 case (int)RequestCode.ConversationNote:
                     int count = ConvsationManager.getInstance().broadcast(socket, request);
-                    mLogHelper.InfoFormat("address = {0}, Conversation broadcast = {1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), count);
+                    mLogHelper.InfoFormat("addr:{0}, Conversation broadcast:{1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), count);
                     back = request;
                     break;
                 default:
+                    back = null;
                     break;
             }
             return back;
