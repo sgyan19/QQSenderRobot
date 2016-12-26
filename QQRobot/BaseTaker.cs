@@ -38,6 +38,14 @@ namespace QQRobot
             {
                 taker = new TwitterTaker2();
             }
+            else if (string.Equals(name, "twitter3"))
+            {
+                taker = new TwitterTaker3();
+            }
+            else
+            {
+                taker = new TwitterTaker2();
+            }
             return taker;
         }
         protected BaseTaker()

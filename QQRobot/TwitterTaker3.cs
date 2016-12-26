@@ -8,18 +8,49 @@ using System.Threading.Tasks;
 
 namespace QQRobot
 {
-    class TwitterTaker2 : BaseTaker
+    class TwitterTaker3 : BaseTaker
     {
+        private const string UserTemplet = "<img class=\\\"ProfileAvatar-image \\\" src=\\\"(?<url>[\\S]*?)\\\" alt=\\\"(?<name>[\\S]*?)\\\">";
+        private const string ItemTemplet = "<div class=\\\"tweet js-stream-tweet js-actionable-tweet(?<item>[\\s\\S]*?)<div class=\\\"stream-item-footer\\\">";
+        private const string ItemTextTemplet = "<p class=\\\"TweetTextSize TweetTextSize--[\\d]{1,3}px js-tweet-text tweet-text\\\" lang=\\\"[a-z]{1,3}\\\" data-aria-label-part=\\\"[\\d]\\\">(?<content>[\\s\\S]*?)</p>";
+        private const string ItemImgTemplet = "<img data-aria-label-part src=\\\"(?<url>[\\S]*?)\\\" alt=";
+        private const string ItemLinkTemplet = "<a[\\s\\S]*?href=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
+        private const string ItemLink2Templet = "<a[\\s\\S]*?title=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
+        private const string HtmlLabel1Templet = "<[\\s\\S]*?>";
+        private const string HtmlLabel2Templet = "</[\\s\\S]*?>";
+        private const string HtmlLabel3Templet = "<[\\S]>";
+        private const string HtmlLabel4Templet = "</[b-z]>";
+
+        private Regex mUserReg = new Regex(UserTemplet);
+        private string mUserImgGroups = "url";
+        private string mUserNameGroups = "name";
+        private Regex mItemReg = new Regex(ItemTemplet);
+        private string mItemGroups = "item";
+        private Regex mItemTextReg = new Regex(ItemTextTemplet);
+        private string mTextContentGroups = "content";
+        private Regex mItemImgsReg = new Regex(ItemImgTemplet);
+        private string mImgUrlGroups = "url";
+        private Regex mItemLinkReg = new Regex(ItemLinkTemplet);
+        private Regex mItemLink2Reg = new Regex(ItemLink2Templet);
+        private string mLinkUrlGroups = "url";
+        private string mLinkNameGroups = "name";
+        private Regex mHtmlLabel1Reg = new Regex(HtmlLabel1Templet);
+        private Regex mHtmlLabel2Reg = new Regex(HtmlLabel2Templet);
+        private Regex mHtmlLabel3Reg = new Regex(HtmlLabel3Templet);
+        private Regex mHtmlLabel4Reg = new Regex(HtmlLabel4Templet);
+
         private const string AtEndTemplet = "@([a-zA-Z\\d_ ]*?)$";
         private const string AtStartTemplet = "^(@[a-zA-Z\\d_]*?) ";
         private const string HttpUriTemplet = "https{0,1}://\\S{1,}";
+        private const string HttpTwitterTimplet = "https://twitter.com\\S{1,}";
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
 
         private Regex mAtEndNameReg = new Regex(AtEndTemplet);
         private Regex mStartAtNameReg = new Regex(AtStartTemplet);
         private Regex mHttpUriReg = new Regex(HttpUriTemplet);
-        public TwitterTaker2()
+        private Regex mHttpTwitterReg = new Regex(HttpTwitterTimplet);
+        public TwitterTaker3()
         {
             SafeCount = int.MaxValue;
         }
@@ -164,31 +195,10 @@ namespace QQRobot
         public override BaseData onUse(BaseData data)
         {
             Twitter d = data as Twitter;
-
             if (d.Reply == null)
             {
-                int times = 3;
-                if (bool.Parse(d.Truncated))
-                {
-                    Twitter newData = null;
-                tryRequest:
-                    try
-                    {
-                        times--;
-                        string tr = TwitterApi.getInstance().GetTwitter(d.Id, null, Proxy);
-                        JSONNode jsonNode = JSON.Parse(tr);
-                        newData = paserTwitterFormJson(jsonNode);
-                    }
-                    catch (Exception)
-                    {
-                        if (times >= 0)
-                            goto tryRequest;
-                    }
-                    if (newData != null)
-                    {
-                        d = newData;
-                    }
-                }
+                d = location302(d);
+                d = requestTruncated(d);
                 if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))
                 {
                     string text = mAtEndNameReg.Replace(d.Text, "") + string.Format(" //@{0} ", d.ReplyUser.ScreenName);
@@ -198,24 +208,6 @@ namespace QQRobot
                     recursionReply(d, ref text, urls);
                     d.Text = text.Replace(((TwitterUser)User).ScreenName, ((TwitterUser)User).UserName);
                     d.ImgUrls = urls.ToArray();
-                }
-                MatchCollection matches = mHttpUriReg.Matches(d.Text);
-                foreach (Match match in matches)
-                {
-                    string location = null;
-                reTry:
-                    try
-                    {
-                        location = request.Location(match.Value, Proxy, null);
-                    }
-                    catch (TimeoutException)
-                    {
-                        goto reTry;
-                    }
-                    if (!string.IsNullOrEmpty(location))
-                    {
-                        d.Text = d.Text.Replace(match.Value, location);
-                    }
                 }
             }
             
@@ -247,6 +239,8 @@ namespace QQRobot
                 reply = paserTwitterFormJson(JSON.Parse(jsonStr));
             }
             catch (Exception) { }
+            reply = location302(reply);
+            reply = requestTruncated(reply);
             try
             {
                 fullText += mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""), "") + ((string.IsNullOrEmpty(reply.ReplyId) || string.Equals(reply.ReplyId, "null")) ? "" : string.Format(" //@{0} ", reply.ReplyUser.ScreenName));
@@ -254,6 +248,64 @@ namespace QQRobot
                 recursionReply(reply, ref fullText, fullUrl);
                 data.Reply = reply;
             }catch  (Exception) { }
+        }
+
+        private Twitter requestTruncated(Twitter d)
+        {
+            if (bool.Parse(d.Truncated))
+            {
+                Match match = mHttpTwitterReg.Match(d.Text);
+                if (match.Success)
+                {
+                tryRequest:
+                    string html = null;
+                    try {
+                        html = request.GetData(3, null, match.Value, Proxy, Cookie, "https://twitter.com/");
+                    }catch(TimeoutException e)
+                    {
+                        goto tryRequest;
+                    }
+                    match = mItemTextReg.Match(html);
+                    if (match.Success)
+                    {
+                        string content = match.Groups[mTextContentGroups].Value;
+                        content = mHtmlLabel1Reg.Replace(content, " ");
+                        d.Text = content;
+                    }
+                    MatchCollection imgMatches = mItemImgsReg.Matches(html);
+                    string[] imgUrls = new string[imgMatches.Count];
+                    int i = 0;
+                    foreach (Match m in imgMatches)
+                    {
+                        imgUrls[i++] = m.Groups[mImgUrlGroups].Value.Replace("\\", "");
+                    }
+                    d.ImgUrls = imgUrls;
+                }
+            }
+            return d;
+        }
+
+        private Twitter location302(Twitter d)
+        {
+            MatchCollection matches = mHttpUriReg.Matches(d.Text);
+            foreach (Match match in matches)
+            {
+                string location = null;
+            reTry:
+                try
+                {
+                    location = request.Location(match.Value, Proxy, null);
+                }
+                catch (TimeoutException)
+                {
+                    goto reTry;
+                }
+                if (!string.IsNullOrEmpty(location))
+                {
+                    d.Text = d.Text.Replace(match.Value, location);
+                }
+            }
+            return d;
         }
     }
 }
