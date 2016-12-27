@@ -183,7 +183,7 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationNote:
                     int count = ConvsationManager.getInstance().broadcast(socket, requestStr);
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
                     break;
                 default:
