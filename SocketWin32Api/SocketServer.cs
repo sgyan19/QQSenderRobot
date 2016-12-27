@@ -100,7 +100,7 @@ namespace SocketWin32Api
                         JSONNode node = JSON.Parse(json);
                         request.Code = int.Parse(node[RequestKey.Code]);
                         request.Args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
-                        string RequestId = node[RequestKey.RequestId];
+                        request.RequestId = node[RequestKey.RequestId];
                         if (request.RequestId == null) request.RequestId = "";
                         string deviceId = node[RequestKey.DeviceId];
                         if (!string.IsNullOrEmpty(deviceId))
