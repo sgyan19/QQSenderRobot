@@ -80,6 +80,8 @@ namespace SocketWin32Api
         {
             Socket s = accept as Socket;
             string json = "";
+            Request request = new Request();
+            request.DeviceId = "";
             try
             {
                 while (true)
@@ -87,40 +89,41 @@ namespace SocketWin32Api
                     //通过clientSocket接收数据  
                     int receiveNumber = s.Receive(buffer);
                     json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
-                    mLogHelper.InfoFormat("addr:{0}, Receive:{1}, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), json, receiveNumber);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive:{2}, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
                     if (receiveNumber <= 0)
                     {
                         break;
                     }
-                    int code = -1;
-                    string[] args;
-                    string requestId;
+                    request.Code = -1;
                     try
                     {
                         JSONNode node = JSON.Parse(json);
-                        code = int.Parse(node[RequestKey.Code]);
-                        args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
-                        requestId = node[RequestKey.RequestId];
-                        if (requestId == null) requestId = "";
+                        request.Code = int.Parse(node[RequestKey.Code]);
+                        request.Args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
+                        string RequestId = node[RequestKey.RequestId];
+                        if (request.RequestId == null) request.RequestId = "";
+                        string deviceId = node[RequestKey.DeviceId];
+                        if (!string.IsNullOrEmpty(deviceId))
+                        {
+                            request.DeviceId = deviceId;
+                        }
                     }
                     catch
                     {
-                        args = new string[0];
-                        requestId = "";
+                        request.Args = new string[0];
                     }
-                    if(code == (int)RequestCode.DisConnect)
+                    if(request.Code == (int)RequestCode.DisConnect)
                     {
                         break;
                     }
                     string end;
                     try
                     {
-                        end = handleCommand(s, json, code, args);
+                        end = handleCommand(s, json, request);
                     }
                     catch (Exception ex)
                     {
                         end = ex.Message;
-                        code = 1;
                         Console.WriteLine(ex.Message);
                         Console.WriteLine(ex.StackTrace);
                     }
@@ -129,26 +132,26 @@ namespace SocketWin32Api
                         JSONClass response = new JSONClass();
                         response.Add(ResponseKey.Code, "0");
                         response.Add(ResponseKey.Data, end);
-                        response.Add(ResponseKey.RequestId, requestId);
+                        response.Add(ResponseKey.RequestId, request.RequestId);
                         string responseJson = response.ToString();
-                        mLogHelper.InfoFormat("addr:{0}, response:{1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), responseJson);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, responseJson);
                         s.Send(Encoding.UTF8.GetBytes(responseJson));
                     }
                     else
                     {
-                        mLogHelper.InfoFormat("addr:{0}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
                     }
                 }
             }
             catch (Exception ex)
             {
-                mLogHelper.ErrorFormat("addr:{0}, while Receivere Exception:{1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), ex.Message);
+                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, while Receivere Exception:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, ex.Message);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
             finally
             {
-                mLogHelper.InfoFormat("addr:{0}, socket close", ((IPEndPoint)s.RemoteEndPoint).Address.ToString());
+                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, socket close", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
                 s.Shutdown(SocketShutdown.Both);
                 s.Disconnect(true);
                 s.Close();
@@ -156,32 +159,32 @@ namespace SocketWin32Api
 
         }
 
-        private string handleCommand(Socket socket, string request, int code, params string[] args)
+        private string handleCommand(Socket socket, string requestStr, Request request)
         {
             string back = "success";
-            switch (code)
+            switch (request.Code)
             {
                 case (int)RequestCode.RunCmd:
-                    back = runCmd(args[0], args[1]);
+                    back = runCmd(request.Args[0], request.Args[1]);
                     break;
                 case (int)RequestCode.FindWindow:
-                    back = findWindowHwnd(args[0]);
+                    back = findWindowHwnd(request.Args[0]);
                     break;
                 case (int)RequestCode.SendWindowInfo:
-                    back = PasteToWindow((IntPtr)int.Parse(args[0]), args[1]);
+                    back = PasteToWindow((IntPtr)int.Parse(request.Args[0]), request.Args[1]);
                     break;
                 case (int)RequestCode.RemoteFindWindow:
-                    var socketClient = getConnectedSocketClient(args[0], args[1]);
-                    back = socketClient.remoteFindWindow(args[2]).ToString();
+                    var socketClient = getConnectedSocketClient(request.Args[0], request.Args[1]);
+                    back = socketClient.remoteFindWindow(request.Args[2]).ToString();
                     break;
                 case (int)RequestCode.ConversationLongLink:
                     ConvsationManager.getInstance().addSocket(socket);
-                    mLogHelper.InfoFormat("addr:{0}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString());
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(),request.DeviceId);
                     break;
                 case (int)RequestCode.ConversationNote:
-                    int count = ConvsationManager.getInstance().broadcast(socket, request);
-                    mLogHelper.InfoFormat("addr:{0}, Conversation broadcast:{1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), count);
-                    back = request;
+                    int count = ConvsationManager.getInstance().broadcast(socket, requestStr);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{1}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    back = requestStr;
                     break;
                 default:
                     back = null;

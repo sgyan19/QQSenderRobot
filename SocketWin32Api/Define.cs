@@ -37,6 +37,15 @@ namespace SocketWin32Api
             public const string Code = "code";
             public const string Args = "args";
             public const string RequestId = "requestId";
+            public const string DeviceId = "deviceId";
+        }
+
+        public class Request
+        {
+            public int Code { set; get; }
+            public string[] Args { set; get; }
+            public string RequestId { set; get; }
+            public string DeviceId { set; get; }
         }
 
         public class ResponseKey
