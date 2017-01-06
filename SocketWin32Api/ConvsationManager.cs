@@ -64,5 +64,10 @@ namespace SocketWin32Api
         {
             return ConvsationSockets.Count();
         }
+
+        public void removeSocket(Socket socket)
+        {
+            ConvsationSockets.Remove(socket);
+        }
     }
 }

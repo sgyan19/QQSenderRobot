@@ -12,6 +12,12 @@ namespace SocketWin32Api
         {
             public const int SocketBufferSize = 1024 * 100;
         }
+        public class HeartBeat
+        {
+            public const byte ASK = 0x19;
+            public const byte ANS = 0X91;
+        }
+
         public enum Port
         {
             Service = 19194,
@@ -26,6 +32,7 @@ namespace SocketWin32Api
             ConversationLongLink = 11,
             ConversationNote = 12,
             ConversationDisconnect = 13,
+            ConversationRingNote = 14,
 
             RemoteFindWindow = 1002,
             RemoteSendWindowText = 1003,

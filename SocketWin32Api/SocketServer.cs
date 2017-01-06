@@ -87,13 +87,22 @@ namespace SocketWin32Api
                 while (true)
                 {
                     //通过clientSocket接收数据  
+                    s.ReceiveTimeout = -1;
                     int receiveNumber = s.Receive(buffer);
-                    json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive:{2}, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
+                    if(receiveNumber == 1 && buffer[0] == HeartBeat.ASK)
+                    {
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeartBeat.ASK, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, receiveNumber);
+                        s.Send(new byte[] { HeartBeat.ANS });
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response: HeartBeat.ANS", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                        continue;
+                    }
                     if (receiveNumber <= 0)
                     {
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: null, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
                         break;
                     }
+                    json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive:{2}, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
                     request.Code = -1;
                     try
                     {
@@ -182,9 +191,14 @@ namespace SocketWin32Api
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(),request.DeviceId);
                     break;
                 case (int)RequestCode.ConversationNote:
+                case (int)RequestCode.ConversationRingNote:
                     int count = ConvsationManager.getInstance().broadcast(socket, requestStr);
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
+                    break;
+                case (int)RequestCode.ConversationDisconnect:
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation unlink", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    ConvsationManager.getInstance().removeSocket(socket);
                     break;
                 default:
                     back = null;
