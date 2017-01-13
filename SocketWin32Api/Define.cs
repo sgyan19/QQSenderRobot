@@ -17,7 +17,11 @@ namespace SocketWin32Api
             public const byte ASK = 0x19;
             public const byte ANS = 0X91;
         }
-
+        public enum ResponseCode
+        {
+            Success = 0,
+            ErrorOverBuffer = 400,
+        }
         public enum Port
         {
             Service = 19194,
@@ -32,7 +36,9 @@ namespace SocketWin32Api
             ConversationLongLink = 11,
             ConversationNote = 12,
             ConversationDisconnect = 13,
-            ConversationRingNote = 14,
+            ConversationNoteRing = 14,
+            ConversationNoteImage = 15,
+            ConversationNoteBuffer = 16,
 
             RemoteFindWindow = 1002,
             RemoteSendWindowText = 1003,
@@ -74,6 +80,12 @@ namespace SocketWin32Api
             public const string timeStamp = "timeStamp";
             public const string Extend = "extend";
             public const string IsSend = "isSend";
+        }
+
+        public enum RequestId
+        {
+            REQUEST_KEY_NOBODY = -1,
+            REQUEST_KEY_ANYBODY = 0,
         }
     }
 }

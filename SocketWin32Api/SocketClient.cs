@@ -37,7 +37,7 @@ namespace SocketWin32Api
             {
                 string code = "";
                 string data = "";
-                Utils.request(mSocket, buffer, ((int)RequestCode.FindWindow).ToString(), ref code, ref data, window);
+                SocketHelper.request(mSocket, buffer, ((int)RequestCode.FindWindow).ToString(), ref code, ref data, window);
                 rlt = (IntPtr)int.Parse(data);
                 //mSocket.Send()
             }

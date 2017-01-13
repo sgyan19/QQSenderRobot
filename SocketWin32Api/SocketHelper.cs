@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SocketWin32Api
 {
-    public class Utils
+    public class SocketHelper
     {
 
         public static void request(Socket socket, byte[] buffer, string code, ref string bakeCode, ref string backData, params string[] args)
@@ -27,6 +27,26 @@ namespace SocketWin32Api
             JSONClass response = JSON.Parse(Encoding.UTF8.GetString(buffer, 0, receiveNumber)) as JSONClass;
             bakeCode = response[ResponseKey.Code];
             backData = response[ResponseKey.Data];
+        }
+
+        public static string makeResponse(string code, string data, string requestId)
+        {
+            JSONClass response = new JSONClass();
+            response.Add(ResponseKey.Code, code);
+            response.Add(ResponseKey.Data, data);
+            response.Add(ResponseKey.RequestId, requestId);
+            return response.ToString();
+        }
+
+        public static string response(Socket socket, string code, string data, string requestId)
+        {
+            JSONClass response = new JSONClass();
+            response.Add(ResponseKey.Code, code);
+            response.Add(ResponseKey.Data, data);
+            response.Add(ResponseKey.RequestId, requestId);
+            string responseJson = response.ToString();
+            socket.Send(Encoding.UTF8.GetBytes(responseJson));
+            return responseJson;
         }
     }
 }

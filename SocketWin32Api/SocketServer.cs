@@ -6,6 +6,7 @@ using System.Collections;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace SocketWin32Api
         private Socket mServerSocket;
         private int mPort;
         private static byte[] buffer = new byte[Config.SocketBufferSize];
-
+        private BufferManager mBufferManager;
         private Hashtable mSocketMap = new Hashtable();
         private LogHelper mLogHelper = new LogHelper();
 
@@ -126,9 +127,10 @@ namespace SocketWin32Api
                         break;
                     }
                     string end;
+                    int code = (int)ResponseCode.Success;
                     try
                     {
-                        end = handleCommand(s, json, request);
+                        end = handleCommand(s, json, request, ref code);
                     }
                     catch (Exception ex)
                     {
@@ -138,13 +140,8 @@ namespace SocketWin32Api
                     }
                     if (end != null)
                     { 
-                        JSONClass response = new JSONClass();
-                        response.Add(ResponseKey.Code, "0");
-                        response.Add(ResponseKey.Data, end);
-                        response.Add(ResponseKey.RequestId, request.RequestId);
-                        string responseJson = response.ToString();
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, responseJson);
-                        s.Send(Encoding.UTF8.GetBytes(responseJson));
+                        String response = SocketHelper.response(s, code.ToString(), end, request.RequestId);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                     }
                     else
                     {
@@ -168,7 +165,7 @@ namespace SocketWin32Api
 
         }
 
-        private string handleCommand(Socket socket, string requestStr, Request request)
+        private string handleCommand(Socket socket, string requestStr, Request request, ref int code)
         {
             string back = "success";
             switch (request.Code)
@@ -191,10 +188,16 @@ namespace SocketWin32Api
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(),request.DeviceId);
                     break;
                 case (int)RequestCode.ConversationNote:
-                case (int)RequestCode.ConversationRingNote:
-                    int count = ConvsationManager.getInstance().broadcast(socket, requestStr);
+                case (int)RequestCode.ConversationNoteRing:
+                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponse(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
+                    break;
+                case (int)RequestCode.ConversationNoteImage:
+                    receiveImage(socket, requestStr, request, ref code);
+                    break;
+                case (int)RequestCode.ConversationNoteBuffer:
+                    int len = int.Parse(request.Args[0]);
                     break;
                 case (int)RequestCode.ConversationDisconnect:
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation unlink", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
@@ -265,6 +268,30 @@ namespace SocketWin32Api
                 mSocketMap.Add(addr, socket);
             }
             return socket;
+        }
+
+        private string receiveImage(Socket socket, string requestStr, Request request, ref int code)
+        {
+            int size = -1;
+            try
+            {
+                size = int.Parse(request.Args[0]);
+            }
+            catch (Exception) { }
+            if(size <=0 || size > Config.SocketBufferSize)
+            {
+                code = (int)ResponseCode.ErrorOverBuffer;
+                return "not support image size =" + size;
+            }
+
+            String answerHeader = SocketHelper.response(socket, ((int)ResponseCode.Success).ToString(), requestStr, request.RequestId);
+            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} response:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, answerHeader);
+            int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponse(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
+            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, count);
+            int len = socket.Receive(buffer);
+            count = ConvsationManager.getInstance().broadcast(socket, buffer, 0, len);
+            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img body len:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, len, count);
+            return "";
         }
     }
 }

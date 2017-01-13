@@ -30,14 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\libs\SocketWin32Api\log4net.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-      <Private>True</Private>
+    <Reference Include="log4net">
+      <HintPath>..\libs\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -50,7 +48,8 @@
     <Compile Include="Define.cs" />
     <Compile Include="Hastable.cs" />
     <Compile Include="LogHelper.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="SocketBufferManager.cs" />
+    <Compile Include="SocketHelper.cs" />
     <Compile Include="WindowSendApi.cs" />
     <Compile Include="SimpleJSON.cs" />
     <Compile Include="SocketClient.cs" />

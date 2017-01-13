@@ -38,7 +38,7 @@ namespace SocketWin32Api
             ConvsationSockets.Add(socket);
         }
 
-        public int broadcast(Socket sender, string noteRequest)
+        public int broadcast(Socket sender, string response)
         {
             if (!ConvsationSockets.Contains(sender))
             {
@@ -46,15 +46,29 @@ namespace SocketWin32Api
             }
             HashSet<Socket>.Enumerator en = ConvsationSockets.GetEnumerator();
             ConvsationSockets.RemoveWhere(socket => (socket == null || !socket.Connected));
-            JSONClass response = new JSONClass();
-            response.Add(ResponseKey.Code, "0");
-            response.Add(ResponseKey.Data, noteRequest);
-            string responseStr = response.ToString();
             foreach (Socket item in ConvsationSockets)
             {
                 if(item != sender)
                 {
-                    item.Send(Encoding.UTF8.GetBytes(responseStr));
+                    item.Send(Encoding.UTF8.GetBytes(response));
+                }
+            }
+            return ConvsationSockets.Count() - 1;
+        }
+
+        public int broadcast(Socket sender, byte[] buffer, int offset, int len)
+        {
+            if (!ConvsationSockets.Contains(sender))
+            {
+                ConvsationSockets.Add(sender);
+            }
+            HashSet<Socket>.Enumerator en = ConvsationSockets.GetEnumerator();
+            ConvsationSockets.RemoveWhere(socket => (socket == null || !socket.Connected));
+            foreach (Socket item in ConvsationSockets)
+            {
+                if (item != sender)
+                {
+                    item.Send(buffer, offset, len, SocketFlags.None);
                 }
             }
             return ConvsationSockets.Count() - 1;
