@@ -3,6 +3,7 @@ using SimpleJSON;
 using SocketWin32Api.Define;
 using System;
 using System.Collections;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -25,6 +26,7 @@ namespace SocketWin32Api
         private BufferManager mBufferManager;
         private Hashtable mSocketMap = new Hashtable();
         private LogHelper mLogHelper = new LogHelper();
+        private string mRawFolder = "raw";
 
         public void setLoger(ILog log)
         {
@@ -35,6 +37,10 @@ namespace SocketWin32Api
         {
             RunningFlag = 1;
             mPort = port;
+            if (!Directory.Exists(mRawFolder))
+            {
+                Directory.CreateDirectory(mRawFolder);
+            }
             socketListenWork();
         }
 
@@ -89,63 +95,73 @@ namespace SocketWin32Api
                 {
                     //通过clientSocket接收数据  
                     s.ReceiveTimeout = -1;
-                    int receiveNumber = s.Receive(buffer);
-                    if(receiveNumber == 1 && buffer[0] == HeartBeat.ASK)
-                    {
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeartBeat.ASK, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, receiveNumber);
-                        s.Send(new byte[] { HeartBeat.ANS });
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response: HeartBeat.ANS", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
-                        continue;
-                    }
+                    int receiveNumber = s.Receive(buffer, 1, SocketFlags.None);
                     if (receiveNumber <= 0)
                     {
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: null, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
                         break;
                     }
-                    json = Encoding.UTF8.GetString(buffer, 0, receiveNumber);
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive:{2}, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
-                    request.Code = -1;
-                    try
+
+                    if (buffer[0] == HeaderCode.ASK)
                     {
-                        JSONNode node = JSON.Parse(json);
-                        request.Code = int.Parse(node[RequestKey.Code]);
-                        request.Args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
-                        request.RequestId = node[RequestKey.RequestId];
-                        if (request.RequestId == null) request.RequestId = "";
-                        string deviceId = node[RequestKey.DeviceId];
-                        if (!string.IsNullOrEmpty(deviceId))
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.ASK, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, receiveNumber);
+                        s.Send(new byte[] { HeaderCode.ANS });
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response: HeaderCode.ANS", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                        continue;
+                    }
+                    else if (buffer[0] == HeaderCode.BIN)
+                    {
+                        string rawName = SocketHelper.receiveTextFrame(s, buffer);
+                        int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.BIN, ByteCount:{2} name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                    }
+                    else if(buffer[0] == HeaderCode.JSON)
+                    {
+                        json = SocketHelper.receiveTextFrame(s, buffer);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.JSON, ByteCount:{2} json:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json);
+                        request.Code = -1;
+                        try
                         {
-                            request.DeviceId = deviceId;
+                            JSONNode node = JSON.Parse(json);
+                            request.Code = int.Parse(node[RequestKey.Code]);
+                            request.Args = (node[RequestKey.Args] as JSONArray).Childs.Select((m) => ((string)m)).ToArray();
+                            request.RequestId = node[RequestKey.RequestId];
+                            if (request.RequestId == null) request.RequestId = "";
+                            string deviceId = node[RequestKey.DeviceId];
+                            if (!string.IsNullOrEmpty(deviceId))
+                            {
+                                request.DeviceId = deviceId;
+                            }
                         }
-                    }
-                    catch
-                    {
-                        request.Args = new string[0];
-                    }
-                    if(request.Code == (int)RequestCode.DisConnect)
-                    {
-                        break;
-                    }
-                    string end;
-                    int code = (int)ResponseCode.Success;
-                    try
-                    {
-                        end = handleCommand(s, json, request, ref code);
-                    }
-                    catch (Exception ex)
-                    {
-                        end = ex.Message;
-                        Console.WriteLine(ex.Message);
-                        Console.WriteLine(ex.StackTrace);
-                    }
-                    if (end != null)
-                    { 
-                        String response = SocketHelper.response(s, code.ToString(), end, request.RequestId);
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
-                    }
-                    else
-                    {
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                        catch
+                        {
+                            request.Args = new string[0];
+                        }
+                        if (request.Code == (int)RequestCode.DisConnect)
+                        {
+                            break;
+                        }
+                        string end;
+                        int code = (int)ResponseCode.Success;
+                        try
+                        {
+                            end = handleJson(s, json, request, ref code);
+                        }
+                        catch (Exception ex)
+                        {
+                            end = ex.Message;
+                            Console.WriteLine(ex.Message);
+                            Console.WriteLine(ex.StackTrace);
+                        }
+                        if (end != null)
+                        {
+                            string response = SocketHelper.responseJson(s, code.ToString(), end, request.RequestId);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                        }
+                        else
+                        {
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                        }
                     }
                 }
             }
@@ -165,7 +181,12 @@ namespace SocketWin32Api
 
         }
 
-        private string handleCommand(Socket socket, string requestStr, Request request, ref int code)
+        private string handleCode(Socket socket, byte code)
+        {
+            return null;
+        }
+
+        private string handleJson(Socket socket, string requestStr, Request request, ref int code)
         {
             string back = "success";
             switch (request.Code)
@@ -185,11 +206,11 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationLongLink:
                     ConvsationManager.getInstance().addSocket(socket);
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(),request.DeviceId);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
-                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponse(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
+                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
                     break;
@@ -225,11 +246,11 @@ namespace SocketWin32Api
             return Hwnd.ToString();
         }
 
-        private string PasteToWindow(IntPtr hwnd,string text)
+        private string PasteToWindow(IntPtr hwnd, string text)
         {
             //WindowSendApi.WindowPasteln(hwnd);
             //WindowSendApi.WindowsSend(hwnd, "哈哈");
-            WindowSendApi.WindowsSend(hwnd,text);
+            WindowSendApi.WindowsSend(hwnd, text);
             WindowSendApi.WindowSumbit(hwnd);
             //WindowSendApi.WindowPaste(hwnd);
             //WindowSendApi.WindowSumbit(hwnd);
@@ -278,20 +299,27 @@ namespace SocketWin32Api
                 size = int.Parse(request.Args[0]);
             }
             catch (Exception) { }
-            if(size <=0 || size > Config.SocketBufferSize)
+            if (size <= 0 || size > Config.SocketBufferSize)
             {
                 code = (int)ResponseCode.ErrorOverBuffer;
                 return "not support image size =" + size;
             }
 
-            String answerHeader = SocketHelper.response(socket, ((int)ResponseCode.Success).ToString(), requestStr, request.RequestId);
+            String answerHeader = SocketHelper.responseJson(socket, ((int)ResponseCode.Success).ToString(), requestStr, request.RequestId);
             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} response:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, answerHeader);
-            int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponse(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
+            int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, count);
             int len = socket.Receive(buffer);
             count = ConvsationManager.getInstance().broadcast(socket, buffer, 0, len);
             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img body len:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, len, count);
             return "";
+        }
+
+
+
+        private void sendJson(Socket socket, string json)
+        {
+
         }
     }
 }

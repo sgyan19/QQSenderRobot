@@ -12,10 +12,12 @@ namespace SocketWin32Api
         {
             public const int SocketBufferSize = 1024 * 100;
         }
-        public class HeartBeat
+        public class HeaderCode
         {
             public const byte ASK = 0x19;
             public const byte ANS = 0X91;
+            public const byte BIN = 0x2B;
+            public const byte JSON = 0x7B;
         }
         public enum ResponseCode
         {
