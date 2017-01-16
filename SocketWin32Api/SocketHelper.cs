@@ -46,14 +46,16 @@ namespace SocketWin32Api
             response.Add(ResponseKey.Data, data);
             response.Add(ResponseKey.RequestId, requestId);
             string responseJson = response.ToString();
-            socket.Send(Encoding.UTF8.GetBytes(responseJson));
+            socket.Send(HeaderCode.BYTES_JSON);
+            sendTextFrame(socket, responseJson);
             return responseJson;
         }
 
         public static void sendTextFrame(Socket socket, string text)
         {
             byte[] forSend = Encoding.UTF8.GetBytes(text);
-            socket.Send(BitConverter.GetBytes(forSend.Length));
+            byte[] size = BitConverter.GetBytes(forSend.Length);
+            socket.Send(size);
             socket.Send(forSend);
         }
 
@@ -77,34 +79,29 @@ namespace SocketWin32Api
 
         public static string receiveTextFrame(Socket socket, byte[] buf)
         {
+            socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
-            if (len > buf.Length)
+            if (size > buf.Length)
             {
-                return null;
+                throw new SocketException();
             }
             int offset = 0;
-            socket.ReceiveTimeout = 5000;
-            try
+            while ((len = socket.Receive(buf, offset, size, SocketFlags.None)) > 0)
             {
-                while ((len = socket.Receive(buf, offset, size, SocketFlags.None)) > 0)
-                {
-                    offset += len;
-                    size = size - len;
-                }
+                offset += len;
+                size = size - len;
             }
-            catch (SocketException)
-            {
-            }
+            socket.ReceiveTimeout = -1;
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
 
         public static int receiveRawFrame(Socket socket, byte[] buf, string dirPath, string name = null)
         {
-
-            socket.ReceiveTimeout = 5000;
+            socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
-            Int32 size = System.BitConverter.ToInt32(buf, 0);
+            Int32 size = BitConverter.ToInt32(buf, 0);
+            int result = size;
             if (string.IsNullOrEmpty(name))
             {
                 name = "server." + DateTime.UtcNow.ToString();
@@ -123,7 +120,7 @@ namespace SocketWin32Api
                 stream.Close();
             }
             socket.ReceiveTimeout = -1;
-            return size;
+            return result;
         }
     }
 }

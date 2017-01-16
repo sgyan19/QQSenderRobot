@@ -98,27 +98,36 @@ namespace SocketWin32Api
                     int receiveNumber = s.Receive(buffer, 1, SocketFlags.None);
                     if (receiveNumber <= 0)
                     {
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: null, ByteCount:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json, receiveNumber);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: null, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, receiveNumber);
                         break;
                     }
 
                     if (buffer[0] == HeaderCode.ASK)
                     {
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.ASK, ByteCount:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, receiveNumber);
-                        s.Send(new byte[] { HeaderCode.ANS });
+                        s.Send(HeaderCode.BYTES_ANS);
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response: HeaderCode.ANS", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
                         continue;
                     }
-                    else if (buffer[0] == HeaderCode.BIN)
+                    else if (buffer[0] == HeaderCode.RAW)
                     {
-                        string rawName = SocketHelper.receiveTextFrame(s, buffer);
-                        int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName);
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.BIN, ByteCount:{2} name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                        try
+                        {
+                            string rawName = SocketHelper.receiveTextFrame(s, buffer);
+                            int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName);
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", request.RequestId);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                        }
+                        catch(Exception e)
+                        {
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), string.Format("{0}:{1}",e.Message , e.StackTrace), request.RequestId);
+                        }
                     }
                     else if(buffer[0] == HeaderCode.JSON)
                     {
                         json = SocketHelper.receiveTextFrame(s, buffer);
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.JSON, ByteCount:{2} json:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.JSON, json:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json);
                         request.Code = -1;
                         try
                         {
@@ -168,6 +177,7 @@ namespace SocketWin32Api
             catch (Exception ex)
             {
                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, while Receivere Exception:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, ex.Message);
+                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, while Receivere Exception:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, ex.StackTrace);
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.StackTrace);
             }
@@ -179,11 +189,6 @@ namespace SocketWin32Api
                 s.Close();
             }
 
-        }
-
-        private string handleCode(Socket socket, byte code)
-        {
-            return null;
         }
 
         private string handleJson(Socket socket, string requestStr, Request request, ref int code)

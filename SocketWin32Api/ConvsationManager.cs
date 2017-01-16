@@ -50,7 +50,8 @@ namespace SocketWin32Api
             {
                 if(item != sender)
                 {
-                    item.Send(Encoding.UTF8.GetBytes(response));
+                    item.Send(HeaderCode.BYTES_JSON);
+                    SocketHelper.sendTextFrame(item, response);
                 }
             }
             return ConvsationSockets.Count() - 1;
