@@ -21,7 +21,7 @@ namespace SocketWin32Api
 
             public static byte[] BYTES_ASK = { ASK };
             public static byte[] BYTES_ANS = { ANS };
-            public static byte[] BYTES_BIN = { RAW };
+            public static byte[] BYTES_RAW = { RAW };
             public static byte[] BYTES_JSON = { JSON };
         }
         public enum ResponseCode
@@ -29,6 +29,8 @@ namespace SocketWin32Api
             Success = 0,
             ErrorOverBuffer = 400,
             ErrorSocketRecive = 401,
+            ErrorRawNotExist = 402,
+            ErrorRawSend = 403,
         }
         public enum Port
         {

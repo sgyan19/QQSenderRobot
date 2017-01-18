@@ -1,6 +1,7 @@
 ﻿using SimpleJSON;
 using SocketWin32Api.Define;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace SocketWin32Api
 {
     public class SocketHelper
     {
+
+        public static Hashtable LockObject = new Hashtable();
 
         public static void request(Socket socket, byte[] buffer, string code, ref string bakeCode, ref string backData, params string[] args)
         {
@@ -51,6 +54,12 @@ namespace SocketWin32Api
             return responseJson;
         }
 
+        public static int responseRaw(Socket socket, byte[] buf, string dir, string name)
+        {
+            sendTextFrame(socket, name);
+            return sendRawFrame(socket, buf, dir, name);
+        }
+
         public static void sendTextFrame(Socket socket, string text)
         {
             byte[] forSend = Encoding.UTF8.GetBytes(text);
@@ -59,22 +68,47 @@ namespace SocketWin32Api
             socket.Send(forSend);
         }
 
-        public static void sendRawFrame(Socket socket, byte[] buf, string dir, string name)
+        public static int sendRawFrame(Socket socket, byte[] buf, string dir, string name)
         {
             string path = dir + "\\" + name;
-            FileInfo info = new FileInfo(path);
-            int size = (int)info.Length;
-            socket.Send(BitConverter.GetBytes(size));
             int len;
-            using (FileStream stream = new FileStream(path,
-                FileMode.Open))
+            int size;
+            object obj = LockObject[name];
+            if(obj != null)
             {
-                while ((len = stream.Read(buf, 0, buf.Length)) > 0)
+                lock (obj)
                 {
-                    socket.Send(buf, 0, len, SocketFlags.None);
+                    FileInfo info = new FileInfo(path);
+                    size = (int)info.Length;
+                    socket.Send(BitConverter.GetBytes(size));
+                    using (FileStream stream = new FileStream(path,
+                        FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        while ((len = stream.Read(buf, 0, buf.Length)) > 0)
+                        {
+                            socket.Send(buf, 0, len, SocketFlags.None);
+                        }
+                        stream.Close();
+                    }
                 }
-                stream.Close();
             }
+            else
+            {
+
+                FileInfo info = new FileInfo(path);
+                size = (int)info.Length;
+                socket.Send(BitConverter.GetBytes(size));
+                using (FileStream stream = new FileStream(path,
+                        FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    while ((len = stream.Read(buf, 0, buf.Length)) > 0)
+                    {
+                        socket.Send(buf, 0, len, SocketFlags.None);
+                    }
+                    stream.Close();
+                }
+            }
+            return size;
         }
 
         public static string receiveTextFrame(Socket socket, byte[] buf)
@@ -87,7 +121,7 @@ namespace SocketWin32Api
                 throw new SocketException();
             }
             int offset = 0;
-            while ((len = socket.Receive(buf, offset, size, SocketFlags.None)) > 0)
+            while (size > 0 && (len = socket.Receive(buf, offset, size, SocketFlags.None)) > 0)
             {
                 offset += len;
                 size = size - len;
@@ -107,17 +141,30 @@ namespace SocketWin32Api
                 name = "server." + DateTime.UtcNow.ToString();
             }
             string path = dirPath + "\\" + name;
-            using (FileStream stream = new FileStream(path,
-                FileMode.Create))
+            object obj = LockObject[name];
+            if (obj == null) obj = new object();
+            LockObject.Add(name, obj);
+            lock (obj)
             {
-                while (size > 0)
+                try
                 {
-                    len = socket.Receive(buf, 0, size > buf.Length ? buf.Length : size, SocketFlags.None);
-                    if (len == 0) break;
-                    size = size - len;
-                    stream.Write(buf, 0, len);
+                    using (FileStream stream = new FileStream(path,
+                        FileMode.Create, FileAccess.Write, FileShare.Read))
+                    {
+                        while (size > 0)
+                        {
+                            len = socket.Receive(buf, 0, size > buf.Length ? buf.Length : size, SocketFlags.None);
+                            if (len == 0) break;
+                            size = size - len;
+                            stream.Write(buf, 0, len);
+                        }
+                        stream.Close();
+                    }
                 }
-                stream.Close();
+                finally
+                {
+                    LockObject.Remove(name);
+                }
             }
             socket.ReceiveTimeout = -1;
             return result;

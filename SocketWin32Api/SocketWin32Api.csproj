@@ -44,9 +44,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BufferPool.cs" />
     <Compile Include="ConvsationManager.cs" />
     <Compile Include="Define.cs" />
-    <Compile Include="Hastable.cs" />
     <Compile Include="LogHelper.cs" />
     <Compile Include="SocketBufferManager.cs" />
     <Compile Include="SocketHelper.cs" />

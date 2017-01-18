@@ -22,7 +22,8 @@ namespace SocketWin32Api
         private Task mAutoCheckTask;
         private Socket mServerSocket;
         private int mPort;
-        private static byte[] buffer = new byte[Config.SocketBufferSize];
+        //private static byte[] buffer = new byte[Config.SocketBufferSize];
+        private static BufferPool bufferPool;
         private BufferManager mBufferManager;
         private Hashtable mSocketMap = new Hashtable();
         private LogHelper mLogHelper = new LogHelper();
@@ -62,6 +63,7 @@ namespace SocketWin32Api
             mListenerTask = new Task(socketAcceptWork);
             try
             {
+                bufferPool = new BufferPool(10, Config.SocketBufferSize);
                 mServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 mServerSocket.Bind(new IPEndPoint(IPAddress.Parse("0.0.0.0"), mPort));
                 mServerSocket.Listen(10);
@@ -89,6 +91,7 @@ namespace SocketWin32Api
             string json = "";
             Request request = new Request();
             request.DeviceId = "";
+            byte[] buffer = bufferPool.borrow();
             try
             {
                 while (true)
@@ -121,12 +124,22 @@ namespace SocketWin32Api
                         }
                         catch(Exception e)
                         {
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), string.Format("{0}:{1}",e.Message , e.StackTrace), request.RequestId);
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), format(e), request.RequestId);
                         }
                     }
                     else if(buffer[0] == HeaderCode.JSON)
                     {
-                        json = SocketHelper.receiveTextFrame(s, buffer);
+                        string end;
+                        int code = (int)ResponseCode.Success;
+                        try
+                        {
+                            json = SocketHelper.receiveTextFrame(s, buffer);
+                        }
+                        catch (Exception e)
+                        {
+                            code = (int)ResponseCode.ErrorSocketRecive;
+                            end = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), format(e), request.RequestId);
+                        }
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.JSON, json:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json);
                         request.Code = -1;
                         try
@@ -150,11 +163,9 @@ namespace SocketWin32Api
                         {
                             break;
                         }
-                        string end;
-                        int code = (int)ResponseCode.Success;
                         try
                         {
-                            end = handleJson(s, json, request, ref code);
+                            end = handleJson(s, buffer, json, request, ref code);
                         }
                         catch (Exception ex)
                         {
@@ -187,11 +198,12 @@ namespace SocketWin32Api
                 s.Shutdown(SocketShutdown.Both);
                 s.Disconnect(true);
                 s.Close();
+                bufferPool.giveBack(buffer);
             }
 
         }
 
-        private string handleJson(Socket socket, string requestStr, Request request, ref int code)
+        private string handleJson(Socket socket, byte[] buffer, string requestStr, Request request, ref int code)
         {
             string back = "success";
             switch (request.Code)
@@ -215,12 +227,33 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
-                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
+                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, "0"));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
                     break;
                 case (int)RequestCode.ConversationNoteImage:
-                    receiveImage(socket, requestStr, request, ref code);
+                    socket.Send(HeaderCode.BYTES_RAW);
+                    if(File.Exists(mRawFolder + "\\" + request.Args[0]))
+                    {
+                        try
+                        {
+                            int size = SocketHelper.responseRaw(socket, buffer, mRawFolder, request.Args[0]);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image over size:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size);
+                        }
+                        catch (Exception e)
+                        {
+                            back = format(e);
+                            code = (int)ResponseCode.ErrorRawSend;
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image exception:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, back);
+                        }
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image suc", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    }
+                    else
+                    {
+                        code = (int)ResponseCode.ErrorRawNotExist;
+                        back = "server don not find file:" + request.Args[0];
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image request server don not find file", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    }
                     break;
                 case (int)RequestCode.ConversationNoteBuffer:
                     int len = int.Parse(request.Args[0]);
@@ -296,35 +329,9 @@ namespace SocketWin32Api
             return socket;
         }
 
-        private string receiveImage(Socket socket, string requestStr, Request request, ref int code)
+        private string format(Exception e)
         {
-            int size = -1;
-            try
-            {
-                size = int.Parse(request.Args[0]);
-            }
-            catch (Exception) { }
-            if (size <= 0 || size > Config.SocketBufferSize)
-            {
-                code = (int)ResponseCode.ErrorOverBuffer;
-                return "not support image size =" + size;
-            }
-
-            String answerHeader = SocketHelper.responseJson(socket, ((int)ResponseCode.Success).ToString(), requestStr, request.RequestId);
-            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} response:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, answerHeader);
-            int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, request.RequestId));
-            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img header size:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size, count);
-            int len = socket.Receive(buffer);
-            count = ConvsationManager.getInstance().broadcast(socket, buffer, 0, len);
-            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation img body len:{2} broadcast:{3}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, len, count);
-            return "";
-        }
-
-
-
-        private void sendJson(Socket socket, string json)
-        {
-
+            return string.Format("{0}:{1}", e.Message, e.StackTrace);
         }
     }
 }
