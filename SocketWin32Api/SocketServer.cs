@@ -92,6 +92,7 @@ namespace SocketWin32Api
             Request request = new Request();
             request.DeviceId = "";
             byte[] buffer = bufferPool.borrow();
+            mLogHelper.InfoFormat("addr:{0}, buffer:{1}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), buffer.GetHashCode());
             try
             {
                 while (true)
@@ -116,8 +117,8 @@ namespace SocketWin32Api
                     {
                         try
                         {
-                            string rawName = SocketHelper.receiveTextFrame(s, buffer);
-                            int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName);
+                            string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
+                            int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
                             string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", request.RequestId);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
@@ -133,7 +134,7 @@ namespace SocketWin32Api
                         int code = (int)ResponseCode.Success;
                         try
                         {
-                            json = SocketHelper.receiveTextFrame(s, buffer);
+                            json = SocketHelper.receiveTextFrame(s, buffer ,mLogHelper);
                         }
                         catch (Exception e)
                         {

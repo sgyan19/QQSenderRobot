@@ -15,6 +15,7 @@ namespace SocketWin32Api
     {
 
         public static Hashtable LockObject = new Hashtable();
+        private static int mLogKey = 0;
 
         public static void request(Socket socket, byte[] buffer, string code, ref string bakeCode, ref string backData, params string[] args)
         {
@@ -111,8 +112,13 @@ namespace SocketWin32Api
             return size;
         }
 
-        public static string receiveTextFrame(Socket socket, byte[] buf)
+        public static string receiveTextFrame(Socket socket, byte[] buf, LogHelper loger = null)
         {
+            int key = mLogKey++;
+            if (loger != null)
+            {
+                loger.InfoFormat("receiveTextFrame key:{0}", key);
+            }
             socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
@@ -127,11 +133,20 @@ namespace SocketWin32Api
                 size = size - len;
             }
             socket.ReceiveTimeout = -1;
+            if (loger != null)
+            {
+                loger.InfoFormat("receiveTextFrame key:{0}", key);
+            }
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
 
-        public static int receiveRawFrame(Socket socket, byte[] buf, string dirPath, string name = null)
+        public static int receiveRawFrame(Socket socket, byte[] buf, string dirPath, string name = null, LogHelper loger = null)
         {
+            int key = mLogKey++;
+            if (loger != null)
+            {
+                loger.InfoFormat("receiveRawFrame key:{0}", key);
+            }
             socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
@@ -167,6 +182,10 @@ namespace SocketWin32Api
                 }
             }
             socket.ReceiveTimeout = -1;
+            if (loger != null)
+            {
+                loger.InfoFormat("receiveRawFrame key:{0}", key);
+            }
             return result;
         }
     }

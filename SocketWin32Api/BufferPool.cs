@@ -11,6 +11,7 @@ namespace SocketWin32Api
         private byte[][] coreBuffers;
         private HashSet<byte[]> usingSet = new HashSet<byte[]>();
         private int size;
+        private static object lockObj = new object();
         public BufferPool(int count,int size)
         {
             coreBuffers = new byte[count][];
@@ -19,23 +20,30 @@ namespace SocketWin32Api
 
         public byte[] borrow()
         {
-            if(usingSet.Count > coreBuffers.Length)
+            byte[] result = null;
+            lock (lockObj)
             {
-                return null;
-            }
-            for(int i = 0; i < coreBuffers.Length; i ++)
-            {
-                if(coreBuffers[i] == null)
+                if (usingSet.Count <= coreBuffers.Length)
                 {
-                    coreBuffers[i] = new byte[size];
-                    return coreBuffers[i];
-                }
-                if (!usingSet.Contains(coreBuffers[i]))
-                {
-                    return coreBuffers[i];
+                    for (int i = 0; i < coreBuffers.Length; i++)
+                    {
+                        if (coreBuffers[i] == null)
+                        {
+                            coreBuffers[i] = new byte[size];
+                            usingSet.Add(coreBuffers[i]);
+                            result = coreBuffers[i];
+                            break;
+                        }
+                        else if (!usingSet.Contains(coreBuffers[i]))
+                        {
+                            result = coreBuffers[i];
+                            break;
+                        }
+                    }
                 }
             }
-            return null;
+            
+            return result;
         }
 
         public void giveBack(byte[] obj)
