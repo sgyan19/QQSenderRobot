@@ -29,6 +29,7 @@ namespace SocketWin32Api
                     {
                         if (coreBuffers[i] == null)
                         {
+                            LogHelper.getInstance().InfoFormat("BufferPool borrow new usingSet Count:{0} index:{1}", usingSet.Count, i);
                             coreBuffers[i] = new byte[size];
                             usingSet.Add(coreBuffers[i]);
                             result = coreBuffers[i];
@@ -36,6 +37,7 @@ namespace SocketWin32Api
                         }
                         else if (!usingSet.Contains(coreBuffers[i]))
                         {
+                            LogHelper.getInstance().InfoFormat("BufferPool borrow old usingSet Count:{0} index:{1}", usingSet.Count, i);
                             result = coreBuffers[i];
                             break;
                         }
@@ -48,7 +50,11 @@ namespace SocketWin32Api
 
         public void giveBack(byte[] obj)
         {
-            usingSet.Remove(obj);
+            lock (lockObj)
+            {
+                usingSet.Remove(obj);
+                LogHelper.getInstance().InfoFormat("BufferPool giveBack usingSet Count:{0}", usingSet.Count);
+            }
         }       
     }
 }

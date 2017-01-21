@@ -9,7 +9,26 @@ namespace SocketWin32Api
 {
     public class LogHelper
     {
-        public ILog CoreLog { set; get; }
+        private static LogHelper instance = new LogHelper();
+
+        public static LogHelper getInstance()
+        {
+            return instance;
+        }
+        private ILog coreLog;
+
+        public ILog CoreLog
+        {
+            set
+            {
+                coreLog = value;
+                instance = this;
+            }
+            get
+            {
+                return coreLog;
+            }
+        }
 
         public void Info(object message)
         {
