@@ -1,6 +1,7 @@
 ﻿using SimpleJSON;
 using SocketWin32Api.Define;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -11,6 +12,9 @@ namespace SocketWin32Api
 {
     class ConvsationManager
     {
+        private const int ConvsationCacheCount = 10;
+
+        private LinkedList<ConvsationRequest> convastionCaches = new LinkedList<ConvsationRequest>();
 
         private HashSet<Socket> ConvsationSockets = new HashSet<Socket>();
 
@@ -84,5 +88,48 @@ namespace SocketWin32Api
         {
             ConvsationSockets.Remove(socket);
         }
+
+        public void saveConvsationCache(string requestId, string cvs)
+        {
+            convastionCaches.AddLast(new ConvsationRequest
+            {
+                RequestId = requestId,
+                Content = cvs
+            });
+            int s = convastionCaches.Count - ConvsationCacheCount;
+            for (int i = 0; i < s; i++)
+            {
+                convastionCaches.RemoveFirst();
+            }
+        }
+
+        public List<string> getNewConvasation(string requestId, bool defaultAll)
+        {
+            List<string> result = new List<string>();
+            bool hasFind = false;
+            foreach (ConvsationRequest item in convastionCaches)
+            {
+                if (hasFind)
+                {
+                    result.Add(item.Content);
+                }
+                else if(item.RequestId.Equals(requestId))
+                {
+                    hasFind = true;
+                }
+            }
+            if (defaultAll && !hasFind)
+            {
+                result.AddRange(convastionCaches.Select((m) => (m.Content)));
+                //result.AddRange();
+            }
+            return result;
+        }
+    }
+
+    class ConvsationRequest
+    {
+        public string RequestId { set; get; }
+        public string Content { set; get; }
     }
 }

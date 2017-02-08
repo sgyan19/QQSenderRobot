@@ -3,6 +3,7 @@ using SimpleJSON;
 using SocketWin32Api.Define;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -224,10 +225,21 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationLongLink:
                     ConvsationManager.getInstance().addSocket(socket);
+                    if (request.Args != null && request.Args.Length > 0 && !string.IsNullOrEmpty(request.Args[0]))
+                    {
+                        List<string> news = ConvsationManager.getInstance().getNewConvasation(request.Args[0], false);
+                        foreach (var item in news)
+                        {
+                            string response = SocketHelper.responseJson(socket, "0", item, request.RequestId);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, send new:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                        }
+                        back = null;
+                    }
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
+                    ConvsationManager.getInstance().saveConvsationCache(request.RequestId, requestStr);
                     int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, "0"));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
