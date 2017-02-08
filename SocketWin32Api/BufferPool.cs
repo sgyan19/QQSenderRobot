@@ -32,11 +32,14 @@ namespace SocketWin32Api
                             coreBuffers[i] = new byte[size];
                             usingSet.Add(coreBuffers[i]);
                             result = coreBuffers[i];
+                            LogHelper.getInstance().InfoFormat("BufferPool borrow new usingSet buffer:{0} Count:{1} index:{2}", result.GetHashCode(), usingSet.Count, i);
                             break;
                         }
                         else if (!usingSet.Contains(coreBuffers[i]))
                         {
                             result = coreBuffers[i];
+                            usingSet.Add(coreBuffers[i]);
+                            LogHelper.getInstance().InfoFormat("BufferPool borrow old usingSet buffer:{0} Count:{1} index:{2}", result.GetHashCode(), usingSet.Count, i);
                             break;
                         }
                     }
@@ -48,7 +51,11 @@ namespace SocketWin32Api
 
         public void giveBack(byte[] obj)
         {
-            usingSet.Remove(obj);
+            lock (lockObj)
+            {
+                usingSet.Remove(obj);
+                LogHelper.getInstance().InfoFormat("BufferPool giveBack buffer: {0} usingSet Count:{1}", obj.GetHashCode(),usingSet.Count);
+            }
         }       
     }
 }

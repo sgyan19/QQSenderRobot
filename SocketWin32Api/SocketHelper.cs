@@ -117,7 +117,7 @@ namespace SocketWin32Api
             int key = mLogKey++;
             if (loger != null)
             {
-                loger.InfoFormat("receiveTextFrame key:{0}", key);
+                //loger.InfoFormat("receiveTextFrame key:{0}", key);
             }
             socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
@@ -135,7 +135,7 @@ namespace SocketWin32Api
             socket.ReceiveTimeout = -1;
             if (loger != null)
             {
-                loger.InfoFormat("receiveTextFrame key:{0}", key);
+                //loger.InfoFormat("receiveTextFrame key:{0}", key);
             }
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
@@ -145,7 +145,7 @@ namespace SocketWin32Api
             int key = mLogKey++;
             if (loger != null)
             {
-                loger.InfoFormat("receiveRawFrame key:{0}", key);
+                //loger.InfoFormat("receiveRawFrame key:{0}", key);
             }
             socket.ReceiveTimeout = 2000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
@@ -184,7 +184,7 @@ namespace SocketWin32Api
             socket.ReceiveTimeout = -1;
             if (loger != null)
             {
-                loger.InfoFormat("receiveRawFrame key:{0}", key);
+                //loger.InfoFormat("receiveRawFrame key:{0}", key);
             }
             return result;
         }
