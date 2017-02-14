@@ -89,11 +89,11 @@ namespace SocketWin32Api
             ConvsationSockets.Remove(socket);
         }
 
-        public void saveConvsationCache(string requestId, string cvs)
+        public void saveConvsationCache(string id, string cvs)
         {
             convastionCaches.AddLast(new ConvsationRequest
             {
-                RequestId = requestId,
+                Id = id,
                 Content = cvs
             });
             int s = convastionCaches.Count - ConvsationCacheCount;
@@ -103,7 +103,7 @@ namespace SocketWin32Api
             }
         }
 
-        public List<string> getNewConvasation(string requestId, bool defaultAll)
+        public List<string> getNewConvasation(string id, bool defaultAll)
         {
             List<string> result = new List<string>();
             bool hasFind = false;
@@ -113,7 +113,7 @@ namespace SocketWin32Api
                 {
                     result.Add(item.Content);
                 }
-                else if(item.RequestId.Equals(requestId))
+                else if(item.Id.Equals(id))
                 {
                     hasFind = true;
                 }
@@ -129,7 +129,7 @@ namespace SocketWin32Api
 
     class ConvsationRequest
     {
-        public string RequestId { set; get; }
+        public string Id { set; get; }
         public string Content { set; get; }
     }
 }

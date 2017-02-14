@@ -167,7 +167,7 @@ namespace SocketWin32Api
                         }
                         try
                         {
-                            end = handleJson(s, buffer, json, request, ref code);
+                            end = handleJson(s, buffer, json, request, request.Args.Length, ref code);
                         }
                         catch (Exception ex)
                         {
@@ -205,13 +205,16 @@ namespace SocketWin32Api
 
         }
 
-        private string handleJson(Socket socket, byte[] buffer, string requestStr, Request request, ref int code)
+        private string handleJson(Socket socket, byte[] buffer, string requestStr, Request request,int argCount, ref int code)
         {
             string back = "success";
             switch (request.Code)
             {
                 case (int)RequestCode.RunCmd:
-                    back = runCmd(request.Args[0], request.Args[1]);
+                    if(argCount > 2)
+                    {
+                        back = runCmd(request.Args[0], request.Args[1]);
+                    }
                     break;
                 case (int)RequestCode.FindWindow:
                     back = findWindowHwnd(request.Args[0]);
@@ -225,7 +228,7 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationLongLink:
                     ConvsationManager.getInstance().addSocket(socket);
-                    if (request.Args != null && request.Args.Length > 0 && !string.IsNullOrEmpty(request.Args[0]))
+                    if (argCount > 0)
                     {
                         List<string> news = ConvsationManager.getInstance().getNewConvasation(request.Args[0], false);
                         foreach (var item in news)
@@ -239,7 +242,10 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
-                    ConvsationManager.getInstance().saveConvsationCache(request.RequestId, requestStr);
+                    if (argCount >= 1)
+                    {
+                        ConvsationManager.getInstance().saveConvsationCache(request.Args[1], requestStr);
+                    }
                     int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, "0"));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     back = requestStr;
