@@ -75,6 +75,7 @@ namespace SocketWin32Api
         {
             public const string Code = "code";
             public const string Data = "data";
+            public const string Format = "format";
             public const string RequestId = "requestId";
             public const string Message = "message";
             public const string Error = "error";

@@ -34,20 +34,22 @@ namespace SocketWin32Api
             backData = response[ResponseKey.Data];
         }
 
-        public static string makeResponseJson(string code, string data, string requestId)
+        public static string makeResponseJson(string code, string data, string requestId, string dataFormat = "")
         {
             JSONClass response = new JSONClass();
             response.Add(ResponseKey.Code, code);
             response.Add(ResponseKey.Data, data);
+            response.Add(ResponseKey.Format, dataFormat);
             response.Add(ResponseKey.RequestId, requestId);
             return response.ToString();
         }
 
-        public static string responseJson(Socket socket, string code, string data, string requestId)
+        public static string responseJson(Socket socket, string code, string data, string requestId, string dataFormat = "")
         {
             JSONClass response = new JSONClass();
             response.Add(ResponseKey.Code, code);
             response.Add(ResponseKey.Data, data);
+            response.Add(ResponseKey.Format, dataFormat);
             response.Add(ResponseKey.RequestId, requestId);
             string responseJson = response.ToString();
             socket.Send(HeaderCode.BYTES_JSON);

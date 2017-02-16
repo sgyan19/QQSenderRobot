@@ -242,13 +242,15 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
-                    if (argCount >= 1)
+                    if (argCount >= 2)
                     {
-                        ConvsationManager.getInstance().saveConvsationCache(request.Args[1], requestStr);
+                        ConvsationManager.getInstance().saveConvsationCache(request.Args[2], request.Args[0]);
                     }
-                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), requestStr, "0"));
+                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), request.Args[0], "0", request.Args[1]));
                     mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
-                    back = requestStr;
+                    string response1 = SocketHelper.responseJson(socket, code.ToString(), request.Args[0], request.RequestId, request.Args[1]);
+                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response1);
+                    back = null;
                     break;
                 case (int)RequestCode.ConversationNoteImage:
                     socket.Send(HeaderCode.BYTES_RAW);
