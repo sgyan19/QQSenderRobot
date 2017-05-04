@@ -12,7 +12,7 @@ namespace QQRobot
     {
         private const string UserTemplet = "<img class=\\\"ProfileAvatar-image \\\" src=\\\"(?<url>[\\S]*?)\\\" alt=\\\"(?<name>[\\S]*?)\\\">";
         private const string ItemTemplet = "<div class=\\\"tweet js-stream-tweet js-actionable-tweet(?<item>[\\s\\S]*?)<div class=\\\"stream-item-footer\\\">";
-        private const string ItemTextTemplet = "<p class=\\\"TweetTextSize TweetTextSize--[\\d]{1,3}px js-tweet-text tweet-text\\\" lang=\\\"[a-z]{1,3}\\\" data-aria-label-part=\\\"[\\d]\\\">(?<content>[\\s\\S]*?)</p>";
+        private const string ItemTextTemplet = "<p class=\\\"TweetTextSize TweetTextSize--[\\S]{1,6} js-tweet-text tweet-text\\\" lang=\\\"[a-z]{1,3}\\\" data-aria-label-part=\\\"[\\d]\\\">(?<content>[\\s\\S]*?)</p>";
         private const string ItemImgTemplet = "<img data-aria-label-part src=\\\"(?<url>[\\S]*?)\\\" alt=";
         private const string ItemLinkTemplet = "<a[\\s\\S]*?href=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";
         private const string ItemLink2Templet = "<a[\\s\\S]*?title=\\\"(?<url>[\\S]*?)\\\"[\\s\\S]*?>[\\s]*?(?<name>[\\S]*?)[\\s]*?</a>";

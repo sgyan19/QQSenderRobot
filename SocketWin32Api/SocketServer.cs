@@ -242,7 +242,7 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.ConversationNote:
                 case (int)RequestCode.ConversationNoteRing:
-                    if (argCount >= 2)
+                    if (argCount > 2)
                     {
                         ConvsationManager.getInstance().saveConvsationCache(request.Args[2], request.Args[0]);
                     }
