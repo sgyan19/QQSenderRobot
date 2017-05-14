@@ -43,12 +43,8 @@ namespace SocketWin32Api
             FindWindow = 2,
             SendWindowInfo = 3,
 
-            ConversationLongLink = 11,
-            ConversationNote = 12,
-            ConversationDisconnect = 13,
-            ConversationNoteRing = 14,
-            ConversationNoteImage = 15,
-            ConversationNoteBuffer = 16,
+            MobileTerminalJson=11,
+            MoboleTerminalRaw=12,
 
             RemoteFindWindow = 1002,
             RemoteSendWindowText = 1003,
@@ -75,7 +71,7 @@ namespace SocketWin32Api
         {
             public const string Code = "code";
             public const string Data = "data";
-            public const string Format = "format";
+            //public const string Format = "format";
             public const string RequestId = "requestId";
             public const string Message = "message";
             public const string Error = "error";

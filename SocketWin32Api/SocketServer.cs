@@ -120,13 +120,13 @@ namespace SocketWin32Api
                         {
                             string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
                             int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", request.RequestId);
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), request.RequestId);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                         }
                         catch(Exception e)
                         {
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), format(e), request.RequestId);
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), request.RequestId, format(e));
                         }
                     }
                     else if(buffer[0] == HeaderCode.JSON)
@@ -140,7 +140,7 @@ namespace SocketWin32Api
                         catch (Exception e)
                         {
                             code = (int)ResponseCode.ErrorSocketRecive;
-                            end = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), format(e), request.RequestId);
+                            end = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), request.RequestId, format(e));
                         }
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.JSON, json:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, json);
                         request.Code = -1;
@@ -177,7 +177,7 @@ namespace SocketWin32Api
                         }
                         if (end != null)
                         {
-                            string response = SocketHelper.responseJson(s, code.ToString(), end, request.RequestId);
+                            string response = SocketHelper.responseJson(s, code.ToString(), request.RequestId, end);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                         }
                         else
@@ -226,33 +226,27 @@ namespace SocketWin32Api
                     var socketClient = getConnectedSocketClient(request.Args[0], request.Args[1]);
                     back = socketClient.remoteFindWindow(request.Args[2]).ToString();
                     break;
-                case (int)RequestCode.ConversationLongLink:
-                    ConvsationManager.getInstance().addSocket(socket);
-                    if (argCount > 0)
+                case (int)RequestCode.MobileTerminalJson:
+                    if (!MobileTerminalManager.getInstance().addSocket(socket))
                     {
-                        List<string> news = ConvsationManager.getInstance().getNewConvasation(request.Args[0], false);
-                        foreach (var item in news)
+                        foreach(var item in MobileTerminalManager.getInstance().getConvastationCash())
                         {
-                            string response = SocketHelper.responseJson(socket, "0", item, request.RequestId);
+                            string response = SocketHelper.responseJson(socket, "0", request.RequestId, item);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, send new:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                         }
-                        back = null;
                     }
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation Link", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
-                    break;
-                case (int)RequestCode.ConversationNote:
-                case (int)RequestCode.ConversationNoteRing:
-                    if (argCount > 2)
+                    if (request.Args != null && request.Args.Length >= 1)
                     {
-                        ConvsationManager.getInstance().saveConvsationCache(request.Args[2], request.Args[0]);
+                        int count = MobileTerminalManager.getInstance().broadcast(SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), request.RequestId, request.Args));
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
                     }
-                    int count = ConvsationManager.getInstance().broadcast(socket, SocketHelper.makeResponseJson(((int)ResponseCode.Success).ToString(), request.Args[0], "0", request.Args[1]));
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation broadcast:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, count);
-                    string response1 = SocketHelper.responseJson(socket, code.ToString(), request.Args[0], request.RequestId, request.Args[1]);
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response1);
+
+                    // just for log out
+                    //string response1 = SocketHelper.responseJson(socket, code.ToString(), request.Args[0], request.RequestId, request.Args[1]);
+                    //mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response1);
                     back = null;
                     break;
-                case (int)RequestCode.ConversationNoteImage:
+                case (int)RequestCode.MoboleTerminalRaw:
                     socket.Send(HeaderCode.BYTES_RAW);
                     if(File.Exists(mRawFolder + "\\" + request.Args[0]))
                     {
@@ -275,13 +269,6 @@ namespace SocketWin32Api
                         back = "server don not find file:" + request.Args[0];
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image request server don not find file", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
                     }
-                    break;
-                case (int)RequestCode.ConversationNoteBuffer:
-                    int len = int.Parse(request.Args[0]);
-                    break;
-                case (int)RequestCode.ConversationDisconnect:
-                    mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Conversation unlink", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
-                    ConvsationManager.getInstance().removeSocket(socket);
                     break;
                 default:
                     back = null;
