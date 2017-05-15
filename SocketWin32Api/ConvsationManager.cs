@@ -44,13 +44,27 @@ namespace SocketWin32Api
 
         public int broadcast(string response)
         {
+            int count = 0;
+            ConvsationSockets.RemoveWhere(socket => (socket == null || !socket.Connected));
             foreach (Socket item in ConvsationSockets)
             {
-                item.Send(HeaderCode.BYTES_JSON);
-                SocketHelper.sendTextFrame(item, response);
+                if(item != null)
+                {
+                    try
+                    {
+                        item.Send(HeaderCode.BYTES_JSON);
+                        SocketHelper.sendTextFrame(item, response);
+                        count++;
+                    }
+                    catch(Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                    }
+                }
             }
             saveConvsationCache(response);
-            return ConvsationSockets.Count();
+            return count;
         }
 
         public int broadcast(Socket sender, byte[] buffer, int offset, int len)

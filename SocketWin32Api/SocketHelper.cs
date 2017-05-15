@@ -49,6 +49,12 @@ namespace SocketWin32Api
             return response.ToString();
         }
 
+        public static void responseJson(Socket socket, string responseStr)
+        {
+            socket.Send(HeaderCode.BYTES_JSON);
+            sendTextFrame(socket, responseStr);
+        }
+
         public static string responseJson(Socket socket, string code, string requestId, params string[] data)
         {
             JSONClass response = new JSONClass();

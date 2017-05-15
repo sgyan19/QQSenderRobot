@@ -171,7 +171,7 @@ namespace SocketWin32Api
                         }
                         catch (Exception ex)
                         {
-                            end = ex.Message;
+                            end = ex.StackTrace;
                             Console.WriteLine(ex.Message);
                             Console.WriteLine(ex.StackTrace);
                         }
@@ -227,12 +227,12 @@ namespace SocketWin32Api
                     back = socketClient.remoteFindWindow(request.Args[2]).ToString();
                     break;
                 case (int)RequestCode.MobileTerminalJson:
-                    if (!MobileTerminalManager.getInstance().addSocket(socket))
+                    if (MobileTerminalManager.getInstance().addSocket(socket))
                     {
                         foreach(var item in MobileTerminalManager.getInstance().getConvastationCash())
                         {
-                            string response = SocketHelper.responseJson(socket, "0", request.RequestId, item);
-                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, send new:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                            SocketHelper.responseJson(socket, item);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, send new:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, item);
                         }
                     }
                     if (request.Args != null && request.Args.Length >= 1)
