@@ -141,7 +141,7 @@ namespace QQRobot
                 {
                     imgs[i] = ImageHelper.download(wb, data.ImgUrls[i], 3);
                 }
-                longImage = ImageHelper.longImageMake(imgs);
+                longImage = ImageHelper.longImageMake2(imgs);
                 data.LongImgPath = ImageHelper.save(longImage);
             }
             return longImage;

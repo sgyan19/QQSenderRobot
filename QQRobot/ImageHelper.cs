@@ -145,6 +145,60 @@ namespace QQRobot
             return result;
         }
 
+        public static Image longImageMake2(Image[] src)
+        {
+            if (src.Length <= 0)
+            {
+                return null;
+            }
+            int count = 0;
+            foreach (Image item in src)
+            {
+                if (item != null)
+                {
+                    count++;
+                }
+            }
+            if (count <= 0) return null;
+            Image[] usSrc = new Image[count];
+            for (int i = 0, j = 0; i < src.Length; i++)
+            {
+                if (src[i] != null)
+                {
+                    usSrc[j++] = src[i];
+                }
+
+            }
+            int height = 0;
+            int maxWidth = 0;
+            for (int i = 0; i < usSrc.Length; i++)
+            {
+                if(maxWidth < usSrc[i].Width)
+                {
+                    maxWidth = usSrc[i].Width;
+                }
+                height += usSrc[i].Height;
+            }
+            int[] width_Pos = new int[usSrc.Length];
+            for (int i = 0; i < usSrc.Length; i++)
+            {
+                width_Pos[i] = (maxWidth - usSrc[i].Width) / 2;
+            }
+
+            Bitmap result = new Bitmap(maxWidth, height);
+            Graphics g = Graphics.FromImage(result);
+
+            int height_pos = 0;
+            for (int i = 0; i < usSrc.Length; i++)
+            {
+                g.DrawImage(usSrc[i], width_Pos[i], height_pos, usSrc[i].Width, usSrc[i].Height);
+                height_pos += usSrc[i].Height;
+            }
+            g.Dispose();
+
+            return result;
+        }
+
         public static string save(Image img)
         {
             if(img == null)

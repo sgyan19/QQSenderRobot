@@ -157,7 +157,7 @@ namespace QQRobot
 
         private Twitter paserTwitterFormJson(JSONNode json)
         {
-            return new Twitter
+            Twitter twitter = new Twitter
             {
                 Text = json["text"],
                 Id = json["id_str"],
@@ -171,7 +171,20 @@ namespace QQRobot
                     ScreenName = json["in_reply_to_screen_name"],
                     UserId = json["in_reply_to_user_id_str"],
                 },
+                IsQuoteStatus = json["is_quote_status"],
+                QuotedStatusId = json["quoted_status_id_str"],
             };
+            try
+            {
+                if (bool.Parse(twitter.IsQuoteStatus))
+                {
+                    twitter.QuotedStatus = paserTwitterFormJson(json["quoted_status"]);
+                }
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            return twitter;
         }
 
         private TwitterUser paserUserFormJson(JSONNode json)
@@ -195,11 +208,19 @@ namespace QQRobot
         public override BaseData onUse(BaseData data)
         {
             Twitter d = data as Twitter;
-            if (d.Reply == null)
+            if (d.EverUsed)
             {
-                d = location302(d);
-                d = requestTruncated(d);
-                if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))
+                return d;
+            }
+            d.EverUsed = true;
+            d = location302(d);
+            d = requestTruncated(d);
+
+            if (d.QuotedStatus != null)
+            {
+                recursionTwitter(d);
+            }
+            else if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))
                 {
                     string text = mAtEndNameReg.Replace(d.Text, "") + string.Format(" //@{0} ", d.ReplyUser.ScreenName);
 
@@ -209,9 +230,31 @@ namespace QQRobot
                     d.Text = text.Replace( "@"+ ((TwitterUser)User).ScreenName, "@" + ((TwitterUser)User).UserName);
                     d.ImgUrls = urls.ToArray();
                 }
-            }
             
             return d;
+        }
+
+        private void recursionTwitter(Twitter father)
+        {
+            if(father == null)
+            {
+                return;
+            }
+            Twitter son = father.QuotedStatus;
+            if (son == null) return;
+            son = location302(son);
+            son = requestTruncated(son);
+            recursionTwitter(son);
+            father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
+            if(son.ImgUrls.Length > 0)
+            {
+                string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
+                for (int i = 0; i < son.ImgUrls.Length; i++)
+                {
+                    newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
+                }
+                father.ImgUrls = newUrls;
+            }
         }
 
         private void recursionReply(Twitter data, ref string fullText, List<string> fullUrl)

@@ -18,5 +18,13 @@ namespace QQRobot
         public TwitterUser ReplyUser { set; get; }
         public Twitter Reply { set; get; }
         public string Truncated { set; get; }
+
+        public string IsQuoteStatus { set; get; }
+
+        public string QuotedStatusId { set; get; }
+
+        public Twitter QuotedStatus { set; get; }
+
+        public bool EverUsed { set; get; }
     }
 }
