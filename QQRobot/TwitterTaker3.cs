@@ -215,21 +215,8 @@ namespace QQRobot
             d.EverUsed = true;
             d = location302(d);
             d = requestTruncated(d);
-
-            if (d.QuotedStatus != null)
-            {
-                recursionTwitter(d);
-            }
-            else if (!string.IsNullOrEmpty(d.ReplyId) && !string.Equals(d.ReplyId, "null"))
-                {
-                    string text = mAtEndNameReg.Replace(d.Text, "") + string.Format(" //@{0} ", d.ReplyUser.ScreenName);
-
-                    List<string> urls = new List<string>();
-                    urls.AddRange(d.ImgUrls);
-                    recursionReply(d, ref text, urls);
-                    d.Text = text.Replace( "@"+ ((TwitterUser)User).ScreenName, "@" + ((TwitterUser)User).UserName);
-                    d.ImgUrls = urls.ToArray();
-                }
+            requestReply(d);
+            recursionTwitter(d);
             
             return d;
         }
@@ -240,22 +227,85 @@ namespace QQRobot
             {
                 return;
             }
-            Twitter son = father.QuotedStatus;
-            if (son == null) return;
-            son = location302(son);
-            son = requestTruncated(son);
-            recursionTwitter(son);
-            father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
-            if(son.ImgUrls.Length > 0)
+
+            Twitter son ;
+            if (father.QuotedStatus != null)
             {
-                string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
-                for (int i = 0; i < son.ImgUrls.Length; i++)
+                son = father.QuotedStatus;
+                son = location302(son);
+                son = requestTruncated(son);
+
+                son.Text = mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(son.Text, ""), ""), "");
+                requestReply(son);
+                recursionTwitter(son);
+                father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
+                if (son.ImgUrls.Length > 0)
                 {
-                    newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
+                    string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
+                    for (int i = 0; i < son.ImgUrls.Length; i++)
+                    {
+                        newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
+                    }
+                    father.ImgUrls = newUrls;
                 }
-                father.ImgUrls = newUrls;
             }
+            else if(father.Reply != null)
+            {
+                son = father.Reply;
+                son = location302(son);
+                son = requestTruncated(son);
+                requestReply(son);
+                recursionTwitter(son);
+                father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
+                if (son.ImgUrls.Length > 0)
+                {
+                    string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
+                    for (int i = 0; i < son.ImgUrls.Length; i++)
+                    {
+                        newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
+                    }
+                    father.ImgUrls = newUrls;
+                }
+            }
+            //return;
         }
+
+        private void requestReply(Twitter father)
+        {
+            if(father == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(father.ReplyId) || "null".Equals(father.ReplyId))
+            {
+                return;
+            }
+            int times = 3;
+            string jsonStr = "";
+            Twitter reply = null;
+        tryRequest:
+            try
+            {
+                times--;
+                jsonStr = TwitterApi.getInstance().GetTwitter(father.ReplyId, null, Proxy);
+            }
+            catch (Exception)
+            {
+                if (times >= 0)
+                    goto tryRequest;
+            }
+            try
+            {
+                reply = paserTwitterFormJson(JSON.Parse(jsonStr));
+            }
+            catch (Exception) { }
+            reply = location302(reply);
+            reply = requestTruncated(reply);
+            reply.Text = mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(reply.Text, ""), ""), "");
+            father.Reply = reply;
+        }
+
 
         private void recursionReply(Twitter data, ref string fullText, List<string> fullUrl)
         {

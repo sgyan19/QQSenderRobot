@@ -97,11 +97,14 @@ namespace SocketWin32Api
 
         public void saveConvsationCache(string cvsJson)
         {
-            convastionCaches.AddLast(cvsJson);
-            int s = convastionCaches.Count - ConvsationCacheCount;
-            for (int i = 0; i < s; i++)
+            lock (locker)
             {
-                convastionCaches.RemoveFirst();
+                convastionCaches.AddLast(cvsJson);
+                int s = convastionCaches.Count - ConvsationCacheCount;
+                for (int i = 0; i < s; i++)
+                {
+                    convastionCaches.RemoveFirst();
+                }
             }
         }
 
