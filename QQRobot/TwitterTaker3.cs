@@ -21,6 +21,7 @@ namespace QQRobot
         private const string HtmlLabel3Templet = "<[\\S]>";
         private const string HtmlLabel4Templet = "</[b-z]>";
 
+        private string[] NoneStringArray = new string[0];
         private Regex mUserReg = new Regex(UserTemplet);
         private string mUserImgGroups = "url";
         private string mUserNameGroups = "name";
@@ -162,7 +163,7 @@ namespace QQRobot
                 Text = json["text"],
                 Id = json["id_str"],
                 TimeStamp = json["created_at"],
-                ImgUrls = json["extended_entities"]["media"] == null ? new string[0] : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
+                ImgUrls = json["extended_entities"]["media"] == null ? NoneStringArray : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
                 User = paserUserFormJson(json),
                 ReplyId = json["in_reply_to_status_id"],
                 Truncated = json["truncated"],
@@ -173,6 +174,7 @@ namespace QQRobot
                 },
                 IsQuoteStatus = json["is_quote_status"],
                 QuotedStatusId = json["quoted_status_id_str"],
+                ExpandedUrls = json["entities"]["urls"] == null ? NoneStringArray : (json["entities"]["urls"] as JSONArray).Childs.Select((m) => ((string)m["expanded_url"])).ToArray(),
             };
             try
             {
@@ -213,6 +215,10 @@ namespace QQRobot
                 return d;
             }
             d.EverUsed = true;
+            for(int i = 0;i < d.ExpandedUrls.Length; i++)
+            {
+                d.Text += " " + d.ExpandedUrls[i];
+            }
             d = location302(d);
             d = requestTruncated(d);
             requestReply(d);
@@ -392,6 +398,9 @@ namespace QQRobot
                 catch (TimeoutException)
                 {
                     goto reTry;
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.StackTrace);
                 }
                 if (!string.IsNullOrEmpty(location))
                 {

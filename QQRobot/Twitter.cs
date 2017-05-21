@@ -26,5 +26,7 @@ namespace QQRobot
         public Twitter QuotedStatus { set; get; }
 
         public bool EverUsed { set; get; }
+
+        public string[] ExpandedUrls { set; get; }
     }
 }

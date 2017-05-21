@@ -120,13 +120,13 @@ namespace SocketWin32Api
                         {
                             string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
                             int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), request.RequestId);
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                         }
                         catch(Exception e)
                         {
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), request.RequestId, format(e));
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), "", format(e));
                         }
                     }
                     else if(buffer[0] == HeaderCode.JSON)
@@ -254,6 +254,7 @@ namespace SocketWin32Api
                         {
                             int size = SocketHelper.responseRaw(socket, buffer, mRawFolder, request.Args[0]);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image over size:{2}", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, size);
+                            back = null;
                         }
                         catch (Exception e)
                         {
