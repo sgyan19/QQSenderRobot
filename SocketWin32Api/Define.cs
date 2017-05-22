@@ -17,11 +17,17 @@ namespace SocketWin32Api
             public const byte ASK = 0x19;
             public const byte ANS = 0X91;
             public const byte RAW = 0x2B;
+            public const byte CKRAW = 0x3B;
+            public const byte CK_SUC_RAW = 0x3C;
+            public const byte CK_FAIL_RAW = 0x3D;
             public const byte JSON = 0x7B;
 
             public static byte[] BYTES_ASK = { ASK };
             public static byte[] BYTES_ANS = { ANS };
             public static byte[] BYTES_RAW = { RAW };
+            public static byte[] BYTES_CKRAW = { CKRAW };
+            public static byte[] BYTES_CK_SUC_RAW = { CK_SUC_RAW };
+            public static byte[] BYTES_CK_FAIL_RAW = { CK_FAIL_RAW };
             public static byte[] BYTES_JSON = { JSON };
         }
         public enum ResponseCode

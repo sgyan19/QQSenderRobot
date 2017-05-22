@@ -44,6 +44,7 @@ namespace QQRobot
         private const string AtStartTemplet = "^(@[a-zA-Z\\d_]*?) ";
         private const string HttpUriTemplet = "https{0,1}://\\S{1,}";
         private const string HttpTwitterTimplet = "https://twitter.com\\S{1,}";
+        private const string HttpTwitterTimplet2 = "pic.twitter.com\\S{1,}";
         private const int HistorySize = 15;
         private List<BaseData> mTakeHistory = new List<BaseData>();
 
@@ -51,6 +52,7 @@ namespace QQRobot
         private Regex mStartAtNameReg = new Regex(AtStartTemplet);
         private Regex mHttpUriReg = new Regex(HttpUriTemplet);
         private Regex mHttpTwitterReg = new Regex(HttpTwitterTimplet);
+        private Regex mHttpTwitterReg2 = new Regex(HttpTwitterTimplet2);
         public TwitterTaker3()
         {
             SafeCount = int.MaxValue;
@@ -215,15 +217,17 @@ namespace QQRobot
                 return d;
             }
             d.EverUsed = true;
+            /*
             for(int i = 0;i < d.ExpandedUrls.Length; i++)
             {
                 d.Text += " " + d.ExpandedUrls[i];
             }
+            */
             d = location302(d);
             d = requestTruncated(d);
             requestReply(d);
             recursionTwitter(d);
-            
+            d.Text = mHttpTwitterReg2.Replace(mHttpTwitterReg.Replace(d.Text, ""),"");
             return d;
         }
 
@@ -244,7 +248,7 @@ namespace QQRobot
                 son.Text = mAtEndNameReg.Replace(mStartAtNameReg.Replace(mStartAtNameReg.Replace(son.Text, ""), ""), "");
                 requestReply(son);
                 recursionTwitter(son);
-                father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
+                father.Text = father.Text + string.Format(" // @{0} ", son.User.UserName) + son.Text;
                 if (son.ImgUrls.Length > 0)
                 {
                     string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
@@ -262,7 +266,7 @@ namespace QQRobot
                 son = requestTruncated(son);
                 requestReply(son);
                 recursionTwitter(son);
-                father.Text = father.Text + string.Format(" //@{0} ", son.User.ScreenName) + son.Text;
+                father.Text = father.Text + string.Format(" //@{0} ", son.User.UserName) + son.Text;
                 if (son.ImgUrls.Length > 0)
                 {
                     string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];

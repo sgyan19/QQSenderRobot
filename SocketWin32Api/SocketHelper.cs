@@ -16,6 +16,7 @@ namespace SocketWin32Api
 
         public static Hashtable LockObject = new Hashtable();
         private static int mLogKey = 0;
+        private static byte[]  NONE_NYTE_ARRAY = new byte[0] ;
 
         public static void request(Socket socket, byte[] buffer, string code, ref string bakeCode, ref string backData, params string[] args)
         {
@@ -159,6 +160,65 @@ namespace SocketWin32Api
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
 
+        public static byte[] getRawMd5(Socket socket,string dirPath, string name, LogHelper loger = null)
+        {
+            string path = dirPath + "\\" + name;
+            object obj = LockObject[name];
+            byte[] md5Data = null;
+            if (File.Exists(path))
+            {
+                if (obj == null)
+                {
+                    obj = new object();
+                    LockObject.Add(name, obj);
+                }
+                lock (obj)
+                {
+                    try
+                    {
+                        using (FileStream stream = new FileStream(path, FileMode.Open))
+                        {
+                            System.Security.Cryptography.MD5 mdr = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                            md5Data = mdr.ComputeHash(stream);
+                            stream.Close();
+                        }
+                    }catch(Exception)
+                    {
+
+                    }
+                }
+            }
+            if(md5Data == null)
+            {
+                md5Data = NONE_NYTE_ARRAY;
+            }
+            return md5Data;
+        }
+
+        public static int receiveRawFrame(Socket socket, byte[] buf, LogHelper loger = null)
+        {
+            int key = mLogKey++;
+            if (loger != null)
+            {
+                //loger.InfoFormat("receiveTextFrame key:{0}", key);
+            }
+            socket.ReceiveTimeout = 2000;
+            int len = socket.Receive(buf, 4, SocketFlags.None);
+            Int32 size = BitConverter.ToInt32(buf, 0);
+            if (size > buf.Length)
+            {
+                throw new SocketException();
+            }
+            int offset = 0;
+            while (size > 0 && (len = socket.Receive(buf, offset, size, SocketFlags.None)) > 0)
+            {
+                offset += len;
+                size = size - len;
+            }
+            socket.ReceiveTimeout = -1;
+            return offset;
+        }
+
         public static int receiveRawFrame(Socket socket, byte[] buf, string dirPath, string name = null, LogHelper loger = null)
         {
             int key = mLogKey++;
@@ -176,8 +236,11 @@ namespace SocketWin32Api
             }
             string path = dirPath + "\\" + name;
             object obj = LockObject[name];
-            if (obj == null) obj = new object();
-            LockObject.Add(name, obj);
+            if (obj == null)
+            {
+                obj = new object();
+                LockObject.Add(name, obj);
+            }
             lock (obj)
             {
                 try

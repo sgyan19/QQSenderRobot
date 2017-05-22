@@ -129,6 +129,49 @@ namespace SocketWin32Api
                             string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), "", format(e));
                         }
                     }
+                    else if (buffer[0] == HeaderCode.CKRAW)
+                    {
+                        try
+                        {
+                            string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
+                            int size = SocketHelper.receiveRawFrame(s, buffer, mLogHelper);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.CKRAW, MD5 ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                            byte[] oldMd5 = SocketHelper.getRawMd5(s, mRawFolder, rawName);
+                            bool checkRight = false;
+                            if(size == oldMd5.Length)
+                            {
+                                checkRight = true;
+                                for (int i = 0; i< size;i++)
+                                {
+                                    if(buffer[i] != oldMd5[i])
+                                    {
+                                        checkRight = false;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (checkRight)
+                            {
+                                s.Send(HeaderCode.BYTES_CK_SUC_RAW);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_SUC_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                                string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                            }
+                            else
+                            {
+                                s.Send(HeaderCode.BYTES_CK_FAIL_RAW);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_FAIL_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                                size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
+                                string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, receiveRawFrame: HeaderCode.BYTES_CK_FAIL_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), "", format(e));
+                        }
+                    }
                     else if(buffer[0] == HeaderCode.JSON)
                     {
                         string end;
@@ -184,6 +227,9 @@ namespace SocketWin32Api
                         {
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, no response", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
                         }
+                    }else
+                    {
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, unkown code{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId,buffer[0]);
                     }
                 }
             }
@@ -269,6 +315,12 @@ namespace SocketWin32Api
                         code = (int)ResponseCode.ErrorRawNotExist;
                         back = "server don not find file:" + request.Args[0];
                         mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, download image request server don not find file", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                    }
+                    if(back != null)
+                    {
+                        SocketHelper.sendTextFrame(socket, request.Args[0]);
+                        SocketHelper.sendTextFrame(socket, back);
+                        back = null;
                     }
                     break;
                 default:
