@@ -240,7 +240,10 @@ namespace SocketWin32Api
                     }
                 }
             }
-            FileMd5table.Add(name, applyMd5);
+            if (!FileMd5table.ContainsKey(name))
+            {
+                FileMd5table.Add(name, applyMd5);
+            }
             return false;
         }
 
