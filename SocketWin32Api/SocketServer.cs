@@ -134,10 +134,10 @@ namespace SocketWin32Api
                         try
                         {
                             string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
-                            int size = SocketHelper.receiveRawFrame(s, buffer, mLogHelper);
-                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.CKRAW, MD5 ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                            string md5 = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.CKRAW, MD5 ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, md5, rawName);
                             
-                            if (SocketHelper.rawMd5ExistCheck(s , buffer, mRawFolder, rawName))
+                            if (SocketHelper.rawMd5ExistCheck(s , md5, mRawFolder, rawName))
                             {
                                 s.Send(HeaderCode.BYTES_CK_SUC_RAW);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_SUC_RAW, name:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, rawName);
@@ -148,7 +148,7 @@ namespace SocketWin32Api
                             {
                                 s.Send(HeaderCode.BYTES_CK_FAIL_RAW);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_FAIL_RAW,name:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, rawName);
-                                size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
+                                int size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
                                 string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, receiveRawFrame: HeaderCode.BYTES_CK_FAIL_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);

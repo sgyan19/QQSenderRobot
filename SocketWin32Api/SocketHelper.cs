@@ -165,11 +165,11 @@ namespace SocketWin32Api
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
 
-        public static byte[] getRawMd5(string dirPath, string name, LogHelper loger = null)
+        public static string getRawMd5(string dirPath, string name, LogHelper loger = null)
         {
             string path = dirPath + "\\" + name;
             object obj = LockObject[name];
-            byte[] md5Data = null;
+            string md5Data = null;
             if (File.Exists(path))
             {
                 if (obj == null)
@@ -184,7 +184,7 @@ namespace SocketWin32Api
                         using (FileStream stream = new FileStream(path, FileMode.Open))
                         {
                             System.Security.Cryptography.MD5 mdr = new System.Security.Cryptography.MD5CryptoServiceProvider();
-                            md5Data = mdr.ComputeHash(stream);
+                            md5Data = toHexString(mdr.ComputeHash(stream));
                             stream.Close();
                         }
                     }catch(Exception)
@@ -195,17 +195,17 @@ namespace SocketWin32Api
             }
             if(md5Data == null)
             {
-                md5Data = NONE_NYTE_ARRAY;
+                md5Data = "null";
             }
             return md5Data;
         }
 
-        public static bool rawMd5ExistCheck(Socket socket, byte[] applyMd5, string dirPath, string name, LogHelper loger = null)
+        public static bool rawMd5ExistCheck(Socket socket, string applyMd5, string dirPath, string name, LogHelper loger = null)
         {
             string path = dirPath + "\\" + name;
             if (FileMd5table[name] != null)
             {
-                if (Equals(applyMd5, ((byte[])FileMd5table[name])))
+                if (applyMd5.Equals(FileMd5table[name] as string))
                 {
                     return true;
 
@@ -213,8 +213,8 @@ namespace SocketWin32Api
             }
             else
             {
-                byte[] md5 = getRawMd5(dirPath, name);
-                if(Equals(applyMd5, md5))
+                string md5 = getRawMd5(dirPath, name);
+                if(applyMd5.Equals(md5))
                 {
                     FileMd5table.Add(name, md5);
                     return true;
@@ -222,7 +222,7 @@ namespace SocketWin32Api
             }
             foreach (DictionaryEntry item in FileMd5table.Values)
             {
-                if (Equals(applyMd5, item.Value))
+                if (applyMd5.Equals(item.Value))
                 {
                     File.Copy(dirPath + "\\" + item.Key, path, true);
                     return true;
@@ -316,6 +316,20 @@ namespace SocketWin32Api
             }
             return result;
         }
-        
+
+        private static char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'A', 'B', 'C', 'D', 'E', 'F' };
+
+        public static string toHexString(byte[] b)
+        {
+            StringBuilder sb = new StringBuilder(b.Length * 2);
+            for (int i = 0; i < b.Length; i++)
+            {
+                sb.Append(HEX_DIGITS[(b[i] & 0xf0) >> 4]);
+                sb.Append(HEX_DIGITS[b[i] & 0x0f]);
+            }
+            return sb.ToString();
+        }
+
     }
 }
