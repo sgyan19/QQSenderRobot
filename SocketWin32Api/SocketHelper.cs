@@ -189,7 +189,6 @@ namespace SocketWin32Api
                         }
                     }catch(Exception)
                     {
-
                     }
                 }
             }
@@ -200,7 +199,7 @@ namespace SocketWin32Api
             return md5Data;
         }
 
-        public static bool rawMd5ExistCheck(Socket socket, string applyMd5, string dirPath, string name, LogHelper loger = null)
+        public static bool rawMd5Check(Socket socket, string applyMd5, string dirPath, string name, LogHelper loger = null)
         {
             string path = dirPath + "\\" + name;
             if (FileMd5table[name] != null)
@@ -214,26 +213,41 @@ namespace SocketWin32Api
             else
             {
                 string md5 = getRawMd5(dirPath, name);
-                if(applyMd5.Equals(md5))
+                if (applyMd5.Equals(md5))
                 {
-                    FileMd5table.Add(name, md5);
-                    return true;
-                }
-            }
-            foreach (DictionaryEntry item in FileMd5table.Values)
-            {
-                if (applyMd5.Equals(item.Value))
-                {
-                    File.Copy(dirPath + "\\" + item.Key, path, true);
                     return true;
                 }
             }
             return false;
         }
 
+        public static bool rawMd5ExistCheck(Socket socket, string applyMd5, string dirPath, string name, LogHelper loger = null)
+        {
+            string path = dirPath + "\\" + name;
+            if (rawMd5Check(socket, applyMd5, dirPath, name, loger))
+            {
+                return true;
+            }
+            foreach (DictionaryEntry item in FileMd5table)
+            {
+                if (applyMd5.Equals(item.Value as string))
+                {
+                    string oldPath = dirPath + "\\" + item.Key;
+                    if (File.Exists(oldPath))
+                    {
+                        File.Copy(oldPath, path, true);
+                        return true;
+                    }
+                }
+            }
+            FileMd5table.Add(name, applyMd5);
+            return false;
+        }
+
         public static bool Equals(byte[] a, byte[] b)
         {
             if (a == null || b == null) return false;
+            if (a.Length != b.Length ) return false;
             int len = a.Length <= b.Length ? a.Length : b.Length;
             for (int i = 0; i < len; i++)
                 if (a[i] != b[i])

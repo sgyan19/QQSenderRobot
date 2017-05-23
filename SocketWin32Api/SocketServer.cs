@@ -294,6 +294,21 @@ namespace SocketWin32Api
                     break;
                 case (int)RequestCode.MoboleTerminalRaw:
                     socket.Send(HeaderCode.BYTES_RAW);
+                    if(request.Args.Length >= 2)
+                    {
+                        if (SocketHelper.rawMd5Check(null, request.Args[1], mRawFolder, request.Args[0]))
+                        {
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, name:{2}, md5:{3} check suc", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, request.Args[0], request.Args[1]);
+                            socket.Send(HeaderCode.BYTES_CK_SUC_RAW);
+                            break;
+                        }
+                        else
+                        {
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, name:{2}, md5:{3} check fail", ((IPEndPoint)socket.RemoteEndPoint).Address.ToString(), request.DeviceId, request.Args[0], request.Args[1]);
+                            socket.Send(HeaderCode.BYTES_CK_FAIL_RAW);
+                        }
+                    }
+
                     if(File.Exists(mRawFolder + "\\" + request.Args[0]))
                     {
                         try
