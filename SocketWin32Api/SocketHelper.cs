@@ -216,7 +216,6 @@ namespace SocketWin32Api
                 byte[] md5 = getRawMd5(dirPath, name);
                 if(Equals(applyMd5, md5))
                 {
-                    FileMd5table.Add(name, md5);
                     return true;
                 }
             }
@@ -228,12 +227,14 @@ namespace SocketWin32Api
                     return true;
                 }
             }
+            FileMd5table.Add(name, applyMd5);
             return false;
         }
 
         public static bool Equals(byte[] a, byte[] b)
         {
             if (a == null || b == null) return false;
+            if (a.Length != b.Length ) return false;
             int len = a.Length <= b.Length ? a.Length : b.Length;
             for (int i = 0; i < len; i++)
                 if (a[i] != b[i])
