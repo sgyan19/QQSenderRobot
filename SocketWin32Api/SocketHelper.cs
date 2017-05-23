@@ -63,7 +63,10 @@ namespace SocketWin32Api
             JSONArray dataArray = new JSONArray();
             foreach (string item in data)
             {
-                dataArray.Add(null, item);
+                if(item != null)
+                {
+                    dataArray.Add(null, item);
+                }
             }
             response.Add(ResponseKey.Data, dataArray);
             //response.Add(ResponseKey.Data, data);
@@ -202,7 +205,7 @@ namespace SocketWin32Api
             {
                 //loger.InfoFormat("receiveTextFrame key:{0}", key);
             }
-            socket.ReceiveTimeout = 2000;
+            socket.ReceiveTimeout = 10000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
             if (size > buf.Length)
@@ -226,7 +229,7 @@ namespace SocketWin32Api
             {
                 //loger.InfoFormat("receiveRawFrame key:{0}", key);
             }
-            socket.ReceiveTimeout = 2000;
+            socket.ReceiveTimeout = 10000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
             int result = size;
@@ -270,5 +273,6 @@ namespace SocketWin32Api
             }
             return result;
         }
+        
     }
 }

@@ -153,14 +153,14 @@ namespace SocketWin32Api
                             if (checkRight)
                             {
                                 s.Send(HeaderCode.BYTES_CK_SUC_RAW);
-                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_SUC_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_SUC_RAW, name:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, rawName);
                                 string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, response{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, response);
                             }
                             else
                             {
                                 s.Send(HeaderCode.BYTES_CK_FAIL_RAW);
-                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_FAIL_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId);
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_FAIL_RAW,name:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, rawName);
                                 size = SocketHelper.receiveRawFrame(s, buffer, mRawFolder, rawName, mLogHelper);
                                 string response = SocketHelper.responseJson(s, ((int)ResponseCode.Success).ToString(), "", rawName);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, receiveRawFrame: HeaderCode.BYTES_CK_FAIL_RAW, ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
@@ -169,7 +169,8 @@ namespace SocketWin32Api
                         }
                         catch (Exception e)
                         {
-                            string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), "", format(e));
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, HeaderCode.CKRAW Exception:{2} {3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, e.Message, e.StackTrace);
+                            //string response = SocketHelper.responseJson(s, ((int)ResponseCode.ErrorSocketRecive).ToString(), "", format(e));
                         }
                     }
                     else if(buffer[0] == HeaderCode.JSON)
@@ -229,7 +230,19 @@ namespace SocketWin32Api
                         }
                     }else
                     {
-                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, unkown code{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId,buffer[0]);
+                        mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, unkown code {2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, buffer[0]);
+                        s.ReceiveTimeout = 3000;
+                        try
+                        {
+                            int len;
+                            while ((len = s.Receive(buffer)) >= 0)
+                            {
+                                mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive Trash len{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, len);
+                            }
+                        }catch(Exception e)
+                        {
+                            mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive Trash over e:{2} {3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, e.Message, e.StackTrace);
+                        }
                     }
                 }
             }
