@@ -136,21 +136,8 @@ namespace SocketWin32Api
                             string rawName = SocketHelper.receiveTextFrame(s, buffer, mLogHelper);
                             int size = SocketHelper.receiveRawFrame(s, buffer, mLogHelper);
                             mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Receive: HeaderCode.CKRAW, MD5 ByteCount:{2}, name:{3}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, size, rawName);
-                            byte[] oldMd5 = SocketHelper.getRawMd5(s, mRawFolder, rawName);
-                            bool checkRight = false;
-                            if(size == oldMd5.Length)
-                            {
-                                checkRight = true;
-                                for (int i = 0; i< size;i++)
-                                {
-                                    if(buffer[i] != oldMd5[i])
-                                    {
-                                        checkRight = false;
-                                        break;
-                                    }
-                                }
-                            }
-                            if (checkRight)
+                            
+                            if (SocketHelper.rawMd5ExistCheck(s , buffer, mRawFolder, rawName))
                             {
                                 s.Send(HeaderCode.BYTES_CK_SUC_RAW);
                                 mLogHelper.InfoFormat("addr:{0}, deviceId:{1}, Send: HeaderCode.BYTES_CK_SUC_RAW, name:{2}", ((IPEndPoint)s.RemoteEndPoint).Address.ToString(), request.DeviceId, rawName);

@@ -16,7 +16,9 @@ namespace SocketWin32Api
 
         public static Hashtable LockObject = new Hashtable();
         private static int mLogKey = 0;
-        private static byte[]  NONE_NYTE_ARRAY = new byte[0] ;
+        private static byte[]  NONE_NYTE_ARRAY = new byte[0];
+        private static Hashtable FileMd5table = new Hashtable();
+
 
         public static void request(Socket socket, byte[] buffer, string code, ref string bakeCode, ref string backData, params string[] args)
         {
@@ -142,7 +144,7 @@ namespace SocketWin32Api
             {
                 //loger.InfoFormat("receiveTextFrame key:{0}", key);
             }
-            socket.ReceiveTimeout = 2000;
+            socket.ReceiveTimeout = 10000;
             int len = socket.Receive(buf, 4, SocketFlags.None);
             Int32 size = BitConverter.ToInt32(buf, 0);
             if (size > buf.Length)
@@ -163,7 +165,7 @@ namespace SocketWin32Api
             return Encoding.UTF8.GetString(buf, 0, offset);
         }
 
-        public static byte[] getRawMd5(Socket socket,string dirPath, string name, LogHelper loger = null)
+        public static byte[] getRawMd5(string dirPath, string name, LogHelper loger = null)
         {
             string path = dirPath + "\\" + name;
             object obj = LockObject[name];
@@ -196,6 +198,47 @@ namespace SocketWin32Api
                 md5Data = NONE_NYTE_ARRAY;
             }
             return md5Data;
+        }
+
+        public static bool rawMd5ExistCheck(Socket socket, byte[] applyMd5, string dirPath, string name, LogHelper loger = null)
+        {
+            string path = dirPath + "\\" + name;
+            if (FileMd5table[name] != null)
+            {
+                if (Equals(applyMd5, ((byte[])FileMd5table[name])))
+                {
+                    return true;
+
+                }
+            }
+            else
+            {
+                byte[] md5 = getRawMd5(dirPath, name);
+                if(Equals(applyMd5, md5))
+                {
+                    FileMd5table.Add(name, md5);
+                    return true;
+                }
+            }
+            foreach (DictionaryEntry item in FileMd5table.Values)
+            {
+                if (Equals(applyMd5, item.Value))
+                {
+                    File.Copy(dirPath + "\\" + item.Key, path, true);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static bool Equals(byte[] a, byte[] b)
+        {
+            if (a == null || b == null) return false;
+            int len = a.Length <= b.Length ? a.Length : b.Length;
+            for (int i = 0; i < len; i++)
+                if (a[i] != b[i])
+                    return false;
+            return true;
         }
 
         public static int receiveRawFrame(Socket socket, byte[] buf, LogHelper loger = null)
