@@ -252,6 +252,10 @@ namespace QQRobot
                 if (son.ImgUrls.Length > 0)
                 {
                     string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
+                    for (int i = 0; i < father.ImgUrls.Length; i++)
+                    {
+                        newUrls[i] = father.ImgUrls[i];
+                    }
                     for (int i = 0; i < son.ImgUrls.Length; i++)
                     {
                         newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
@@ -270,6 +274,10 @@ namespace QQRobot
                 if (son.ImgUrls.Length > 0)
                 {
                     string[] newUrls = new string[father.ImgUrls.Length + son.ImgUrls.Length];
+                    for (int i = 0; i < father.ImgUrls.Length; i++)
+                    {
+                        newUrls[i] = father.ImgUrls[i];
+                    }
                     for (int i = 0; i < son.ImgUrls.Length; i++)
                     {
                         newUrls[i + father.ImgUrls.Length] = son.ImgUrls[i];
