@@ -347,6 +347,5 @@ namespace SocketWin32Api
             }
             return sb.ToString();
         }
-
     }
 }
