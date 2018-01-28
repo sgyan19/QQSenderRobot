@@ -153,10 +153,11 @@ namespace QQRobot
                 if (img != null)
                 {
                     Clipboard.SetImage(img);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                     SenderApi.QQPasteln(mHwnd);
                 }
             }
+            Thread.Sleep(1000);
             SenderApi.QQSumbit(mHwnd);
         }
 
@@ -186,10 +187,11 @@ namespace QQRobot
                 if (img != null)
                 {
                     Clipboard.SetImage(img);
-                    Thread.Sleep(1000);
+                    Thread.Sleep(2000);
                     SenderApi.QQPasteln(mHwnd);
                 }
             }
+            Thread.Sleep(1000);
             if (!string.IsNullOrEmpty(source))
             {
                 Clipboard.Clear();
