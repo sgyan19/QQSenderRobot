@@ -24,6 +24,7 @@ namespace QQRobot
         public bool ifLog;      // 是否日志开关
         public bool showHeader;
         public bool showFooter;
+        public string ip;
 
         public void NewData(BaseData[] newWeibos, BaseData[] all, BaseUser user)
         {
@@ -39,7 +40,7 @@ namespace QQRobot
                 }
                 if (showFooter)
                 {
-                    source = "本信息来自[" + user.Source + "] ";
+                    source = "本信息来自[" + user.Source + "] " + (ip == null ? "" : ("taker ip:" + ip)) + " ";
                 }
             }
             if(newWeibos.Length > 5)

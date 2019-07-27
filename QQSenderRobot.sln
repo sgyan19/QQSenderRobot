@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQRobot", "QQRobot\QQRobot.csproj", "{8585F112-CCFB-4150-8996-9343C540F6A4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -113,12 +113,12 @@ Global
 		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x64.Build.0 = Release|Any CPU
 		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x86.ActiveCfg = Release|Any CPU
 		{76FC909D-BDA2-4FCE-9B9F-B503A13DF44F}.Release|x86.Build.0 = Release|Any CPU
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|Any CPU.ActiveCfg = Release|x86
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x64.ActiveCfg = Release|x86
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x86.ActiveCfg = Release|x86
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|Any CPU.ActiveCfg = Release|x86
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x64.ActiveCfg = Release|x86
-		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x86.ActiveCfg = Release|x86
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|Any CPU.ActiveCfg = Release
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x64.ActiveCfg = Release
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Debug|x86.ActiveCfg = Release
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|Any CPU.ActiveCfg = Release
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x64.ActiveCfg = Release
+		{53B9F28F-637E-4878-9031-2AE364ECB5FE}.Release|x86.ActiveCfg = Release
 		{3D9BE58C-9E70-438E-98F1-2FE9FFD85D41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3D9BE58C-9E70-438E-98F1-2FE9FFD85D41}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D9BE58C-9E70-438E-98F1-2FE9FFD85D41}.Debug|x64.ActiveCfg = Debug|Any CPU

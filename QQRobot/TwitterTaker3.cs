@@ -239,7 +239,7 @@ namespace QQRobot
             }
 
             Twitter son ;
-            if (father.QuotedStatus != null)
+            if (father.QuotedStatus != null && father.QuotedStatus.Text != null)
             {
                 son = father.QuotedStatus;
                 son = location302(son);
@@ -398,6 +398,10 @@ namespace QQRobot
 
         private Twitter location302(Twitter d)
         {
+            if(d == null || d.Text == null)
+            {
+                return d;
+            }
             MatchCollection matches = mHttpUriReg.Matches(d.Text);
             foreach (Match match in matches)
             {

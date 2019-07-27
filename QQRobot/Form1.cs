@@ -168,6 +168,7 @@ namespace QQRobot
             handle.ifLog = ifLog;
             handle.showHeader = ifHeader;
             handle.showFooter = ifFooter;
+            handle.ip = BlackRain.PageRequest.GetIPAddress();
             listBox2.Items.Clear();
             bool qqWindowReady = windows.Length <= 0 ? true : false;
             foreach (string win in windows)

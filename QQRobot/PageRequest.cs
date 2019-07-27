@@ -8,6 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
 
 namespace BlackRain
 {
@@ -1049,8 +1050,8 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
-                httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
-                httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
+                //httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
+                //httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
@@ -1062,7 +1063,7 @@ namespace BlackRain
                 httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
                 httpRequest.Method = "GET";
                 httpRequest.KeepAlive = true;
-                //httpRequest.Referer = referer;
+                httpRequest.Referer = referer;
                 httpRequest.AllowAutoRedirect = false;
                 httpRequest.Timeout = 10 * 1000;
                 if (!string.IsNullOrEmpty(proxy))
@@ -2115,7 +2116,42 @@ namespace BlackRain
             }
             return _returnData;
         }
+
+        public static string GetIPAddress()
+        {
+            string ip = null;
+            try
+            {
+                WebClient MyWebClient = new WebClient();
+                //MyWebClient.Credentials = CredentialCache.DefaultCredentials;//获取或设置用于向Internet资源的请求进行身份验证的网络凭据
+
+                Byte[] pageData = MyWebClient.DownloadData("http://www.net.cn/static/customercare/yourip.asp"); //从指定网站下载数据
+
+                string pageHtml = Encoding.Default.GetString(pageData);  //如果获取网站页面采用的是GB2312，则使用这句
+
+                System.Text.RegularExpressions.Regex regex = new System.Text.RegularExpressions.Regex("((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}");
+
+                Match match = regex.Match(pageHtml);
+                if (match.Success)
+                {
+                    ip = match.Value;
+                }
+
+                //string pageHtml = Encoding.UTF8.GetString(pageData); //如果获取网站页面采用的是UTF-8，则使用这句
+
+                //string[] str = XmlElement.GetElementsByTagName(pageHtml, "h2");
+                //string[] str1 = str[0].Replace("<h2>", "").Split(',');
+
+                //ip = str1[0];
+            }
+            catch (WebException webEx)
+            {
+                webEx.Message.ToString();
+            }
+            return ip;
+        }
     }
+
     /// <summary>
     /// 上传文件
     /// </summary>
