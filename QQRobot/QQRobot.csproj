@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoLoginConnect.cs" />
+    <Compile Include="ClipboardWrapper.cs" />
     <Compile Include="ImageHelper.cs" />
     <Compile Include="FileHelper.cs" />
     <Compile Include="Sender.cs" />

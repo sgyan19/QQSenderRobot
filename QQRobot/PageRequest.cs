@@ -9,6 +9,8 @@ using System.IO.Compression;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BlackRain
 {
@@ -896,6 +898,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
                 httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
@@ -944,6 +952,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
                 httpRequest.UserAgent = "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
                 httpRequest.ContentType = "text/html; charset=gb2312";
@@ -996,6 +1010,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
@@ -1040,6 +1060,8 @@ namespace BlackRain
         }
         public string GetData3(string _url, string proxy, string _cookie, string referer)
         {
+            //_cookie = "_ga=GA1.2.1925591421.1479559350; remember_checked_on=1; twid=u%3D2879092268; auth_token=B02CF0F18B62E928D130488D99E4675750C903F3; personalization_id=\"v1_HeAF5RbHvLIHYe / zPxIZHQ == \"; guest_id=v1%3A154303681339369187; csrf_same_site_set=1; csrf_same_site=1; external_referer=padhuUp37zjgzgv1mFWxJ12Ozwit7owX|0|8e8t2xd8A2w%3D; rweb_optin=side_no_out; ct0=6c5d224ce1e474b9c565935ccfa51fd9; _gid=GA1.2.659604938.1564493882; lang=zh-cn";
+            referer = "";
             string _returnData = "";
             _cookie = _cookie.Replace(';', ',');
             _cookie = _cookie.TrimStart(',');
@@ -1050,6 +1072,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 //httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
                 //httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
@@ -1058,6 +1086,7 @@ namespace BlackRain
                 httpRequest.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
                 httpRequest.Headers.Add("Accept-Encoding", "gzip, deflate, br");//压缩
                 httpRequest.Headers.Add("Cache-Control", "gzip, deflate, br");//压缩
+                httpRequest.Headers.Add("Upgrade-Insecure-Requests", "1");
                 httpRequest.UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:49.0) Gecko/20100101 Firefox/49.0";// : "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.2; Trident/4.0; .NET";
                 httpRequest.ContentType = "text/html; charset=gb2312";
                 httpRequest.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8, */*";//各类图片匹配
@@ -1065,7 +1094,7 @@ namespace BlackRain
                 httpRequest.KeepAlive = true;
                 httpRequest.Referer = referer;
                 httpRequest.AllowAutoRedirect = false;
-                httpRequest.Timeout = 10 * 1000;
+                httpRequest.Timeout = 20 * 1000;
                 if (!string.IsNullOrEmpty(proxy))
                 {
                     try
@@ -1077,17 +1106,30 @@ namespace BlackRain
                 }
                 //httpRequest.Timeout = 20000;
                 HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
-                Stream webstream = web.GetResponseStream();
-                if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
-                    _returnData = GZipDecompress(webstream);
+
+                /*
+                string location = web.Headers["Location"] != null ? web.Headers["Location"] : "";
+
+                if (web.StatusCode == HttpStatusCode.Found && !string.IsNullOrEmpty(location))
+                {
+                    _returnData = GetData3(uri.Scheme + "://" + uri.Host + location, proxy, _cookie, _url);
+                }
                 else
                 {
-                    using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.Default))
+                */
+                    Stream webstream = web.GetResponseStream();
+                    if (web.Headers["Content-Encoding"] != null && web.Headers["Content-Encoding"].ToLower().IndexOf("gzip") != -1)
+                        _returnData = GZipDecompress(webstream);
+                    else
                     {
-                        _returnData = sr.ReadToEnd();
+                        using (StreamReader sr = new StreamReader(webstream, System.Text.Encoding.UTF8))
+                        {
+                            _returnData = sr.ReadToEnd();
+                        }
                     }
-                }
-                webstream.Close();
+                    webstream.Close();
+                /*
+                }*/
                 web.Close();
             }
             catch (Exception e)
@@ -1109,6 +1151,12 @@ namespace BlackRain
             #endregion
 
             #region 对httpWebRequest对象属性填充
+            if (_url.StartsWith("https"))
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                httpWebRequest.ProtocolVersion = HttpVersion.Version10;
+            }
             //对httpWebRequest对象属性填充
             httpWebRequest.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.Revalidate);
             CookieContainer cookieCon = new CookieContainer();
@@ -1154,6 +1202,12 @@ namespace BlackRain
             #endregion
 
             #region 对httpWebRequest对象属性填充
+            if (_url.StartsWith("https"))
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                httpWebRequest.ProtocolVersion = HttpVersion.Version10;
+            }
             //对httpWebRequest对象属性填充
             httpWebRequest.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.Revalidate);
             httpWebRequest.CookieContainer = _cookie;
@@ -1214,6 +1268,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
                 httpRequest.Headers.Add("Accept-Encoding", "gzip,deflate");//压缩
                 //httpRequest.Headers.Add("Cache-Control", "max-age=0");
@@ -1254,6 +1314,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1296,6 +1362,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1346,6 +1418,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1401,6 +1479,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1468,6 +1552,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3");
@@ -1542,6 +1632,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1584,6 +1680,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 if (!String.IsNullOrEmpty(_cookie))
                     httpRequest.CookieContainer.SetCookies(uri, _cookie);
@@ -1636,6 +1738,12 @@ namespace BlackRain
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
                 httpRequest = webRequest as HttpWebRequest;
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    httpRequest.ProtocolVersion = HttpVersion.Version10;
+                }
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
                 httpRequest.Headers.Add("Accept-Language", "zh-cn,en-us;q=0.5");
@@ -1689,6 +1797,13 @@ namespace BlackRain
                 HttpWebRequest httpRequest = null;
                 Uri uri = new Uri(_url);
                 webRequest = WebRequest.Create(uri);
+                if (_url.StartsWith("https"))
+                {
+                    ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                    ((HttpWebRequest)webRequest).ProtocolVersion = HttpVersion.Version10;
+                }
+
                 httpRequest = webRequest as HttpWebRequest;
                 httpRequest.CookieContainer = new CookieContainer();
                 httpRequest.CookieContainer.SetCookies(uri, _cookie);
@@ -1740,6 +1855,12 @@ namespace BlackRain
         public string GetHtmlSession(string url)
         {
             WebRequest webRequest = WebRequest.Create(new Uri(url));
+            if (url.StartsWith("https"))
+            {
+                ServicePointManager.ServerCertificateValidationCallback = new RemoteCertificateValidationCallback(CheckValidationResult);
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Ssl3;
+                ((HttpWebRequest)webRequest).ProtocolVersion = HttpVersion.Version10;
+            }
             webRequest.Credentials = CredentialCache.DefaultCredentials;
             HttpWebRequest httpWebRequest = webRequest as HttpWebRequest;
             httpWebRequest.KeepAlive = true;
@@ -2005,6 +2126,11 @@ namespace BlackRain
                 return mstream.ToArray();
             }
         }
+ 
+        private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
+        {
+            return true; //总是接受 
+        }
         public Dictionary<string, string> Head(int type, Dictionary<string, string> headers, params string[] args)
         {
             switch (type)
@@ -2062,6 +2188,48 @@ namespace BlackRain
                     }
                 }
                 */
+                webstream.Close();
+                web.Close();
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+            return _returnData;
+        }
+
+        public string Location(string _url, string proxy, WebHeaderCollection headers)
+        {
+            string _returnData = "";
+            try
+            {
+                WebRequest webRequest = null;
+                HttpWebRequest httpRequest = null;
+                Uri uri = new Uri(_url);
+                webRequest = WebRequest.Create(uri);
+                httpRequest = webRequest as HttpWebRequest;
+                //httpRequest.Headers.Add("Cache-Control", "max-age=0");
+                httpRequest.AllowAutoRedirect = false;
+                if (headers != null)
+                {
+                    httpRequest.Headers = headers;
+                }
+                if (!string.IsNullOrEmpty(proxy))
+                {
+                    try
+                    {
+                        WebProxy webProxy = new WebProxy(proxy);
+                        httpRequest.Proxy = webProxy;
+                    }
+                    catch (Exception) { }
+                }
+                //httpRequest.Timeout = 20000;
+                HttpWebResponse web = (HttpWebResponse)httpRequest.GetResponse();
+                Stream webstream = web.GetResponseStream();
+                if (web.StatusCode == HttpStatusCode.Moved || web.StatusCode == HttpStatusCode.Found)
+                {
+                    _returnData = web.Headers["Location"];
+                }
                 webstream.Close();
                 web.Close();
             }

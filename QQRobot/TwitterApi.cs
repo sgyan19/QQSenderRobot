@@ -58,7 +58,7 @@ namespace QQRobot
             {
                 accessToken = GetAccessToken(proxy);
             }
-            string address = string.Format("https://api.twitter.com/1.1/statuses/user_timeline.json?count={0}&screen_name={1}&exclude_replies=false&contributor_details=true", 10, screenName);
+            string address = string.Format("https://api.twitter.com/1.1/statuses/user_timeline.json?tweet_mode=extended&count={0}&screen_name={1}&exclude_replies=false&contributor_details=true&full_text=true", 10, screenName);
             if (!string.IsNullOrEmpty(sinceId))
             {
                 address += string.Format("&since_id={0}", sinceId);
@@ -74,7 +74,7 @@ namespace QQRobot
             {
                 accessToken = GetAccessToken(proxy);
             }
-            string address = string.Format("https://twitter.com/i/profiles/show/{0}/timeline/tweets?composed_count=0&include_available_features=1&include_entities=1&include_new_items_bar=true&interval=30000&latent_count=0", screenName);
+            string address = string.Format("https://twitter.com/i/profiles/show/{0}/timeline/tweets?tweet_mode=extended&composed_count=0&include_available_features=1&include_entities=1&include_new_items_bar=true&interval=30000&latent_count=0", screenName);
             if (!string.IsNullOrEmpty(sinceId))
             {
                 address += string.Format("&min_position={0}", sinceId);
@@ -90,7 +90,7 @@ namespace QQRobot
             {
                 accessToken = GetAccessToken(proxy);
             }
-            string address = string.Format("https://api.twitter.com/1.1/statuses/show.json?id={0}&include_my_retweet=true&include_entities=true", tweetId);
+            string address = string.Format("https://api.twitter.com/1.1/statuses/show.json?tweet_mode=extended&id={0}&include_my_retweet=true&include_entities=true", tweetId);
             return mRequest.GetData(1, new Dictionary<string, string>(){
                 {"Authorization", "Bearer " + accessToken },
             }, address, proxy);

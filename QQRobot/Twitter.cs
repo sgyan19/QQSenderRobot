@@ -28,5 +28,7 @@ namespace QQRobot
         public bool EverUsed { set; get; }
 
         public string[] ExpandedUrls { set; get; }
+
+        public string FullText { set; get; }
     }
 }

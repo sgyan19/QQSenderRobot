@@ -1,12 +1,7 @@
 ﻿using SocketWin32Api;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace QQRobot
@@ -89,8 +84,8 @@ namespace QQRobot
         /// <param name="imgs"></param>
         public void mainThreadSend(string msg,Image[] imgs)
         {
-            Clipboard.Clear();
-            Clipboard.SetText(msg);
+            ClipboardWrapper.Clear();
+            ClipboardWrapper.SetText(msg);
             SenderApi.QQPasteln(mHwnd);
             if (imgs != null)
             {
@@ -98,7 +93,7 @@ namespace QQRobot
                 {
                     if (img != null)
                     {
-                        Clipboard.SetImage(img);
+                        ClipboardWrapper.SetImage(img);
                         Thread.Sleep(1000);
                         SenderApi.QQPaste(mHwnd);
                     }
@@ -134,25 +129,25 @@ namespace QQRobot
         /// <param name="imgs"></param>
         public void mainThreadSendWithUser(string userName, Image userHeader, string msg, Image[] imgs, string longImgPath)
         {
-            Clipboard.Clear();
+            ClipboardWrapper.Clear();
             if(userHeader != null)
             {
-                Clipboard.SetImage(userHeader);
+                ClipboardWrapper.SetImage(userHeader);
                 SenderApi.QQPaste(mHwnd);
             }
             if (!string.IsNullOrEmpty(userName))
             {
-                Clipboard.SetText(userName);
+                ClipboardWrapper.SetText(userName);
                 SenderApi.QQPasteln(mHwnd);
-                Clipboard.Clear();
+                ClipboardWrapper.Clear();
             }
-            Clipboard.SetText(msg);
+            ClipboardWrapper.SetText(msg);
             SenderApi.QQPasteln(mHwnd);
             foreach (Image img in imgs)
             {
                 if (img != null)
                 {
-                    Clipboard.SetImage(img);
+                    ClipboardWrapper.SetImage(img);
                     Thread.Sleep(2000);
                     SenderApi.QQPasteln(mHwnd);
                 }
@@ -168,25 +163,25 @@ namespace QQRobot
         /// <param name="imgs"></param>
         public void mainThreadSendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string longImgPath)
         {
-            Clipboard.Clear();
+            ClipboardWrapper.Clear();
             if (userHeader != null)
             {
-                Clipboard.SetImage(userHeader);
+                ClipboardWrapper.SetImage(userHeader);
                 SenderApi.QQPaste(mHwnd);
             }
             if (!string.IsNullOrEmpty(userName))
             {
-                Clipboard.SetText(userName);
+                ClipboardWrapper.SetText(userName);
                 SenderApi.QQPasteln(mHwnd);
-                Clipboard.Clear();
+                ClipboardWrapper.Clear();
             }
-            Clipboard.SetText(msg);
+            ClipboardWrapper.SetText(msg);
             SenderApi.QQPasteln(mHwnd);
             foreach (Image img in imgs)
             {
                 if (img != null)
                 {
-                    Clipboard.SetImage(img);
+                    ClipboardWrapper.SetImage(img);
                     Thread.Sleep(2000);
                     SenderApi.QQPasteln(mHwnd);
                 }
@@ -194,8 +189,8 @@ namespace QQRobot
             Thread.Sleep(1000);
             if (!string.IsNullOrEmpty(source))
             {
-                Clipboard.Clear();
-                Clipboard.SetText(source);
+                ClipboardWrapper.Clear();
+                ClipboardWrapper.SetText(source);
                 SenderApi.QQPasteAndSumbit(mHwnd);
             }
             else

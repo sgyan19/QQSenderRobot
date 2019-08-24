@@ -163,6 +163,7 @@ namespace QQRobot
             Twitter twitter = new Twitter
             {
                 Text = json["text"],
+                FullText = json["full_text"],
                 Id = json["id_str"],
                 TimeStamp = json["created_at"],
                 ImgUrls = json["extended_entities"]["media"] == null ? NoneStringArray : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
@@ -178,6 +179,12 @@ namespace QQRobot
                 QuotedStatusId = json["quoted_status_id_str"],
                 ExpandedUrls = json["entities"]["urls"] == null ? NoneStringArray : (json["entities"]["urls"] as JSONArray).Childs.Select((m) => ((string)m["expanded_url"])).ToArray(),
             };
+
+            if (!string.IsNullOrEmpty(twitter.FullText))
+            {
+                twitter.Text = twitter.FullText;
+            }
+
             try
             {
                 if (bool.Parse(twitter.IsQuoteStatus))
@@ -371,7 +378,7 @@ namespace QQRobot
                 tryRequest:
                     string html = null;
                     try {
-                        html = request.GetData(3, null, match.Value, Proxy, Cookie, "https://twitter.com/");
+                        html = request.GetData(3, null, match.Value, Proxy, Cookie, "https://api.twitter.com");
                     }catch(TimeoutException e)
                     {
                         goto tryRequest;
@@ -409,7 +416,7 @@ namespace QQRobot
             reTry:
                 try
                 {
-                    location = request.Location(match.Value, Proxy, null);
+                    location = request.Location(match.Value, Proxy, new Dictionary<string, string>(0));
                 }
                 catch (TimeoutException)
                 {

@@ -10,6 +10,7 @@ namespace QQRobot
 {
     class TwitterTaker2 : BaseTaker
     {
+        private string[] NoneStringArray = new string[0];
         private const string AtEndTemplet = "@([a-zA-Z\\d_ ]*?)$";
         private const string AtStartTemplet = "^(@[a-zA-Z\\d_]*?) ";
         private const string HttpUriTemplet = "https{0,1}://\\S{1,}";
@@ -126,12 +127,13 @@ namespace QQRobot
 
         private Twitter paserTwitterFormJson(JSONNode json)
         {
-            return new Twitter
+            Twitter twitter = new Twitter
             {
                 Text = json["text"],
+                FullText = json["full_text"],
                 Id = json["id_str"],
                 TimeStamp = json["created_at"],
-                ImgUrls = json["extended_entities"]["media"] == null ? new string[0] : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
+                ImgUrls = json["extended_entities"]["media"] == null ? NoneStringArray : (json["extended_entities"]["media"] as JSONArray).Childs.Select((m) => ((string)m["media_url"])).ToArray<string>(),
                 User = paserUserFormJson(json),
                 ReplyId = json["in_reply_to_status_id"],
                 Truncated = json["truncated"],
@@ -140,7 +142,28 @@ namespace QQRobot
                     ScreenName = json["in_reply_to_screen_name"],
                     UserId = json["in_reply_to_user_id_str"],
                 },
+                IsQuoteStatus = json["is_quote_status"],
+                QuotedStatusId = json["quoted_status_id_str"],
+                ExpandedUrls = json["entities"]["urls"] == null ? NoneStringArray : (json["entities"]["urls"] as JSONArray).Childs.Select((m) => ((string)m["expanded_url"])).ToArray(),
             };
+
+            if (!string.IsNullOrEmpty(twitter.FullText))
+            {
+                twitter.Text = twitter.FullText;
+            }
+
+            try
+            {
+                if (bool.Parse(twitter.IsQuoteStatus))
+                {
+                    twitter.QuotedStatus = paserTwitterFormJson(json["quoted_status"]);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            return twitter;
         }
 
         private TwitterUser paserUserFormJson(JSONNode json)
@@ -206,7 +229,7 @@ namespace QQRobot
                 reTry:
                     try
                     {
-                        location = request.Location(match.Value, Proxy, null);
+                        location = request.Location(match.Value, Proxy, new Dictionary<string, string>(0));
                     }
                     catch (TimeoutException)
                     {
