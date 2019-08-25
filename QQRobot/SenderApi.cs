@@ -8,7 +8,10 @@ using System.Text.RegularExpressions;
 using SocketWin32Api;
 
 namespace QQRobot
-{
+{    
+    /*
+     * 面向ctrl+enter发送窗口 
+     */
     class SenderApi
     {
         [DllImport(@"ClipboardQQSender.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]

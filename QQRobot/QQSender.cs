@@ -27,9 +27,9 @@ namespace QQRobot
         public static QQSender CreateSender(string wndNameRegex, Form form)
         {
             QQSender instance = null;
-            SenderApi.StartQQFindHwnd(wndNameRegex);
-            IntPtr hwnd = SenderApi.GetFindHwnd();
-            string wndName = SenderApi.GetFindWndName();
+            SenderApi2.StartQQFindHwnd(wndNameRegex);
+            IntPtr hwnd = SenderApi2.GetFindHwnd();
+            string wndName = SenderApi2.GetFindWndName();
             if (Win32Api.IsWindow(hwnd))
             {
                 instance = new QQSender();
@@ -54,7 +54,7 @@ namespace QQRobot
         /// <param name="e"></param>
         private static void HeartbeatTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            SenderApi.QQHeartbeat(HeartbeatHwnd);
+            SenderApi2.QQHeartbeat(HeartbeatHwnd);
         }
         /// <summary>
         /// 获取窗口名
@@ -86,7 +86,7 @@ namespace QQRobot
         {
             ClipboardWrapper.Clear();
             ClipboardWrapper.SetText(msg);
-            SenderApi.QQPasteln(mHwnd);
+            SenderApi2.QQPasteln(mHwnd);
             if (imgs != null)
             {
                 foreach (Image img in imgs)
@@ -95,11 +95,11 @@ namespace QQRobot
                     {
                         ClipboardWrapper.SetImage(img);
                         Thread.Sleep(1000);
-                        SenderApi.QQPaste(mHwnd);
+                        SenderApi2.QQPaste(mHwnd);
                     }
                 }
             }
-            SenderApi.QQSumbit(mHwnd);
+            SenderApi2.QQSumbit(mHwnd);
         }
         /// <summary>
         /// 心跳代理
@@ -107,7 +107,7 @@ namespace QQRobot
         private delegate void Heartbeat();
         public void heartbeat()
         {
-            SenderApi.QQHeartbeat(mHwnd);
+            SenderApi2.QQHeartbeat(mHwnd);
         }
 
         public override void sendWithUser(string userName, Image userHeader, string source, string msg, Image[] imgs, string longImgPath)
@@ -133,27 +133,27 @@ namespace QQRobot
             if(userHeader != null)
             {
                 ClipboardWrapper.SetImage(userHeader);
-                SenderApi.QQPaste(mHwnd);
+                SenderApi2.QQPaste(mHwnd);
             }
             if (!string.IsNullOrEmpty(userName))
             {
                 ClipboardWrapper.SetText(userName);
-                SenderApi.QQPasteln(mHwnd);
+                SenderApi2.QQPasteln(mHwnd);
                 ClipboardWrapper.Clear();
             }
             ClipboardWrapper.SetText(msg);
-            SenderApi.QQPasteln(mHwnd);
+            SenderApi2.QQPasteln(mHwnd);
             foreach (Image img in imgs)
             {
                 if (img != null)
                 {
                     ClipboardWrapper.SetImage(img);
                     Thread.Sleep(2000);
-                    SenderApi.QQPasteln(mHwnd);
+                    SenderApi2.QQPasteln(mHwnd);
                 }
             }
             Thread.Sleep(1000);
-            SenderApi.QQSumbit(mHwnd);
+            SenderApi2.QQSumbit(mHwnd);
         }
 
         /// <summary>
@@ -167,23 +167,23 @@ namespace QQRobot
             if (userHeader != null)
             {
                 ClipboardWrapper.SetImage(userHeader);
-                SenderApi.QQPaste(mHwnd);
+                SenderApi2.QQPaste(mHwnd);
             }
             if (!string.IsNullOrEmpty(userName))
             {
                 ClipboardWrapper.SetText(userName);
-                SenderApi.QQPasteln(mHwnd);
+                SenderApi2.QQPasteln(mHwnd);
                 ClipboardWrapper.Clear();
             }
             ClipboardWrapper.SetText(msg);
-            SenderApi.QQPasteln(mHwnd);
+            SenderApi2.QQPasteln(mHwnd);
             foreach (Image img in imgs)
             {
                 if (img != null)
                 {
                     ClipboardWrapper.SetImage(img);
                     Thread.Sleep(2000);
-                    SenderApi.QQPasteln(mHwnd);
+                    SenderApi2.QQPasteln(mHwnd);
                 }
             }
             Thread.Sleep(1000);
@@ -191,11 +191,11 @@ namespace QQRobot
             {
                 ClipboardWrapper.Clear();
                 ClipboardWrapper.SetText(source);
-                SenderApi.QQPasteAndSumbit(mHwnd);
+                SenderApi2.QQPasteAndSumbit(mHwnd);
             }
             else
             {
-                SenderApi.QQSumbit(mHwnd);
+                SenderApi2.QQSumbit(mHwnd);
             }
         }
 

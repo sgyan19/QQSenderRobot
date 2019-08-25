@@ -239,11 +239,22 @@ namespace QQRobot
 
         private void button5_Click(object sender, EventArgs e)
         {
+            
             string num = textBox6.Text;
             int n = int.Parse(num);
-            if (n > 5) n = 5;
+            if (n > 9) n = 9;
             if (n < 0) return;
             server.handLastTime(n);
+            
+            /*
+            IntPtr ptr = SenderApi2.GetFindHwnd();
+            ClipboardWrapper.Clear();
+            ClipboardWrapper.SetText("TEST\nLine2");
+            SenderApi2.QQPasteln(ptr);
+            ClipboardWrapper.Clear();
+            ClipboardWrapper.SetText("Line3");
+            SenderApi2.QQPasteAndSumbit(ptr);
+            */
         }
     }
 }

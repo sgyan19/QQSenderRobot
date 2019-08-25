@@ -98,6 +98,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Handle.cs" />
+    <Compile Include="SenderApi2.cs" />
     <Compile Include="TwitterApi.cs" />
     <Compile Include="TwitterTaker.cs" />
     <Compile Include="TwitterTaker3.cs" />
